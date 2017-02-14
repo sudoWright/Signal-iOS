@@ -4,7 +4,6 @@ SHELL=/bin/bash -o pipefail -o errexit
 # iPhone6, iOS10
 DEVICE_UUID:=$(shell xcrun instruments -s | grep -o "iPhone 6 (10.0) \[.*\]" | grep -o "\[.*\]" | sed "s/^\[\(.*\)\]$$/\1/")
 BUILD_DESTINATION = platform=iOS Simulator,id=${DEVICE_UUID}
-WORKING_DIR = ./
 SCHEME = Signal
 XCODE_BUILD = xcrun xcodebuild -workspace $(SCHEME).xcworkspace -scheme $(SCHEME) -sdk iphonesimulator
 
@@ -15,26 +14,23 @@ default: test
 ci: dependencies test
 
 dependencies:
-	cd $(WORKING_DIR) && \
-		git submodule update --init
-		pod install
-		carthage build --platform iOS
+	git submodule update --init && \
+	cd Vendor && \
+	pod install && \
+	carthage build --platform iOS
 
 build: dependencies
-	cd $(WORKING_DIR) && \
-		$(XCODE_BUILD) build | xcpretty
+	$(XCODE_BUILD) build | xcpretty
 
 test: optional_early_start_simulator
-	cd $(WORKING_DIR) && \
-		$(XCODE_BUILD) \
-			-destination '${BUILD_DESTINATION}' \
-			test | xcpretty
+	$(XCODE_BUILD) \
+		-destination '${BUILD_DESTINATION}' \
+		test | xcpretty
 
 clean:
-	cd $(WORKING_DIR) && \
-		rm -fr Carthage/Build && \
-		$(XCODE_BUILD) \
-			clean | xcpretty
+	rm -fr Vendor/Carthage/Build && \
+	$(XCODE_BUILD) \
+		clean | xcpretty
 
 optional_early_start_simulator:
 ifdef EARLY_START_SIMULATOR
