@@ -347,6 +347,7 @@ public class PreparedOutgoingMessage {
             return storyMessage.message
         case .transient(let message):
             // Do send states even matter for transient messages?
+            // Yes.
             return message
         }
     }
