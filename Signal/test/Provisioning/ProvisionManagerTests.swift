@@ -174,7 +174,7 @@ private class MockLinkAndSyncManager: LinkAndSyncManager {
         auth: ChatServiceAuth,
         ephemeralBackupKey: MessageRootBackupKey,
         progress: OWSSequentialProgressRootSink<SecondaryLinkNSyncProgressPhase>,
-    ) async throws(SecondaryLinkNSyncError) {
+    ) async throws {
         return
     }
 }

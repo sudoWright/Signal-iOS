@@ -31,13 +31,6 @@ protocol ProvisioningCoordinator {
     ) async throws(CompleteProvisioningError)
 }
 
-protocol ProvisioningLinkAndSyncError {
-    var error: SecondaryLinkNSyncError { get }
-    func retryLinkAndSync() async throws(CompleteProvisioningError)
-    func continueWithoutSyncing() async throws(CompleteProvisioningError)
-    func restartProvisioning() async throws
-}
-
 enum CompleteProvisioningError: Error {
     /// This device was previously linked (or was previously a registered primary)
     /// but the new linking was being done with a different account, which is disallowed.
@@ -47,7 +40,7 @@ enum CompleteProvisioningError: Error {
     /// The server told us the number of devices on the account has exceeded the limit.
     case deviceLimitExceededError(DeviceLimitExceededError)
 
-    case linkAndSyncError(ProvisioningLinkAndSyncError)
+    case linkAndSyncError(ProvisioningCoordinatorImpl.LinkAndSyncError)
 
     case genericError(Error)
 }

@@ -121,8 +121,8 @@ class ProvisioningCoordinatorImpl: ProvisioningCoordinator {
 
     // MARK: Link'n'Sync
 
-    private class LinkAndSyncError: ProvisioningLinkAndSyncError {
-        let error: SecondaryLinkNSyncError
+    class LinkAndSyncError {
+        let error: any Error
         let ephemeralBackupKey: MessageRootBackupKey
         let authedDevice: AuthedDevice.Explicit
         let progressViewModel: LinkAndSyncSecondaryProgressViewModel
@@ -130,7 +130,7 @@ class ProvisioningCoordinatorImpl: ProvisioningCoordinator {
         weak var provisioningCoordinator: ProvisioningCoordinatorImpl?
 
         init(
-            error: SecondaryLinkNSyncError,
+            error: any Error,
             ephemeralBackupKey: MessageRootBackupKey,
             authedDevice: AuthedDevice.Explicit,
             progressViewModel: LinkAndSyncSecondaryProgressViewModel,
@@ -475,8 +475,8 @@ class ProvisioningCoordinatorImpl: ProvisioningCoordinator {
                 ephemeralBackupKey: ephemeralBackupKey,
                 progress: linkNSyncProgress,
             )
-        } catch let error {
-            Logger.error("Failed link'n'sync \(error)")
+        } catch {
+            Logger.warn("Failed link'n'sync \(error)")
             throw .linkAndSyncError(LinkAndSyncError(
                 error: error,
                 ephemeralBackupKey: ephemeralBackupKey,

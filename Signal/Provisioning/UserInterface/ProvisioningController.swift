@@ -435,12 +435,12 @@ class ProvisioningController: NSObject {
                     // to that before jumping again to the chat list.
                     self.provisioningDidComplete(from: viewController)
                 } catch var error as CompleteProvisioningError {
-                    if case let .linkAndSyncError(provisioningLinkAndSyncError) = error {
-                        switch provisioningLinkAndSyncError.error {
-                        case .primaryFailedBackupExport(let continueWithoutSyncing):
+                    if case let .linkAndSyncError(linkAndSyncError) = error {
+                        switch linkAndSyncError.error {
+                        case SecondaryLinkNSyncError.primaryFailedBackupExport(let continueWithoutSyncing):
                             if continueWithoutSyncing {
                                 do {
-                                    try await provisioningLinkAndSyncError.continueWithoutSyncing()
+                                    try await linkAndSyncError.continueWithoutSyncing()
                                     self.provisioningDidComplete(from: viewController)
                                     return
                                 } catch let innerError as CompleteProvisioningError {
@@ -448,17 +448,17 @@ class ProvisioningController: NSObject {
                                 }
                             } else {
                                 // Crash if this fails; things have gone horribly wrong.
-                                try! await provisioningLinkAndSyncError.restartProvisioning()
+                                try! await linkAndSyncError.restartProvisioning()
                                 await self.resetBackToQrCodeController(
                                     from: viewController,
                                     navigationController: navigationController,
                                 )
                                 return
                             }
-                        case .cancelled:
+                        case is CancellationError:
                             // Exit provisioning if we cancelled
                             do {
-                                try await provisioningLinkAndSyncError.continueWithoutSyncing()
+                                try await linkAndSyncError.continueWithoutSyncing()
                                 self.provisioningDidComplete(from: viewController)
                                 return
                             } catch let innerError as CompleteProvisioningError {
@@ -618,7 +618,7 @@ class ProvisioningController: NSObject {
     }
 
     private func linkAndSyncRetryActionSheet(
-        error: ProvisioningLinkAndSyncError,
+        error: ProvisioningCoordinatorImpl.LinkAndSyncError,
         from viewController: ProvisioningQRCodeViewController,
         navigationController: UINavigationController,
         progressViewModel: LinkAndSyncSecondaryProgressViewModel,
@@ -631,26 +631,16 @@ class ProvisioningController: NSObject {
 
         let errorPromptMode: ErrorPromptMode
         let errorMessage: String?
-        switch error.error {
-        case .errorRestoringBackup:
+        if case SecondaryLinkNSyncError.errorRestoringBackup = error.error {
             errorPromptMode = .contactSupport
             errorMessage = nil
-        case .errorDownloadingBackup, .networkError:
+        } else if error.error.isNetworkFailureOrTimeout {
             errorPromptMode = .networkErrorRetry
             errorMessage = OWSLocalizedString(
                 "SECONDARY_LINKING_SYNCING_NETWORK_ERROR_MESSAGE",
                 comment: "Message for action sheet when secondary device fails to sync messages due to network error.",
             )
-        case .primaryFailedBackupExport:
-            owsFailDebug("No prompt for this case")
-            fallthrough
-        case .errorWaitingForBackup, .cancelled:
-            errorPromptMode = .restartProvisioning
-            errorMessage = OWSLocalizedString(
-                "SECONDARY_LINKING_SYNCING_OTHER_ERROR_MESSAGE",
-                comment: "Message for action sheet when secondary device fails to sync messages due to an unspecified error.",
-            )
-        case .unsupportedBackupVersion:
+        } else if case BackupImportError.unsupportedVersion = error.error {
             let actionSheet = ActionSheetController(
                 title: OWSLocalizedString(
                     "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE",
@@ -680,6 +670,12 @@ class ProvisioningController: NSObject {
                 }
             })
             return actionSheet
+        } else {
+            errorPromptMode = .restartProvisioning
+            errorMessage = OWSLocalizedString(
+                "SECONDARY_LINKING_SYNCING_OTHER_ERROR_MESSAGE",
+                comment: "Message for action sheet when secondary device fails to sync messages due to an unspecified error.",
+            )
         }
 
         let retryActionSheet = ActionSheetController(
