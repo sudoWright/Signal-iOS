@@ -35,7 +35,7 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value);
 
 #pragma mark -
 
-@interface TSInteraction : BaseModel <NSCopying>
+@interface TSInteraction : BaseModel
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;

@@ -222,14 +222,6 @@ NSString *NSStringFromTSPaymentFailure(TSPaymentFailure value)
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSPaymentAddress *result = [[[self class] allocWithZone:zone] init];
-    result->_currency = self.currency;
-    result->_mobileCoinPublicAddressData = self.mobileCoinPublicAddressData;
-    return result;
-}
-
 @end
 
 #pragma mark -

@@ -74,13 +74,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSOutgoingArchivedPaymentMessage *result = [super copyWithZone:zone];
-    result->_archivedPaymentInfo = self.archivedPaymentInfo;
-    return result;
-}
-
 - (instancetype)initOutgoingArchivedPaymentMessageWithBuilder:(TSOutgoingMessageBuilder *)messageBuilder
                                                        amount:(nullable NSString *)amount
                                                           fee:(nullable NSString *)fee

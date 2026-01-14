@@ -73,13 +73,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSProfileKeyMessage *result = [super copyWithZone:zone];
-    result->_profileKey = self.profileKey;
-    return result;
-}
-
 - (BOOL)shouldBeSaved
 {
     return NO;

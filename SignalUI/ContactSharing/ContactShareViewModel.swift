@@ -153,6 +153,8 @@ public class ContactShareViewModel: NSObject {
     }
 
     public func copyForRendering() -> ContactShareViewModel {
+        // for compiler enforcement
+        _ = dbRecord as NSCopying
         let newDbRecord = dbRecord.copy() as! OWSContact
         return ContactShareViewModel(
             contactShareRecord: newDbRecord,

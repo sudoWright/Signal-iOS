@@ -142,6 +142,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)copyWithIsEnabled:(BOOL)isEnabled timerVersion:(uint32_t)timerVersion
 {
+    // for compiler enforcement
+    id<NSCopying> selfToCopy = self;
+    (void)selfToCopy;
     OWSDisappearingMessagesConfiguration *newInstance = [self copy];
     newInstance.enabled = isEnabled;
     newInstance.timerVersion = timerVersion;
@@ -153,6 +156,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)copyWithDurationSeconds:(uint32_t)durationSeconds timerVersion:(uint32_t)timerVersion
 {
+    // for compiler enforcement
+    id<NSCopying> selfToCopy = self;
+    (void)selfToCopy;
     OWSDisappearingMessagesConfiguration *newInstance = [self copy];
     newInstance.durationSeconds = durationSeconds;
     newInstance.timerVersion = timerVersion;
@@ -161,6 +167,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)copyAsEnabledWithDurationSeconds:(uint32_t)durationSeconds timerVersion:(uint32_t)timerVersion
 {
+    // for compiler enforcement
+    id<NSCopying> selfToCopy = self;
+    (void)selfToCopy;
     OWSDisappearingMessagesConfiguration *newInstance = [self copy];
     newInstance.enabled = YES;
     newInstance.durationSeconds = durationSeconds;

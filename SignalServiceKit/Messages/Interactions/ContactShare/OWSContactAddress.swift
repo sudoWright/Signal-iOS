@@ -6,7 +6,7 @@
 public import Contacts
 
 @objc(OWSContactAddress)
-public final class OWSContactAddress: NSObject, NSSecureCoding, NSCopying, OWSContactField {
+public final class OWSContactAddress: NSObject, NSSecureCoding, OWSContactField {
     public static var supportsSecureCoding: Bool { true }
 
     public init?(coder: NSCoder) {
@@ -76,10 +76,6 @@ public final class OWSContactAddress: NSObject, NSSecureCoding, NSCopying, OWSCo
         guard self.region == object.region else { return false }
         guard self.street == object.street else { return false }
         return true
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return self
     }
 
     @objc(OWSContactAddressType)

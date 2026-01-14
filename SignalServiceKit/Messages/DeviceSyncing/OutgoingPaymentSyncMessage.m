@@ -170,23 +170,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OutgoingPaymentMobileCoin *result = [[[self class] allocWithZone:zone] init];
-    result->_amountPicoMob = self.amountPicoMob;
-    result->_blockIndex = self.blockIndex;
-    result->_blockTimestamp = self.blockTimestamp;
-    result->_feePicoMob = self.feePicoMob;
-    result->_isDefragmentation = self.isDefragmentation;
-    result->_memoMessage = self.memoMessage;
-    result->_outputPublicKeys = self.outputPublicKeys;
-    result->_receiptData = self.receiptData;
-    result->_recipientAddress = self.recipientAddress;
-    result->_recipientUuidString = self.recipientUuidString;
-    result->_spentKeyImages = self.spentKeyImages;
-    return result;
-}
-
 - (nullable AciObjC *)recipientAci
 {
     return [[AciObjC alloc] initWithAciString:self.recipientUuidString];
@@ -261,13 +244,6 @@ NS_ASSUME_NONNULL_BEGIN
         return NO;
     }
     return YES;
-}
-
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OutgoingPaymentSyncMessage *result = [super copyWithZone:zone];
-    result->_mobileCoin = self.mobileCoin;
-    return result;
 }
 
 - (nullable SSKProtoSyncMessageBuilder *)syncMessageBuilderWithTransaction:(DBReadTransaction *)transaction

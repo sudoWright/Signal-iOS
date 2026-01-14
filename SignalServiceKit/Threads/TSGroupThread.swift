@@ -25,6 +25,7 @@ extension TSGroupThread {
                 }
             }
 
+            _ = newGroupModel as NSCopying
             groupThread.groupModel = newGroupModel.copy() as! TSGroupModel
         }
 

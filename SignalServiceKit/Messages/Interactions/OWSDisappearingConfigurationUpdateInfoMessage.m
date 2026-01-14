@@ -55,16 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSDisappearingConfigurationUpdateInfoMessage *result = [super copyWithZone:zone];
-    result->_configurationDurationSeconds = self.configurationDurationSeconds;
-    result->_configurationIsEnabled = self.configurationIsEnabled;
-    result->_createdByRemoteName = self.createdByRemoteName;
-    result->_createdInExistingGroup = self.createdInExistingGroup;
-    return result;
-}
-
 - (instancetype)initWithContactThread:(TSContactThread *)contactThread
                             timestamp:(uint64_t)timestamp
                isConfigurationEnabled:(BOOL)isConfigurationEnabled

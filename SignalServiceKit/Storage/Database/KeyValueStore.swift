@@ -336,7 +336,7 @@ public struct KeyValueStore {
         return self.getArray(key, ofClass: NSString.self, transaction: transaction) as [String]?
     }
 
-    public func getSet<DecodedObject: NSObject & NSSecureCoding>(_ key: String, ofClass cls: DecodedObject.Type, transaction: DBReadTransaction) -> Set<DecodedObject>? {
+    public func getSet<DecodedObject: NSObject & NSCopying & NSSecureCoding>(_ key: String, ofClass cls: DecodedObject.Type, transaction: DBReadTransaction) -> Set<DecodedObject>? {
         return self.getObject(key, ofClasses: [NSSet.self, cls], transaction: transaction) as? Set<DecodedObject>
     }
 

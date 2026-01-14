@@ -39,12 +39,6 @@ class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.contents = self.contents
-        return result
-    }
-
     typealias Outgoing = DeleteForMeSyncMessage.Outgoing
 
     struct Contents: Codable {

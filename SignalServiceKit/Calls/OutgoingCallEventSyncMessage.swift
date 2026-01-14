@@ -132,12 +132,6 @@ public class OutgoingCallEventSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.callEvent = self.callEvent
-        return result
-    }
-
     /// The call event.
     private(set) var callEvent: OutgoingCallEvent!
 

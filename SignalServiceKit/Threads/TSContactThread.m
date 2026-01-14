@@ -106,15 +106,6 @@ lastVisibleSortIdOnScreenPercentageObsolete:lastVisibleSortIdOnScreenPercentageO
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSContactThread *result = [super copyWithZone:zone];
-    result->_contactPhoneNumber = self.contactPhoneNumber;
-    result->_contactUUID = self.contactUUID;
-    result->_hasDismissedOffers = self.hasDismissedOffers;
-    return result;
-}
-
 - (instancetype)initWithContactUUID:(nullable NSString *)contactUUID
                  contactPhoneNumber:(nullable NSString *)contactPhoneNumber
 {

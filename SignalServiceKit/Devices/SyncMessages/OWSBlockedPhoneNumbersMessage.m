@@ -82,15 +82,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSBlockedPhoneNumbersMessage *result = [super copyWithZone:zone];
-    result->_groupIds = self.groupIds;
-    result->_phoneNumbers = self.phoneNumbers;
-    result->_uuids = self.uuids;
-    return result;
-}
-
 - (instancetype)initWithLocalThread:(TSContactThread *)localThread
                        phoneNumbers:(NSArray<NSString *> *)phoneNumbers
                          aciStrings:(NSArray<NSString *> *)aciStrings

@@ -149,15 +149,6 @@ NSString *NSStringFromCallType(RPRecentCallType callType)
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSCall *result = [super copyWithZone:zone];
-    result->_callType = self.callType;
-    result->_offerType = self.offerType;
-    result->_read = self.read;
-    return result;
-}
-
 - (OWSInteractionType)interactionType
 {
     return OWSInteractionType_Call;

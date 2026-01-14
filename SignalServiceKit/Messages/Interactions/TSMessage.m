@@ -466,36 +466,6 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSMessage *result = [super copyWithZone:zone];
-    result->_body = self.body;
-    result->_bodyRanges = self.bodyRanges;
-    result->_contactShare = self.contactShare;
-    result->_deprecated_attachmentIds = self.deprecated_attachmentIds;
-    result->_editState = self.editState;
-    result->_expireStartedAt = self.expireStartedAt;
-    result->_expireTimerVersion = self.expireTimerVersion;
-    result->_expiresAt = self.expiresAt;
-    result->_expiresInSeconds = self.expiresInSeconds;
-    result->_giftBadge = self.giftBadge;
-    result->_isGroupStoryReply = self.isGroupStoryReply;
-    result->_isPoll = self.isPoll;
-    result->_isSmsMessageRestoredFromBackup = self.isSmsMessageRestoredFromBackup;
-    result->_isViewOnceComplete = self.isViewOnceComplete;
-    result->_isViewOnceMessage = self.isViewOnceMessage;
-    result->_linkPreview = self.linkPreview;
-    result->_messageSticker = self.messageSticker;
-    result->_quotedMessage = self.quotedMessage;
-    result->_schemaVersion = self.schemaVersion;
-    result->_storedShouldStartExpireTimer = self.storedShouldStartExpireTimer;
-    result->_storyAuthorUuidString = self.storyAuthorUuidString;
-    result->_storyReactionEmoji = self.storyReactionEmoji;
-    result->_storyTimestamp = self.storyTimestamp;
-    result->_wasRemotelyDeleted = self.wasRemotelyDeleted;
-    return result;
-}
-
 - (void)setExpireStartedAt:(uint64_t)expireStartedAt
 {
     if (_expireStartedAt != 0 && _expireStartedAt < expireStartedAt) {

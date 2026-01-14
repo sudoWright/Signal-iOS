@@ -306,6 +306,7 @@ public class StickerManager: NSObject {
     ) {
         // If we re-insert a sticker pack, make sure that it
         // has a new row id.
+        _ = stickerPackParam as NSCopying
         let stickerPack = stickerPackParam.copy() as! StickerPack
         stickerPack.clearRowId()
 

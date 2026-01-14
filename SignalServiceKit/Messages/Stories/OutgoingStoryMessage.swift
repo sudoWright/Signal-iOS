@@ -59,16 +59,6 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result._storyMessageRowId = self._storyMessageRowId
-        result.isPrivateStorySend = self.isPrivateStorySend
-        result.skipSyncTranscript = self.skipSyncTranscript
-        result.storyAllowsReplies = self.storyAllowsReplies
-        result.storyMessageId = self.storyMessageId
-        return result
-    }
-
     public private(set) var storyMessageId: String!
     public private(set) var _storyMessageRowId: NSNumber!
     public var storyMessageRowId: Int64! { _storyMessageRowId?.int64Value }

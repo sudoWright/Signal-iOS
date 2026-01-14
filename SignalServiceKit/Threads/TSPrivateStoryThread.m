@@ -49,15 +49,6 @@
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSPrivateStoryThread *result = [super copyWithZone:zone];
-    result->_addresses = self.addresses;
-    result->_allowsReplies = self.allowsReplies;
-    result->_name = self.name;
-    return result;
-}
-
 - (instancetype)initWithName:(NSString *)name allowsReplies:(BOOL)allowsReplies viewMode:(TSThreadStoryViewMode)viewMode
 {
     NSString *uniqueId = [[self class] generateUniqueId];

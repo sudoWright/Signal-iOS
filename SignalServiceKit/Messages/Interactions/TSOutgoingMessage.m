@@ -311,25 +311,6 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSOutgoingMessage *result = [super copyWithZone:zone];
-    result->_changeActionsProtoData = self.changeActionsProtoData;
-    result->_customMessage = self.customMessage;
-    result->_groupMetaMessage = self.groupMetaMessage;
-    result->_hasLegacyMessageState = self.hasLegacyMessageState;
-    result->_hasSyncedTranscript = self.hasSyncedTranscript;
-    result->_isVoiceMessage = self.isVoiceMessage;
-    result->_legacyMessageState = self.legacyMessageState;
-    result->_legacyWasDelivered = self.legacyWasDelivered;
-    result->_mostRecentFailureText = self.mostRecentFailureText;
-    result->_outgoingMessageSchemaVersion = self.outgoingMessageSchemaVersion;
-    result->_recipientAddressStates = self.recipientAddressStates;
-    result->_storedMessageState = self.storedMessageState;
-    result->_wasNotCreatedLocally = self.wasNotCreatedLocally;
-    return result;
-}
-
 - (instancetype)initOutgoingMessageWithBuilder:(TSOutgoingMessageBuilder *)outgoingMessageBuilder
                           additionalRecipients:(NSArray<ServiceIdObjC *> *)additionalRecipients
                             explicitRecipients:(NSArray<AciObjC *> *)explicitRecipients

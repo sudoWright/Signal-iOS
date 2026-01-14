@@ -137,7 +137,7 @@ public final class UserProfileNotifications: NSObject {
 }
 
 @objc
-public final class OWSUserProfile: NSObject, NSCopying, SDSCodableModel, Decodable {
+public final class OWSUserProfile: NSObject, SDSCodableModel, Decodable {
     public static let databaseTableName = "model_OWSUserProfile"
     public static var recordType: UInt { SDSRecordType.userProfile.rawValue }
 
@@ -323,10 +323,6 @@ public final class OWSUserProfile: NSObject, NSCopying, SDSCodableModel, Decodab
         self.lastFetchDate = lastFetchDate
         self.lastMessagingDate = lastMessagingDate
         self.isPhoneNumberShared = isPhoneNumberShared
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return shallowCopy()
     }
 
     @objc

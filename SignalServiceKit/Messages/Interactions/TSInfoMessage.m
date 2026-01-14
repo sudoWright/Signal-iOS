@@ -106,18 +106,6 @@ const InfoMessageUserInfoKey InfoMessageUserInfoKeyPinnedMessage = @"InfoMessage
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSInfoMessage *result = [super copyWithZone:zone];
-    result->_customMessage = self.customMessage;
-    result->_infoMessageUserInfo = self.infoMessageUserInfo;
-    result->_messageType = self.messageType;
-    result->_read = self.read;
-    result->_serverGuid = self.serverGuid;
-    result->_unregisteredAddress = self.unregisteredAddress;
-    return result;
-}
-
 - (instancetype)initWithThread:(TSThread *)thread
                      timestamp:(uint64_t)timestamp
                     serverGuid:(nullable NSString *)serverGuid

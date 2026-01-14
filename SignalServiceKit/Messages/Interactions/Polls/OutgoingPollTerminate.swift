@@ -32,12 +32,6 @@ class OutgoingPollTerminateMessage: TSOutgoingMessage {
         return true
     }
 
-    override func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.targetPollTimestamp = self.targetPollTimestamp
-        return result
-    }
-
     var targetPollTimestamp: UInt64 = 0
 
     init(

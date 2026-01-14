@@ -92,14 +92,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSDisappearingMessagesConfigurationMessage *result = [super copyWithZone:zone];
-    result->_configuration = self.configuration;
-    return result;
-}
-
-
 - (nullable SSKProtoDataMessageBuilder *)dataMessageBuilderWithThread:(TSThread *)thread
                                                           transaction:(DBReadTransaction *)transaction
 {

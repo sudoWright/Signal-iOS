@@ -116,17 +116,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSOutgoingReactionMessage *result = [super copyWithZone:zone];
-    result->_createdReaction = self.createdReaction;
-    result->_emoji = self.emoji;
-    result->_isRemoving = self.isRemoving;
-    result->_messageUniqueId = self.messageUniqueId;
-    result->_previousReaction = self.previousReaction;
-    return result;
-}
-
 - (BOOL)shouldBeSaved
 {
     return NO;

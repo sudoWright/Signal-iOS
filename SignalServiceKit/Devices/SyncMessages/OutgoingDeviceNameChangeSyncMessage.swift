@@ -35,12 +35,6 @@ public class OutgoingDeviceNameChangeSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.deviceId = self.deviceId
-        return result
-    }
-
     private(set) var deviceId: NSNumber!
 
     init(

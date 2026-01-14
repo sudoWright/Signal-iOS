@@ -587,6 +587,7 @@ extension TSPaymentModel: TSPaymentBaseModel {
 
 extension TSPaymentAmount: DeepCopyable {
     public func deepCopy() throws -> AnyObject {
+        _ = self as NSCopying
         return self.copy() as! Self
     }
 }

@@ -334,24 +334,3 @@ private extension String {
         return filtered.nilIfEmpty
     }
 }
-
-// MARK: - NSCopying
-
-extension SignalAccount: NSCopying {
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return SignalAccount(
-            id: self.id,
-            uniqueId: self.uniqueId,
-            contactAvatarHash: self.contactAvatarHash,
-            multipleAccountLabelText: self.multipleAccountLabelText,
-            recipientPhoneNumber: self.recipientPhoneNumber,
-            recipientServiceId: self.recipientServiceId,
-            hasDeprecatedRepresentation: self.hasDeprecatedRepresentation,
-            cnContactId: self.cnContactId,
-            givenName: self.givenName,
-            familyName: self.familyName,
-            nickname: self.nickname,
-            fullName: self.fullName,
-        )
-    }
-}

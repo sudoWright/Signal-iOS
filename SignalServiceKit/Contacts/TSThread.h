@@ -33,7 +33,7 @@ typedef NS_CLOSED_ENUM(NSUInteger, TSThreadStoryViewMode) {
 /**
  *  TSThread is the superclass of TSContactThread, TSGroupThread, and TSPrivateStoryThread
  */
-@interface TSThread : BaseModel <NSCopying>
+@interface TSThread : BaseModel
 
 @property (nonatomic) TSThreadStoryViewMode storyViewMode;
 @property (nonatomic, nullable) NSNumber *lastSentStoryTimestamp;

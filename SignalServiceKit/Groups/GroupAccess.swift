@@ -65,7 +65,7 @@ public enum GroupV2Access: UInt, Codable, CustomStringConvertible {
 
 // This class is immutable.
 @objc
-public final class GroupAccess: NSObject, NSSecureCoding, NSCopying {
+public final class GroupAccess: NSObject, NSSecureCoding {
     public static var supportsSecureCoding: Bool { true }
 
     public init?(coder: NSCoder) {
@@ -95,10 +95,6 @@ public final class GroupAccess: NSObject, NSSecureCoding, NSCopying {
         guard self.attributes == object.attributes else { return false }
         guard self.members == object.members else { return false }
         return true
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return self
     }
 
     public let members: GroupV2Access

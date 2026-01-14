@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class DBReadTransaction;
 
-@interface InstalledSticker : BaseModel <NSCopying>
+@interface InstalledSticker : BaseModel
 
 @property (nonatomic, readonly) StickerInfo *info;
 @property (nonatomic, readonly, nullable) NSString *emojiString;

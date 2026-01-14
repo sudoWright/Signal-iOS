@@ -75,21 +75,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSIncomingMessage *result = [super copyWithZone:zone];
-    result->_authorPhoneNumber = self.authorPhoneNumber;
-    result->_authorUUID = self.authorUUID;
-    result->_deprecated_sourceDeviceId = self.deprecated_sourceDeviceId;
-    result->_read = self.read;
-    result->_serverDeliveryTimestamp = self.serverDeliveryTimestamp;
-    result->_serverGuid = self.serverGuid;
-    result->_serverTimestamp = self.serverTimestamp;
-    result->_viewed = self.viewed;
-    result->_wasReceivedByUD = self.wasReceivedByUD;
-    return result;
-}
-
 - (instancetype)initIncomingMessageWithBuilder:(TSIncomingMessageBuilder *)incomingMessageBuilder
 {
     self = [super initMessageWithBuilder:incomingMessageBuilder];

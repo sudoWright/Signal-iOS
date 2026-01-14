@@ -6,7 +6,7 @@
 public import Contacts
 
 @objc(OWSContactName)
-public final class OWSContactName: NSObject, NSSecureCoding, NSCopying {
+public final class OWSContactName: NSObject, NSSecureCoding {
     public static var supportsSecureCoding: Bool { true }
 
     public init?(coder: NSCoder) {
@@ -66,18 +66,6 @@ public final class OWSContactName: NSObject, NSSecureCoding, NSCopying {
         guard self.nickname == object.nickname else { return false }
         guard self.organizationName == object.organizationName else { return false }
         return true
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return Self(
-            givenName: givenName,
-            familyName: familyName,
-            namePrefix: namePrefix,
-            nameSuffix: nameSuffix,
-            middleName: middleName,
-            nickname: nickname,
-            organizationName: organizationName,
-        )
     }
 
     public let givenName: String?

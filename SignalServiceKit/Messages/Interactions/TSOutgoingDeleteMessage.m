@@ -100,15 +100,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSOutgoingDeleteMessage *result = [super copyWithZone:zone];
-    result->_isDeletingStoryMessage = self.isDeletingStoryMessage;
-    result->_messageTimestamp = self.messageTimestamp;
-    result->_messageUniqueId = self.messageUniqueId;
-    return result;
-}
-
 - (instancetype)initWithThread:(TSThread *)thread
                   storyMessage:(StoryMessage *)storyMessage
              skippedRecipients:(NSArray<ServiceIdObjC *> *)skippedRecipients

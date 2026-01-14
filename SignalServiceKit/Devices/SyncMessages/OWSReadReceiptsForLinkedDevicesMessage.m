@@ -76,13 +76,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSReadReceiptsForLinkedDevicesMessage *result = [super copyWithZone:zone];
-    result->_readReceipts = self.readReceipts;
-    return result;
-}
-
 - (nullable SSKProtoSyncMessageBuilder *)syncMessageBuilderWithTransaction:(DBReadTransaction *)transaction
 {
     SSKProtoSyncMessageBuilder *syncMessageBuilder = [SSKProtoSyncMessage builder];

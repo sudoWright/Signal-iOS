@@ -47,15 +47,6 @@ public class OutgoingPinMessage: TSOutgoingMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.pinDurationForever = self.pinDurationForever
-        result.pinDurationSeconds = self.pinDurationSeconds
-        result.targetMessageAuthorAciBinary = self.targetMessageAuthorAciBinary
-        result.targetMessageTimestamp = self.targetMessageTimestamp
-        return result
-    }
-
     public private(set) var targetMessageTimestamp: UInt64 = 0
     public private(set) var targetMessageAuthorAciBinary: Data?
     public private(set) var pinDurationSeconds: UInt32 = 0

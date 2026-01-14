@@ -49,15 +49,6 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.targetPollAuthorAciBinary = self.targetPollAuthorAciBinary
-        result.targetPollTimestamp = self.targetPollTimestamp
-        result.voteCount = self.voteCount
-        result.voteOptionIndexes = self.voteOptionIndexes
-        return result
-    }
-
     var targetPollTimestamp: UInt64 = 0
     var targetPollAuthorAciBinary: Data?
     var voteOptionIndexes: [UInt32]?

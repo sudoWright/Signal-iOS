@@ -57,14 +57,6 @@ final class ReceiptMessage: TSOutgoingMessage {
         return true
     }
 
-    override func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.messageTimestamps = self.messageTimestamps
-        result.messageUniqueIds = self.messageUniqueIds
-        result.receiptType = self.receiptType
-        return result
-    }
-
     override func shouldSyncTranscript() -> Bool { false }
 
     override var isUrgent: Bool { false }

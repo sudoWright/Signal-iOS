@@ -90,16 +90,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSSyncMessageRequestResponseMessage *result = [super copyWithZone:zone];
-    result->_groupId = self.groupId;
-    result->_responseType = self.responseType;
-    result->_threadAci = self.threadAci;
-    result->_version = self.version;
-    return result;
-}
-
 - (instancetype)initWithLocalThread:(TSContactThread *)localThread
                messageRequestThread:(TSThread *)thread
                        responseType:(OWSSyncMessageRequestResponseType)responseType

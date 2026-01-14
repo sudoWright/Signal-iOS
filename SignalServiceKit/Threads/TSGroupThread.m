@@ -97,13 +97,6 @@ lastVisibleSortIdOnScreenPercentageObsolete:lastVisibleSortIdOnScreenPercentageO
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSGroupThread *result = [super copyWithZone:zone];
-    result->_groupModel = self.groupModel;
-    return result;
-}
-
 - (instancetype)initWithGroupModel:(TSGroupModelV2 *)groupModel
 {
     OWSAssertDebug(groupModel);

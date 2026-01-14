@@ -81,13 +81,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSStaticOutgoingMessage *result = [super copyWithZone:zone];
-    result->_plaintextData = self.plaintextData;
-    return result;
-}
-
 - (BOOL)shouldBeSaved
 {
     return NO;

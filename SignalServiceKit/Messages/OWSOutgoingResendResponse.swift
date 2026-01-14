@@ -56,16 +56,6 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
         return true
     }
 
-    override func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.derivedContentHint = self.derivedContentHint
-        result.didAppendSKDM = self.didAppendSKDM
-        result.originalGroupId = self.originalGroupId
-        result.originalMessagePlaintext = self.originalMessagePlaintext
-        result.originalThreadId = self.originalThreadId
-        return result
-    }
-
     private(set) var originalMessagePlaintext: Data?
     private(set) var originalThreadId: String?
     private(set) var originalGroupId: Data?

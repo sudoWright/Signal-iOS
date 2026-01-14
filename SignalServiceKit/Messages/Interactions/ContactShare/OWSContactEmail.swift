@@ -6,7 +6,7 @@
 public import Contacts
 
 @objc(OWSContactEmail)
-public final class OWSContactEmail: NSObject, NSSecureCoding, NSCopying, OWSContactField {
+public final class OWSContactEmail: NSObject, NSSecureCoding, OWSContactField {
     public static var supportsSecureCoding: Bool { true }
 
     public init?(coder: NSCoder) {
@@ -38,10 +38,6 @@ public final class OWSContactEmail: NSObject, NSSecureCoding, NSCopying, OWSCont
         guard self.type == object.type else { return false }
         guard self.label == object.label else { return false }
         return true
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return self
     }
 
     @objc(OWSContactEmailType)

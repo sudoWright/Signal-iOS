@@ -40,13 +40,6 @@ public final class OutgoingEditMessage: TSOutgoingMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.editedMessage = self.editedMessage
-        result.targetMessageTimestamp = self.targetMessageTimestamp
-        return result
-    }
-
     // MARK: - Edit target data
 
     @objc

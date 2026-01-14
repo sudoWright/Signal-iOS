@@ -37,15 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    InstalledSticker *result = [self copyAndAssignIdsWithZone:zone];
-    result->_contentType = self.contentType;
-    result->_emojiString = self.emojiString;
-    result->_info = self.info;
-    return result;
-}
-
 - (instancetype)initWithInfo:(StickerInfo *)info
                  contentType:(nullable NSString *)contentType
                  emojiString:(nullable NSString *)emojiString

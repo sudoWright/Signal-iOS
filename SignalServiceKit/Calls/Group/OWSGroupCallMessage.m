@@ -115,17 +115,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSGroupCallMessage *result = [super copyWithZone:zone];
-    result->_creatorUuid = self.creatorUuid;
-    result->_eraId = self.eraId;
-    result->_hasEnded = self.hasEnded;
-    result->_joinedMemberUuids = self.joinedMemberUuids;
-    result->_read = self.read;
-    return result;
-}
-
 - (NSArray<AciObjC *> *)joinedMemberAcis
 {
     NSArray<NSString *> *_Nullable uuids = self.joinedMemberUuids;

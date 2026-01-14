@@ -884,7 +884,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
 // MARK: - InvalidInviteModel
 
 @objc(GroupMembershipInvalidInviteModel)
-private final class InvalidInviteModel: NSObject, NSSecureCoding, NSCopying {
+private final class InvalidInviteModel: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     init?(coder: NSCoder) {
@@ -916,10 +916,6 @@ private final class InvalidInviteModel: NSObject, NSSecureCoding, NSCopying {
         return true
     }
 
-    func copy(with zone: NSZone? = nil) -> Any {
-        return self
-    }
-
     let userId: Data?
     let addedByUserId: Data?
 
@@ -932,7 +928,7 @@ private final class InvalidInviteModel: NSObject, NSSecureCoding, NSCopying {
 // MARK: - LegacyMemberState
 
 @objc(_TtCC16SignalServiceKit15GroupMembership11MemberState)
-private final class LegacyMemberState: NSObject, NSSecureCoding, NSCopying {
+private final class LegacyMemberState: NSObject, NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     init?(coder: NSCoder) {
@@ -964,10 +960,6 @@ private final class LegacyMemberState: NSObject, NSSecureCoding, NSCopying {
         guard self.isPending == object.isPending else { return false }
         guard self.role == object.role else { return false }
         return true
-    }
-
-    func copy(with zone: NSZone? = nil) -> Any {
-        return self
     }
 
     let role: TSGroupMemberRole

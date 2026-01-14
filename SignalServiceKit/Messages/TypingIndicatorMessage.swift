@@ -36,12 +36,6 @@ public final class TypingIndicatorMessage: TSOutgoingMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.action = self.action
-        return result
-    }
-
     private var action: TypingIndicatorAction = .started
 
     // MARK: Initializers

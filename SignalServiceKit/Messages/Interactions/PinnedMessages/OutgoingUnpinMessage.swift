@@ -39,13 +39,6 @@ public class OutgoingUnpinMessage: TSOutgoingMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.targetMessageAuthorAciBinary = self.targetMessageAuthorAciBinary
-        result.targetMessageTimestamp = self.targetMessageTimestamp
-        return result
-    }
-
     public private(set) var targetMessageTimestamp: UInt64 = 0
     public private(set) var targetMessageAuthorAciBinary: Data?
 

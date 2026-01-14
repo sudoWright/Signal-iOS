@@ -204,16 +204,6 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value)
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSInteraction *result = [self copyAndAssignIdsWithZone:zone];
-    result->_receivedAtTimestamp = self.receivedAtTimestamp;
-    result->_sortId = self.sortId;
-    result->_timestamp = self.timestamp;
-    result->_uniqueThreadId = self.uniqueThreadId;
-    return result;
-}
-
 #pragma mark Thread
 
 - (nullable TSThread *)threadWithTx:(DBReadTransaction *)tx

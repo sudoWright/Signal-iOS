@@ -105,7 +105,7 @@ NSString *NSStringFromTSPaymentFailure(TSPaymentFailure value);
 
 #pragma mark -
 
-@interface TSPaymentAddress : NSObject <NSCopying>
+@interface TSPaymentAddress : NSObject
 
 @property (nonatomic, readonly) TSPaymentCurrency currency;
 @property (nonatomic, readonly) NSData *mobileCoinPublicAddressData;

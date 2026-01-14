@@ -37,12 +37,6 @@ public final class OutgoingGroupCallUpdateMessage: TSOutgoingMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.eraId = self.eraId
-        return result
-    }
-
     /// The era ID of the call with the update.
     private(set) var eraId: String?
 

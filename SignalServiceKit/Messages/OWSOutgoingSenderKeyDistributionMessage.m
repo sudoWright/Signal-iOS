@@ -94,15 +94,6 @@
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSOutgoingSenderKeyDistributionMessage *result = [super copyWithZone:zone];
-    result->_isSentOnBehalfOfOnlineMessage = self.isSentOnBehalfOfOnlineMessage;
-    result->_isSentOnBehalfOfStoryMessage = self.isSentOnBehalfOfStoryMessage;
-    result->_serializedSKDM = self.serializedSKDM;
-    return result;
-}
-
 - (BOOL)shouldBeSaved
 {
     return NO;

@@ -119,15 +119,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSAttachmentInfo *result = [[[self class] allocWithZone:zone] init];
-    result->_attachmentId = self.attachmentId;
-    result->_contentType = self.contentType;
-    result->_sourceFilename = self.sourceFilename;
-    return result;
-}
-
 @end
 
 // MARK: -

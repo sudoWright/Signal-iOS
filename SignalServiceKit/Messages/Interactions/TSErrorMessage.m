@@ -56,17 +56,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSErrorMessage *result = [super copyWithZone:zone];
-    result->_errorType = self.errorType;
-    result->_read = self.read;
-    result->_recipientAddress = self.recipientAddress;
-    result->_sender = self.sender;
-    result->_wasIdentityVerified = self.wasIdentityVerified;
-    return result;
-}
-
 - (instancetype)initErrorMessageWithBuilder:(TSErrorMessageBuilder *)errorMessageBuilder
 {
     self = [super initMessageWithBuilder:errorMessageBuilder];

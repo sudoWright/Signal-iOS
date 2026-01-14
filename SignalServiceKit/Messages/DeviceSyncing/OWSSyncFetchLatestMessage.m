@@ -69,13 +69,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSSyncFetchLatestMessage *result = [super copyWithZone:zone];
-    result->_fetchType = self.fetchType;
-    return result;
-}
-
 - (SSKProtoSyncMessageFetchLatestType)protoFetchType
 {
     switch (self.fetchType) {

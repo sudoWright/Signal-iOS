@@ -47,14 +47,6 @@ public class OutgoingStorySentMessageTranscript: OWSOutgoingSyncMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.isRecipientUpdate = self.isRecipientUpdate
-        result.storyEncodedRecipientStates = self.storyEncodedRecipientStates
-        result.storyMessageUniqueId = self.storyMessageUniqueId
-        return result
-    }
-
     private var storyEncodedRecipientStates: Data?
     private var storyMessageUniqueId: String?
     private var isRecipientUpdate: NSNumber!

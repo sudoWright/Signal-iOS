@@ -64,13 +64,6 @@ final class OutgoingResendRequest: TSOutgoingMessage {
         return true
     }
 
-    override func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.decryptionErrorData = self.decryptionErrorData
-        result.failedEnvelopeGroupId = self.failedEnvelopeGroupId
-        return result
-    }
-
     override var encryptionStyle: EncryptionStyle { .plaintext }
 
     override var isUrgent: Bool { false }

@@ -42,13 +42,6 @@ public class OutgoingCallLinkUpdateMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.adminPasskey = self.adminPasskey
-        result.rootKey = self.rootKey
-        return result
-    }
-
     private var rootKey: Data!
     private var adminPasskey: Data?
 

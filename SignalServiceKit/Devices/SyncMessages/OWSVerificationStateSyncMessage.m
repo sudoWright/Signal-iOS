@@ -126,16 +126,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSVerificationStateSyncMessage *result = [super copyWithZone:zone];
-    result->_identityKey = self.identityKey;
-    result->_paddingBytesLength = self.paddingBytesLength;
-    result->_verificationForRecipientAddress = self.verificationForRecipientAddress;
-    result->_verificationState = self.verificationState;
-    return result;
-}
-
 - (nullable SSKProtoSyncMessageBuilder *)syncMessageBuilderWithTransaction:(DBReadTransaction *)transaction
 {
     // We add the same amount of padding in the VerificationStateSync message and it's corresponding NullMessage so that

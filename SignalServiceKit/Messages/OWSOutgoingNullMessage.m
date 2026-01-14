@@ -75,13 +75,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSOutgoingNullMessage *result = [super copyWithZone:zone];
-    result->_verificationStateSyncMessage = self.verificationStateSyncMessage;
-    return result;
-}
-
 - (instancetype)initWithContactThread:(TSContactThread *)contactThread
          verificationStateSyncMessage:(OWSVerificationStateSyncMessage *)verificationStateSyncMessage
                           transaction:(DBReadTransaction *)transaction

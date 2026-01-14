@@ -53,13 +53,6 @@ final class StickerPackSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.operationType = self.operationType
-        result.packs = self.packs
-        return result
-    }
-
     init(
         localThread: TSContactThread,
         packs: [StickerPackInfo],

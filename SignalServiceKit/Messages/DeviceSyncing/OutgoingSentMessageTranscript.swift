@@ -62,15 +62,6 @@ class OutgoingSentMessageTranscript: OWSOutgoingSyncMessage {
         return true
     }
 
-    override func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.isRecipientUpdate = self.isRecipientUpdate
-        result.message = self.message
-        result.messageThread = self.messageThread
-        result.sentRecipientAddress = self.sentRecipientAddress
-        return result
-    }
-
     override var isUrgent: Bool { false }
 
     override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {

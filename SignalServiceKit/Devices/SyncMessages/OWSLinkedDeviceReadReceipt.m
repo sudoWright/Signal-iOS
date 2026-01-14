@@ -149,18 +149,6 @@ NSUInteger const OWSLinkedDeviceReadReceiptSchemaVersion = 1;
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSLinkedDeviceReadReceipt *result = [[[self class] allocWithZone:zone] init];
-    result->_linkedDeviceReadReceiptSchemaVersion = self.linkedDeviceReadReceiptSchemaVersion;
-    result->_messageIdTimestamp = self.messageIdTimestamp;
-    result->_messageUniqueId = self.messageUniqueId;
-    result->_readTimestamp = self.readTimestamp;
-    result->_senderPhoneNumber = self.senderPhoneNumber;
-    result->_senderUUID = self.senderUUID;
-    return result;
-}
-
 - (SignalServiceAddress *)senderAddress
 {
     return [SignalServiceAddress legacyAddressWithServiceIdString:self.senderUUID phoneNumber:self.senderPhoneNumber];

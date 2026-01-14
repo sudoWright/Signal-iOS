@@ -76,13 +76,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSViewedReceiptsForLinkedDevicesMessage *result = [super copyWithZone:zone];
-    result->_viewedReceipts = self.viewedReceipts;
-    return result;
-}
-
 - (BOOL)isUrgent
 {
     return NO;
@@ -233,17 +226,6 @@ NS_ASSUME_NONNULL_BEGIN
         return NO;
     }
     return YES;
-}
-
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSLinkedDeviceViewedReceipt *result = [[[self class] allocWithZone:zone] init];
-    result->_messageIdTimestamp = self.messageIdTimestamp;
-    result->_messageUniqueId = self.messageUniqueId;
-    result->_senderPhoneNumber = self.senderPhoneNumber;
-    result->_senderUUID = self.senderUUID;
-    result->_viewedTimestamp = self.viewedTimestamp;
-    return result;
 }
 
 - (SignalServiceAddress *)senderAddress

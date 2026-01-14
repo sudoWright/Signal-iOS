@@ -57,7 +57,7 @@ class MockUserProfileStore: UserProfileStore {
 
     func updateUserProfile(_ userProfile: OWSUserProfile, tx: DBWriteTransaction) {
         let index = userProfiles.firstIndex(where: { $0.uniqueId == userProfile.uniqueId })!
-        userProfiles[index] = userProfile.copy() as! OWSUserProfile
+        userProfiles[index] = userProfile.shallowCopy()
     }
 
     func removeUserProfile(_ userProfile: OWSUserProfile, tx: DBWriteTransaction) {

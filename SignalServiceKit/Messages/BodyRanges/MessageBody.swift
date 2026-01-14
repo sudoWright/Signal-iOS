@@ -9,7 +9,7 @@ public import LibSignalClient
 /// MessageBody is a container for a message's body as well as the `MessageBodyRanges` that
 /// apply to it.
 /// Most of the work is done by `MessageBodyRanges`; this is just a container for the text too.
-public class MessageBody: NSObject, NSCopying, NSSecureCoding {
+public class MessageBody: NSObject, NSSecureCoding {
     typealias Style = MessageBodyRanges.Style
     typealias CollapsedStyle = MessageBodyRanges.CollapsedStyle
 
@@ -56,10 +56,6 @@ public class MessageBody: NSObject, NSCopying, NSSecureCoding {
 
         self.text = text
         self.ranges = ranges
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return MessageBody(text: text, ranges: ranges)
     }
 
     public func encode(with coder: NSCoder) {

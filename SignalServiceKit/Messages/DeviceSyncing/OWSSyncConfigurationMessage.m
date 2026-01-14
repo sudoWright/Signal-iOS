@@ -113,17 +113,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSSyncConfigurationMessage *result = [super copyWithZone:zone];
-    result->_areReadReceiptsEnabled = self.areReadReceiptsEnabled;
-    result->_provisioningVersion = self.provisioningVersion;
-    result->_sendLinkPreviews = self.sendLinkPreviews;
-    result->_showTypingIndicators = self.showTypingIndicators;
-    result->_showUnidentifiedDeliveryIndicators = self.showUnidentifiedDeliveryIndicators;
-    return result;
-}
-
 - (nullable SSKProtoSyncMessageBuilder *)syncMessageBuilderWithTransaction:(DBReadTransaction *)transaction
 {
     SSKProtoSyncMessageConfigurationBuilder *configurationBuilder = [SSKProtoSyncMessageConfiguration builder];

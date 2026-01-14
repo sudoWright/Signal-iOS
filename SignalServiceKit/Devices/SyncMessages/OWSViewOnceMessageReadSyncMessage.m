@@ -108,16 +108,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSViewOnceMessageReadSyncMessage *result = [super copyWithZone:zone];
-    result->_messageIdTimestamp = self.messageIdTimestamp;
-    result->_messageUniqueId = self.messageUniqueId;
-    result->_readTimestamp = self.readTimestamp;
-    result->_senderAddress = self.senderAddress;
-    return result;
-}
-
 - (BOOL)isUrgent
 {
     return NO;

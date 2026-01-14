@@ -207,34 +207,6 @@ lastVisibleSortIdOnScreenPercentageObsolete:(double)lastVisibleSortIdOnScreenPer
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    TSThread *result = [self copyAndAssignIdsWithZone:zone];
-    result->_conversationColorNameObsolete = self.conversationColorNameObsolete;
-    result->_creationDate = self.creationDate;
-    result->_editTargetTimestamp = self.editTargetTimestamp;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    result->_isArchivedByLegacyTimestampForSorting = self.isArchivedByLegacyTimestampForSorting;
-#pragma clang diagnostic pop
-    result->_isArchivedObsolete = self.isArchivedObsolete;
-    result->_isMarkedUnreadObsolete = self.isMarkedUnreadObsolete;
-    result->_lastDraftInteractionRowId = self.lastDraftInteractionRowId;
-    result->_lastDraftUpdateTimestamp = self.lastDraftUpdateTimestamp;
-    result->_lastInteractionRowId = self.lastInteractionRowId;
-    result->_lastSentStoryTimestamp = self.lastSentStoryTimestamp;
-    result->_lastVisibleSortIdObsolete = self.lastVisibleSortIdObsolete;
-    result->_lastVisibleSortIdOnScreenPercentageObsolete = self.lastVisibleSortIdOnScreenPercentageObsolete;
-    result->_mentionNotificationMode = self.mentionNotificationMode;
-    result->_messageDraft = [self.messageDraft copy];
-    result->_messageDraftBodyRanges = self.messageDraftBodyRanges;
-    result->_mutedUntilDateObsolete = self.mutedUntilDateObsolete;
-    result->_mutedUntilTimestampObsolete = self.mutedUntilTimestampObsolete;
-    result->_shouldThreadBeVisible = self.shouldThreadBeVisible;
-    result->_storyViewMode = self.storyViewMode;
-    return result;
-}
-
 - (void)anyDidInsertWithTransaction:(DBWriteTransaction *)transaction
 {
     [super anyDidInsertWithTransaction:transaction];

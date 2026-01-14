@@ -38,13 +38,6 @@ final class OutgoingGroupUpdateMessage: TSOutgoingMessage {
         return true
     }
 
-    override func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.isDeletingAccount = self.isDeletingAccount
-        result.isUpdateUrgent = self.isUpdateUrgent
-        return result
-    }
-
     private var isUpdateUrgent: Bool = false
     private(set) var isDeletingAccount: Bool = false
 

@@ -64,15 +64,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSVerificationStateChangeMessage *result = [super copyWithZone:zone];
-    result->_isLocalChange = self.isLocalChange;
-    result->_recipientAddress = self.recipientAddress;
-    result->_verificationState = self.verificationState;
-    return result;
-}
-
 - (bool)isVerified
 {
     return _verificationState == OWSVerificationStateVerified;

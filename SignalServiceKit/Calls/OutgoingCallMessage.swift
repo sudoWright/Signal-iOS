@@ -68,13 +68,6 @@ public final class OutgoingCallMessage: TSOutgoingMessage {
         return true
     }
 
-    override public func copy(with zone: NSZone? = nil) -> Any {
-        let result = super.copy(with: zone) as! Self
-        result.messageType = self.messageType
-        result.destinationDeviceId = self.destinationDeviceId
-        return result
-    }
-
     override public func shouldSyncTranscript() -> Bool { false }
 
     override public func contentBuilder(thread: TSThread, transaction: DBReadTransaction) -> SSKProtoContentBuilder? {

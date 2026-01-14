@@ -97,15 +97,6 @@ NS_ASSUME_NONNULL_BEGIN
     return YES;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    OWSSyncKeysMessage *result = [super copyWithZone:zone];
-    result->_accountEntropyPool = self.accountEntropyPool;
-    result->_masterKey = self.masterKey;
-    result->_mediaRootBackupKey = self.mediaRootBackupKey;
-    return result;
-}
-
 - (nullable SSKProtoSyncMessageBuilder *)syncMessageBuilderWithTransaction:(DBReadTransaction *)transaction
 {
     SSKProtoSyncMessageKeysBuilder *keysBuilder = [SSKProtoSyncMessageKeys builder];
