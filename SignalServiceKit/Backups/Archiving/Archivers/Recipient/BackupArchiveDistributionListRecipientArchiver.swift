@@ -115,6 +115,10 @@ public class BackupArchiveDistributionListRecipientArchiver: BackupArchiveProtoS
                 errors.append(.archiveFrameError(.referencedRecipientIdMissing(.distributionList(distributionId)), distributionListAppId))
                 return nil
             }
+            // Filter out 'Self' in distribution lists
+            guard recipientId != context.localRecipientId else {
+                return nil
+            }
             return recipientId.value
         }
 
