@@ -212,11 +212,8 @@ extension BackupArchive {
             /// be nil (missing); this is a SQL error when we tried to read.
             case unableToReadStoryContextAssociatedData(Error)
 
-            /// An unviewed view-once message is missing its attachment.
-            case unviewedViewOnceMessageMissingAttachment
-            /// An unviewed view-once message has more than one attachment.
-            /// Associated value provides the number of attachments.
-            case unviewedViewOnceMessageTooManyAttachments(Int)
+            /// An unviewed view-once message had an unexpected attachment count.
+            case unviewedViewOnceMessageUnexpectedAttachmentCount(Int)
 
             /// An ad hoc call's ``CallRecord/conversationId`` is not a
             /// call link, which is illegal.
@@ -371,8 +368,7 @@ extension BackupArchive {
                 .learnedProfileUpdateMissingAuthor,
                 .editHistoryFailedToFetch,
                 .unableToReadStoryContextAssociatedData,
-                .unviewedViewOnceMessageMissingAttachment,
-                .unviewedViewOnceMessageTooManyAttachments,
+                .unviewedViewOnceMessageUnexpectedAttachmentCount,
                 .adHocCallDoesNotHaveCallLinkAsConversationId,
                 .invalidAdHocCallTimestamp,
                 .revisionsPresentOnUnexpectedMessage,
@@ -446,8 +442,7 @@ extension BackupArchive {
                 .learnedProfileUpdateMissingAuthor,
                 .editHistoryFailedToFetch,
                 .unableToReadStoryContextAssociatedData,
-                .unviewedViewOnceMessageMissingAttachment,
-                .unviewedViewOnceMessageTooManyAttachments,
+                .unviewedViewOnceMessageUnexpectedAttachmentCount,
                 .adHocCallDoesNotHaveCallLinkAsConversationId,
                 .invalidAdHocCallTimestamp,
                 .revisionsPresentOnUnexpectedMessage,

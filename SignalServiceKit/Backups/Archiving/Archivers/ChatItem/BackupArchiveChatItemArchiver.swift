@@ -38,6 +38,7 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
 
     private let archivedPaymentStore: ArchivedPaymentStore
     private let attachmentsArchiver: BackupArchiveMessageAttachmentArchiver
+    private let attachmentStore: AttachmentStore
     private let callRecordStore: CallRecordStore
     private let contactManager: BackupArchive.Shims.ContactManager
     private let editMessageStore: EditMessageStore
@@ -56,6 +57,7 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
         interactionStore: interactionStore,
         archivedPaymentStore: archivedPaymentStore,
         attachmentsArchiver: attachmentsArchiver,
+        attachmentStore: attachmentStore,
         oversizeTextArchiver: oversizeTextArchiver,
         reactionArchiver: reactionArchiver,
         pollArchiver: pollArchiver,
@@ -85,6 +87,7 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
     init(
         archivedPaymentStore: ArchivedPaymentStore,
         attachmentsArchiver: BackupArchiveMessageAttachmentArchiver,
+        attachmentStore: AttachmentStore,
         callRecordStore: CallRecordStore,
         contactManager: BackupArchive.Shims.ContactManager,
         editMessageStore: EditMessageStore,
@@ -101,6 +104,7 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
     ) {
         self.archivedPaymentStore = archivedPaymentStore
         self.attachmentsArchiver = attachmentsArchiver
+        self.attachmentStore = attachmentStore
         self.callRecordStore = callRecordStore
         self.contactManager = contactManager
         self.editMessageStore = editMessageStore

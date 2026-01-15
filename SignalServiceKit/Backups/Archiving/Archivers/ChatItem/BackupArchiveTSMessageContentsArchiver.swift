@@ -144,9 +144,8 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
     private let interactionStore: BackupArchiveInteractionStore
     private let archivedPaymentStore: ArchivedPaymentStore
     private let attachmentsArchiver: BackupArchiveMessageAttachmentArchiver
-    private lazy var contactAttachmentArchiver = BackupArchiveContactAttachmentArchiver(
-        attachmentsArchiver: attachmentsArchiver,
-    )
+    private let attachmentStore: AttachmentStore
+    private let contactAttachmentArchiver: BackupArchiveContactAttachmentArchiver
     private let oversizeTextArchiver: BackupArchiveInlinedOversizeTextArchiver
     private let reactionArchiver: BackupArchiveReactionArchiver
     private let pollArchiver: BackupArchivePollArchiver
@@ -156,6 +155,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         interactionStore: BackupArchiveInteractionStore,
         archivedPaymentStore: ArchivedPaymentStore,
         attachmentsArchiver: BackupArchiveMessageAttachmentArchiver,
+        attachmentStore: AttachmentStore,
         oversizeTextArchiver: BackupArchiveInlinedOversizeTextArchiver,
         reactionArchiver: BackupArchiveReactionArchiver,
         pollArchiver: BackupArchivePollArchiver,
@@ -164,6 +164,8 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         self.interactionStore = interactionStore
         self.archivedPaymentStore = archivedPaymentStore
         self.attachmentsArchiver = attachmentsArchiver
+        self.attachmentStore = attachmentStore
+        self.contactAttachmentArchiver = BackupArchiveContactAttachmentArchiver(attachmentsArchiver: attachmentsArchiver)
         self.oversizeTextArchiver = oversizeTextArchiver
         self.reactionArchiver = reactionArchiver
         self.pollArchiver = pollArchiver
@@ -171,6 +173,15 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
     }
 
     // MARK: - Archiving
+
+    private struct MessageOwnedReferencedAttachments {
+        let body: [ReferencedAttachment]
+        let oversizeText: ReferencedAttachment?
+        let quotedReply: ReferencedAttachment?
+        let linkPreview: ReferencedAttachment?
+        let contactAvatar: ReferencedAttachment?
+        let sticker: ReferencedAttachment?
+    }
 
     func archiveMessageContents(
         _ message: TSMessage,
@@ -181,6 +192,24 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
                 .fetchedInteractionMissingRowId,
             ))
         }
+
+        let messageOwnedReferencedAttachments: MessageOwnedReferencedAttachments = {
+            let referencedAttachments = attachmentStore.fetchReferencedAttachmentsOwnedByMessage(
+                messageRowId: messageRowId,
+                tx: context.tx,
+            )
+
+            let grouped = Dictionary(grouping: referencedAttachments, by: \.reference.owner.id)
+
+            return MessageOwnedReferencedAttachments(
+                body: grouped[.messageBodyAttachment(messageRowId: messageRowId)] ?? [],
+                oversizeText: grouped[.messageOversizeText(messageRowId: messageRowId)]?.first,
+                quotedReply: grouped[.quotedReplyAttachment(messageRowId: messageRowId)]?.first,
+                linkPreview: grouped[.messageLinkPreview(messageRowId: messageRowId)]?.first,
+                contactAvatar: grouped[.messageContactAvatar(messageRowId: messageRowId)]?.first,
+                sticker: grouped[.messageSticker(messageRowId: messageRowId)]?.first,
+            )
+        }()
 
         if let paymentMessage = message as? OWSPaymentMessage {
             return archivePaymentMessageContents(
@@ -203,14 +232,14 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
             return archiveContactShareMessageContents(
                 message,
                 contactShare: contactShare,
-                messageRowId: messageRowId,
+                contactAvatarReferencedAttachment: messageOwnedReferencedAttachments.contactAvatar,
                 context: context.recipientContext,
             )
         } else if let messageSticker = message.messageSticker {
             return archiveStickerMessageContents(
                 message,
                 messageSticker: messageSticker,
-                messageRowId: messageRowId,
+                stickerReferencedAttachment: messageOwnedReferencedAttachments.sticker,
                 context: context.recipientContext,
             )
         } else if let giftBadge = message.giftBadge {
@@ -221,14 +250,14 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         } else if message.isViewOnceMessage {
             return archiveViewOnceMessage(
                 message,
-                messageRowId: messageRowId,
+                bodyReferencedAttachments: messageOwnedReferencedAttachments.body,
                 context: context,
             )
         } else if message.isStoryReply, !message.isGroupStoryReply {
             return archiveDirectStoryReplyMessage(
                 message,
+                oversizeTextReferencedAttachment: messageOwnedReferencedAttachments.oversizeText,
                 interactionUniqueId: message.uniqueInteractionId,
-                messageRowId: messageRowId,
                 context: context,
             )
         } else if message.isPoll {
@@ -241,7 +270,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         } else {
             return archiveStandardMessageContents(
                 message,
-                messageRowId: messageRowId,
+                messageOwnedReferencedAttachments: messageOwnedReferencedAttachments,
                 context: context.recipientContext,
             )
         }
@@ -328,7 +357,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
 
     private func archiveStandardMessageContents(
         _ message: TSMessage,
-        messageRowId: Int64,
+        messageOwnedReferencedAttachments: MessageOwnedReferencedAttachments,
         context: BackupArchive.RecipientArchivingContext,
     ) -> ArchiveInteractionResult<ChatItemType> {
         var standardMessage = BackupProto_StandardMessage()
@@ -343,7 +372,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
 
             let oversizeTextResult = oversizeTextArchiver.archiveMessageBody(
                 text: messageBody,
-                messageRowId: messageRowId,
+                oversizeTextReferencedAttachment: messageOwnedReferencedAttachments.oversizeText,
                 messageId: message.uniqueInteractionId,
                 context: context,
             )
@@ -373,19 +402,13 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
             }
         }
 
-        let bodyAttachmentsResult = attachmentsArchiver.archiveBodyAttachments(
-            messageId: message.uniqueInteractionId,
-            messageRowId: messageRowId,
+        let bodyAttachmentProtos: [BackupProto_MessageAttachment] = attachmentsArchiver.archiveBodyAttachments(
+            referencedAttachments: messageOwnedReferencedAttachments.body,
             context: context,
         )
-        switch bodyAttachmentsResult.bubbleUp(ChatItemType.self, partialErrors: &partialErrors) {
-        case .continue(let bodyAttachmentProtos):
-            if !bodyAttachmentProtos.isEmpty {
-                hasPrimaryContent = true
-                standardMessage.attachments = bodyAttachmentProtos
-            }
-        case .bubbleUpError(let errorResult):
-            return errorResult
+        if !bodyAttachmentProtos.isEmpty {
+            hasPrimaryContent = true
+            standardMessage.attachments = bodyAttachmentProtos
         }
 
         guard hasPrimaryContent else {
@@ -400,8 +423,8 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         if let quotedMessage = message.quotedMessage {
             let quoteResult = archiveQuote(
                 quotedMessage,
+                quotedReplyReferencedAttachment: messageOwnedReferencedAttachments.quotedReply,
                 interactionUniqueId: message.uniqueInteractionId,
-                messageRowId: messageRowId,
                 context: context,
             )
             switch quoteResult.bubbleUp(ChatItemType.self, partialErrors: &partialErrors) {
@@ -415,10 +438,10 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         if let linkPreview = message.linkPreview {
             let linkPreviewResult = self.archiveLinkPreview(
                 linkPreview,
+                linkPreviewReferencedAttachment: messageOwnedReferencedAttachments.linkPreview,
                 messageBody: standardMessage.text.body,
                 interactionUniqueId: message.uniqueInteractionId,
                 context: context,
-                messageRowId: messageRowId,
             )
             switch linkPreviewResult.bubbleUp(ChatItemType.self, partialErrors: &partialErrors) {
             case .continue(let linkPreviewProto):
@@ -492,8 +515,8 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
 
     private func archiveQuote(
         _ quotedMessage: TSQuotedMessage,
+        quotedReplyReferencedAttachment: ReferencedAttachment?,
         interactionUniqueId: BackupArchive.InteractionUniqueId,
-        messageRowId: Int64,
         context: BackupArchive.RecipientArchivingContext,
     ) -> ArchiveInteractionResult<BackupProto_Quote?> {
         var partialErrors = [ArchiveFrameError]()
@@ -572,19 +595,12 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         }
 
         if let attachmentInfo = quotedMessage.attachmentInfo() {
-            let quoteAttachmentResult = self.archiveQuoteAttachment(
+            let quoteAttachmentProto = archiveQuoteAttachment(
                 attachmentInfo: attachmentInfo,
-                interactionUniqueId: interactionUniqueId,
-                messageRowId: messageRowId,
+                quotedReplyReferencedAttachment: quotedReplyReferencedAttachment,
                 context: context,
             )
-            switch quoteAttachmentResult.bubbleUp(Optional<BackupProto_Quote>.self, partialErrors: &partialErrors) {
-            case .continue(let quoteAttachmentProto):
-                quote.attachments = [quoteAttachmentProto]
-            case .bubbleUpError(let errorResult):
-                return errorResult
-            }
-
+            quote.attachments = [quoteAttachmentProto]
             didArchiveAttachments = true
         }
 
@@ -618,12 +634,9 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
 
     private func archiveQuoteAttachment(
         attachmentInfo: OWSAttachmentInfo,
-        interactionUniqueId: BackupArchive.InteractionUniqueId,
-        messageRowId: Int64,
+        quotedReplyReferencedAttachment: ReferencedAttachment?,
         context: BackupArchive.ArchivingContext,
-    ) -> BackupArchive.ArchiveInteractionResult<BackupProto_Quote.QuotedAttachment> {
-        var partialErrors = [BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>]()
-
+    ) -> BackupProto_Quote.QuotedAttachment {
         var proto = BackupProto_Quote.QuotedAttachment()
         if let mimeType = attachmentInfo.originalAttachmentMimeType {
             proto.contentType = mimeType
@@ -632,30 +645,22 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
             proto.fileName = sourceFilename
         }
 
-        let imageResult = attachmentsArchiver.archiveQuotedReplyThumbnailAttachment(
-            messageRowId: messageRowId,
-            context: context,
-        )
-        switch imageResult.bubbleUp(BackupProto_Quote.QuotedAttachment.self, partialErrors: &partialErrors) {
-        case .continue(let pointerProto):
-            pointerProto.map { proto.thumbnail = $0 }
-        case .bubbleUpError(let result):
-            return result
+        if let quotedReplyReferencedAttachment {
+            proto.thumbnail = attachmentsArchiver.archiveQuotedReplyThumbnailAttachment(
+                referencedAttachment: quotedReplyReferencedAttachment,
+                context: context,
+            )
         }
 
-        if partialErrors.isEmpty {
-            return .success(proto)
-        } else {
-            return .partialFailure(proto, partialErrors)
-        }
+        return proto
     }
 
     private func archiveLinkPreview(
         _ linkPreview: OWSLinkPreview,
+        linkPreviewReferencedAttachment: ReferencedAttachment?,
         messageBody: String,
         interactionUniqueId: BackupArchive.InteractionUniqueId,
         context: BackupArchive.RecipientArchivingContext,
-        messageRowId: Int64,
     ) -> ArchiveInteractionResult<BackupProto_LinkPreview?> {
         var partialErrors = [ArchiveFrameError]()
 
@@ -698,16 +703,11 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
             )
         }
 
-        // Returns nil if no link preview image; this is both how we check presence and how we archive.
-        let imageResult = attachmentsArchiver.archiveLinkPreviewAttachment(
-            messageRowId: messageRowId,
-            context: context,
-        )
-        switch imageResult.bubbleUp(Optional<BackupProto_LinkPreview>.self, partialErrors: &partialErrors) {
-        case .continue(let pointerProto):
-            pointerProto.map { proto.image = $0 }
-        case .bubbleUpError(let archiveInteractionResult):
-            return archiveInteractionResult
+        if let linkPreviewReferencedAttachment {
+            proto.image = attachmentsArchiver.archiveLinkPreviewAttachment(
+                referencedAttachment: linkPreviewReferencedAttachment,
+                context: context,
+            )
         }
 
         if partialErrors.isEmpty {
@@ -722,7 +722,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
     private func archiveContactShareMessageContents(
         _ message: TSMessage,
         contactShare: OWSContact,
-        messageRowId: Int64,
+        contactAvatarReferencedAttachment: ReferencedAttachment?,
         context: BackupArchive.RecipientArchivingContext,
     ) -> ArchiveInteractionResult<ChatItemType> {
         var partialErrors = [ArchiveFrameError]()
@@ -731,8 +731,8 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
 
         let contactResult = contactAttachmentArchiver.archiveContact(
             contactShare,
+            contactAvatarReferencedAttachment: contactAvatarReferencedAttachment,
             uniqueInteractionId: message.uniqueInteractionId,
-            messageRowId: messageRowId,
             context: context,
         )
         switch contactResult.bubbleUp(ChatItemType.self, partialErrors: &partialErrors) {
@@ -765,9 +765,17 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
     private func archiveStickerMessageContents(
         _ message: TSMessage,
         messageSticker: MessageSticker,
-        messageRowId: Int64,
+        stickerReferencedAttachment: ReferencedAttachment?,
         context: BackupArchive.RecipientArchivingContext,
     ) -> ArchiveInteractionResult<ChatItemType> {
+        guard let stickerReferencedAttachment else {
+            // We can't have a sticker without an attachment.
+            return .messageFailure([.archiveFrameError(
+                .stickerMessageMissingStickerAttachment,
+                message.uniqueInteractionId,
+            )])
+        }
+
         var partialErrors = [ArchiveFrameError]()
 
         var proto = BackupProto_StickerMessage()
@@ -778,24 +786,10 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
         stickerProto.stickerID = messageSticker.stickerId
         messageSticker.emoji.map { stickerProto.emoji = $0 }
 
-        let stickerAttachmentResult = attachmentsArchiver.archiveStickerAttachment(
-            messageRowId: messageRowId,
+        stickerProto.data = attachmentsArchiver.archiveStickerAttachment(
+            referencedAttachment: stickerReferencedAttachment,
             context: context,
         )
-
-        switch stickerAttachmentResult.bubbleUp(ChatItemType.self, partialErrors: &partialErrors) {
-        case .continue(let stickerAttachmentProto):
-            guard let stickerAttachmentProto else {
-                // We can't have a sticker without an attachment.
-                return .messageFailure(partialErrors + [.archiveFrameError(
-                    .stickerMessageMissingStickerAttachment,
-                    message.uniqueInteractionId,
-                )])
-            }
-            stickerProto.data = stickerAttachmentProto
-        case .bubbleUpError(let errorResult):
-            return errorResult
-        }
 
         proto.sticker = stickerProto
 
@@ -848,7 +842,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
 
     private func archiveViewOnceMessage(
         _ message: TSMessage,
-        messageRowId: Int64,
+        bodyReferencedAttachments: [ReferencedAttachment],
         context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveInteractionResult<ChatItemType> {
         var partialErrors = [ArchiveFrameError]()
@@ -859,29 +853,22 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
             !context.includedContentFilter.shouldTombstoneViewOnce,
             !message.isViewOnceComplete
         {
-            let attachmentResult = attachmentsArchiver.archiveBodyAttachments(
-                messageId: message.uniqueInteractionId,
-                messageRowId: messageRowId,
+            let bodyAttachmentProtos: [BackupProto_MessageAttachment] = attachmentsArchiver.archiveBodyAttachments(
+                referencedAttachments: bodyReferencedAttachments,
                 context: context,
             )
-            switch attachmentResult.bubbleUp(ChatItemType.self, partialErrors: &partialErrors) {
-            case .continue(let value):
-                guard let first = value.first else {
-                    return .messageFailure(partialErrors + [.archiveFrameError(
-                        .unviewedViewOnceMessageMissingAttachment,
-                        message.uniqueInteractionId,
-                    )])
-                }
-                if value.count > 1 {
-                    partialErrors.append(.archiveFrameError(
-                        .unviewedViewOnceMessageTooManyAttachments(value.count),
-                        message.uniqueInteractionId,
-                    ))
-                }
-                proto.attachment = first
-            case .bubbleUpError(let errorResult):
-                return errorResult
+
+            guard
+                bodyAttachmentProtos.count == 1,
+                let first = bodyAttachmentProtos.first
+            else {
+                return .messageFailure(partialErrors + [.archiveFrameError(
+                    .unviewedViewOnceMessageUnexpectedAttachmentCount(bodyAttachmentProtos.count),
+                    message.uniqueInteractionId,
+                )])
             }
+
+            proto.attachment = first
         }
 
         let reactions: [BackupProto_Reaction]
@@ -911,8 +898,8 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
     /// up since stories are not backed up.
     private func archiveDirectStoryReplyMessage(
         _ message: TSMessage,
+        oversizeTextReferencedAttachment: ReferencedAttachment?,
         interactionUniqueId: BackupArchive.InteractionUniqueId,
-        messageRowId: Int64,
         context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveInteractionResult<ChatItemType> {
         guard
@@ -973,7 +960,7 @@ class BackupArchiveTSMessageContentsArchiver: BackupArchiveProtoStreamWriter {
 
             let oversizeTextResult = oversizeTextArchiver.archiveMessageBody(
                 text: body,
-                messageRowId: messageRowId,
+                oversizeTextReferencedAttachment: oversizeTextReferencedAttachment,
                 messageId: message.uniqueInteractionId,
                 context: context,
             )

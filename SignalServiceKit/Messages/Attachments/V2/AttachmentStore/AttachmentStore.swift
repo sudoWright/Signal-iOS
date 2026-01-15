@@ -225,6 +225,26 @@ public struct AttachmentStore {
 
     // MARK: -
 
+    /// Fetch an arbitrary referenced attachment for the provided owner.
+    ///
+    /// - Important
+    /// Callers should be sure that they are, in fact, interested in an
+    /// arbitrary attachment; for example, if the passed `owner` only allows at
+    /// most one reference.
+    public func fetchAnyReferencedAttachment(
+        for owner: AttachmentReference.Owner.ID,
+        tx: DBReadTransaction,
+    ) -> ReferencedAttachment? {
+        guard let reference = self.fetchAnyReference(owner: owner, tx: tx) else {
+            return nil
+        }
+        guard let attachment = self.fetch(id: reference.attachmentRowId, tx: tx) else {
+            owsFailDebug("Missing attachment!")
+            return nil
+        }
+        return ReferencedAttachment(reference: reference, attachment: attachment)
+    }
+
     public func fetchReferencedAttachments(
         for owner: AttachmentReference.Owner.ID,
         tx: DBReadTransaction,
@@ -287,26 +307,6 @@ public struct AttachmentStore {
         }
 
         return fetchReferencedAttachments(owners: allStoryOwners, tx: tx)
-    }
-
-    /// Fetch an arbitrary referenced attachment for the provided owner.
-    ///
-    /// - Important
-    /// Callers should be sure that they are, in fact, interested in an
-    /// arbitrary attachment; for example, if the passed `owner` only allows at
-    /// most one reference.
-    public func fetchAnyReferencedAttachment(
-        for owner: AttachmentReference.Owner.ID,
-        tx: DBReadTransaction,
-    ) -> ReferencedAttachment? {
-        guard let reference = self.fetchAnyReference(owner: owner, tx: tx) else {
-            return nil
-        }
-        guard let attachment = self.fetch(id: reference.attachmentRowId, tx: tx) else {
-            owsFailDebug("Missing attachment!")
-            return nil
-        }
-        return ReferencedAttachment(reference: reference, attachment: attachment)
     }
 
     private func fetchReferencedAttachments(

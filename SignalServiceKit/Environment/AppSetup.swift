@@ -1457,6 +1457,7 @@ extension AppSetup.GlobalsContinuation {
             chatItemArchiver: BackupArchiveChatItemArchiver(
                 archivedPaymentStore: archivedPaymentStore,
                 attachmentsArchiver: backupAttachmentsArchiver,
+                attachmentStore: attachmentStore,
                 callRecordStore: callRecordStore,
                 contactManager: BackupArchive.Wrappers.ContactManager(contactManager),
                 editMessageStore: editMessageStore,

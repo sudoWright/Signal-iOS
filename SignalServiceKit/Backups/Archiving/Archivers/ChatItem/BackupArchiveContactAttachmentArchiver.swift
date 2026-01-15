@@ -20,8 +20,8 @@ class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamWriter {
 
     func archiveContact(
         _ contact: OWSContact,
+        contactAvatarReferencedAttachment: ReferencedAttachment?,
         uniqueInteractionId: BackupArchive.InteractionUniqueId,
-        messageRowId: Int64,
         context: BackupArchive.ArchivingContext,
     ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment> {
         let resultType = BackupProto_ContactAttachment.self
@@ -62,7 +62,7 @@ class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamWriter {
         for address in contact.addresses {
             switch archiveContactAddress(address).bubbleUp(resultType, partialErrors: &partialErrors) {
             case .continue(let addressProto):
-                addressProto.flatMap { addressProtos.append($0) }
+                addressProto.map { addressProtos.append($0) }
             case .bubbleUpError(let errorResult):
                 return errorResult
             }
@@ -73,16 +73,11 @@ class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamWriter {
             contactProto.organization = organization
         }
 
-        // Returns nil if no avatar; this is both how we check existence and how we archive.
-        let avatarResult = attachmentsArchiver.archiveContactShareAvatarAttachment(
-            messageRowId: messageRowId,
-            context: context,
-        )
-        switch avatarResult.bubbleUp(BackupProto_ContactAttachment.self, partialErrors: &partialErrors) {
-        case .continue(let avatarPointerProto):
-            avatarPointerProto.map { contactProto.avatar = $0 }
-        case .bubbleUpError(let errorResult):
-            return errorResult
+        if let contactAvatarReferencedAttachment {
+            contactProto.avatar = attachmentsArchiver.archiveContactAvatar(
+                referencedAttachment: contactAvatarReferencedAttachment,
+                context: context,
+            )
         }
 
         if partialErrors.isEmpty {

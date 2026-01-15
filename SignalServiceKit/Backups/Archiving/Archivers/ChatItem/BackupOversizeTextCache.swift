@@ -144,7 +144,7 @@ class BackupArchiveInlinedOversizeTextArchiver {
 
     func archiveMessageBody(
         text: String,
-        messageRowId: Int64,
+        oversizeTextReferencedAttachment: ReferencedAttachment?,
         messageId: BackupArchive.InteractionUniqueId,
         context: BackupArchive.ArchivingContext,
     ) -> BackupArchive.ArchiveInteractionResult<ArchivedMessageBody> {
@@ -156,12 +156,8 @@ class BackupArchiveInlinedOversizeTextArchiver {
             text = text.trimToUtf8ByteCount(BackupOversizeTextCache.maxTextLengthBytes)
         }
 
-        let oversizedTextReference = attachmentStore.fetchAnyReference(
-            owner: .messageOversizeText(messageRowId: messageRowId),
-            tx: context.tx,
-        )
         guard
-            let oversizedTextReference
+            let oversizeTextReferencedAttachment
         else {
             // No oversized text if there's no corresponding attachment!
             return .success(ArchivedMessageBody(
@@ -173,7 +169,7 @@ class BackupArchiveInlinedOversizeTextArchiver {
         let oversizedText: String?
         do {
             oversizedText = try self.fetchInlineableOversizedText(
-                attachmentId: oversizedTextReference.attachmentRowId,
+                attachmentId: oversizeTextReferencedAttachment.attachment.id,
                 tx: context.tx,
             )
         } catch {
@@ -189,31 +185,14 @@ class BackupArchiveInlinedOversizeTextArchiver {
             ))
         } else {
             // Otherwise the best we can do is return a pointer.
-            guard let attachment = attachmentStore.fetch(id: oversizedTextReference.attachmentRowId, tx: context.tx) else {
-                return .success(ArchivedMessageBody(
-                    inlinedText: text,
-                    oversizedTextPointer: nil,
-                ))
-            }
-            var partialErrors = [BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>]()
-            let pointerResult = attachmentsArchiver.archiveOversizeTextAttachment(
-                ReferencedAttachment(reference: oversizedTextReference, attachment: attachment),
+            let oversizeTextProto = attachmentsArchiver.archiveOversizeTextAttachment(
+                referencedAttachment: oversizeTextReferencedAttachment,
                 context: context,
             )
-            switch pointerResult.bubbleUp(ArchivedMessageBody.self, partialErrors: &partialErrors) {
-            case .bubbleUpError(let error):
-                return error
-            case .continue(let oversizedTextPointer):
-                let body = ArchivedMessageBody(
-                    inlinedText: text.trimToUtf8ByteCount(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes),
-                    oversizedTextPointer: oversizedTextPointer,
-                )
-                if partialErrors.isEmpty {
-                    return .success(body)
-                } else {
-                    return .partialFailure(body, partialErrors)
-                }
-            }
+            return .success(ArchivedMessageBody(
+                inlinedText: text.trimToUtf8ByteCount(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes),
+                oversizedTextPointer: oversizeTextProto,
+            ))
         }
     }
 
