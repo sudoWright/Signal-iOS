@@ -23,7 +23,7 @@ public class SharingThreadPickerProgressSheet: ActionSheetController {
         setupSubviews()
 
         let cancelAction = ActionSheetAction(
-            title: CommonStrings.cancelButton,
+            title: CommonStrings.dismissButton,
             style: .cancel,
         ) { [weak delegate] _ in
             delegate?.shareViewWasCancelled()
