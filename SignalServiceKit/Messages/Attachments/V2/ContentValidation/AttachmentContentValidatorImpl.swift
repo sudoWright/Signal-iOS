@@ -401,22 +401,6 @@ public class AttachmentContentValidatorImpl: AttachmentContentValidator {
 
     // MARK: Content Type Validation
 
-    private func rawContentType(mimeType: String) -> Attachment.ContentTypeRaw {
-        if MimeTypeUtil.isSupportedVideoMimeType(mimeType) {
-            return .video
-        } else if MimeTypeUtil.isSupportedAudioMimeType(mimeType) {
-            return .audio
-        } else if MimeTypeUtil.isSupportedDefinitelyAnimatedMimeType(mimeType) {
-            return .animatedImage
-        } else if MimeTypeUtil.isSupportedImageMimeType(mimeType) {
-            return .image
-        } else if MimeTypeUtil.isSupportedMaybeAnimatedMimeType(mimeType) {
-            return .animatedImage
-        } else {
-            return .file
-        }
-    }
-
     fileprivate struct PendingFile {
         let tmpFileUrl: URL
         let isTmpFileEncrypted: Bool
@@ -448,7 +432,7 @@ public class AttachmentContentValidatorImpl: AttachmentContentValidator {
         let blurHash: String?
         let audioWaveformFile: PendingFile?
         let videoStillFrameFile: PendingFile?
-        switch rawContentType(mimeType: input.mimeType) {
+        switch Attachment.ContentTypeRaw(mimeType: input.mimeType) {
         case .invalid:
             contentType = .invalid
             blurHash = nil

@@ -34,6 +34,22 @@ extension Attachment {
             }
             self = value
         }
+
+        init(mimeType: String) {
+            if MimeTypeUtil.isSupportedVideoMimeType(mimeType) {
+                self = .video
+            } else if MimeTypeUtil.isSupportedAudioMimeType(mimeType) {
+                self = .audio
+            } else if MimeTypeUtil.isSupportedDefinitelyAnimatedMimeType(mimeType) {
+                self = .animatedImage
+            } else if MimeTypeUtil.isSupportedImageMimeType(mimeType) {
+                self = .image
+            } else if MimeTypeUtil.isSupportedMaybeAnimatedMimeType(mimeType) {
+                self = .animatedImage
+            } else {
+                self = .file
+            }
+        }
     }
 
     public enum ContentType {
