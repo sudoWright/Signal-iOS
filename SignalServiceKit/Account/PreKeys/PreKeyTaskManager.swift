@@ -77,15 +77,14 @@ struct PreKeyTaskManager {
     /// When we register, we create a new identity key and other keys. So this variant:
     /// CAN create a new identity key (or uses any existing one)
     /// ALWAYS changes the targeted keys (regardless of current key state)
-    func createForRegistration() async throws -> RegistrationPreKeyUploadBundles {
+    func createForRegistration() async -> RegistrationPreKeyUploadBundles {
         logger.info("Create for registration")
 
-        try Task.checkCancellation()
-        let (aciBundle, pniBundle) = try await db.awaitableWrite { tx in
+        let (aciBundle, pniBundle) = await db.awaitableWrite { tx in
             let aciBundle = self.generateKeysForRegistration(identity: .aci, tx: tx)
             let pniBundle = self.generateKeysForRegistration(identity: .pni, tx: tx)
-            try self.persistKeysPriorToUpload(bundle: aciBundle, tx: tx)
-            try self.persistKeysPriorToUpload(bundle: pniBundle, tx: tx)
+            self.persistKeysPriorToUpload(bundle: aciBundle, tx: tx)
+            self.persistKeysPriorToUpload(bundle: pniBundle, tx: tx)
             return (aciBundle, pniBundle)
         }
         return .init(aci: aciBundle, pni: pniBundle)
@@ -97,11 +96,10 @@ struct PreKeyTaskManager {
     func createForProvisioning(
         aciIdentityKeyPair: ECKeyPair,
         pniIdentityKeyPair: ECKeyPair,
-    ) async throws -> RegistrationPreKeyUploadBundles {
+    ) async -> RegistrationPreKeyUploadBundles {
         logger.info("Create for provisioning")
 
-        try Task.checkCancellation()
-        let (aciBundle, pniBundle) = try await db.awaitableWrite { tx in
+        let (aciBundle, pniBundle) = await db.awaitableWrite { tx in
             let aciBundle = self.generateKeysForProvisioning(
                 identity: .aci,
                 identityKeyPair: aciIdentityKeyPair,
@@ -112,8 +110,8 @@ struct PreKeyTaskManager {
                 identityKeyPair: pniIdentityKeyPair,
                 tx: tx,
             )
-            try self.persistKeysPriorToUpload(bundle: aciBundle, tx: tx)
-            try self.persistKeysPriorToUpload(bundle: pniBundle, tx: tx)
+            self.persistKeysPriorToUpload(bundle: aciBundle, tx: tx)
+            self.persistKeysPriorToUpload(bundle: pniBundle, tx: tx)
             return (aciBundle, pniBundle)
         }
         return .init(aci: aciBundle, pni: pniBundle)
@@ -122,13 +120,12 @@ struct PreKeyTaskManager {
     func persistAfterRegistration(
         bundles: RegistrationPreKeyUploadBundles,
         uploadDidSucceed: Bool,
-    ) async throws {
+    ) async {
         logger.info("Persist after provisioning")
-        try Task.checkCancellation()
-        try await db.awaitableWrite { tx in
+        await db.awaitableWrite { tx in
             if uploadDidSucceed {
-                try self.persistStateAfterUpload(bundle: bundles.aci, tx: tx)
-                try self.persistStateAfterUpload(bundle: bundles.pni, tx: tx)
+                self.persistStateAfterUpload(bundle: bundles.aci, tx: tx)
+                self.persistStateAfterUpload(bundle: bundles.pni, tx: tx)
             } else {
                 // Wipe the keys.
                 self.wipeKeysAfterFailedRegistration(bundle: bundles.aci, tx: tx)
@@ -183,7 +180,7 @@ struct PreKeyTaskManager {
         logger.info("[\(identity)] Refresh: [\(filteredTargets)]")
         let bundle = try await db.awaitableWrite { tx in
             let identityKeyPair = try self.requireIdentityKeyPair(for: identity, tx: tx)
-            return try self.createAndPersistPartialBundle(
+            return self.createAndPersistPartialBundle(
                 identity: identity,
                 identityKeyPair: identityKeyPair,
                 targets: filteredTargets,
@@ -203,7 +200,7 @@ struct PreKeyTaskManager {
         try Task.checkCancellation()
         let bundle = try await db.awaitableWrite { tx in
             let identityKeyPair = try self.requireIdentityKeyPair(for: identity, tx: tx)
-            return try self.createAndPersistPartialBundle(
+            return self.createAndPersistPartialBundle(
                 identity: identity,
                 identityKeyPair: identityKeyPair,
                 targets: [.oneTimePreKey, .oneTimePqPreKey],
@@ -295,7 +292,7 @@ struct PreKeyTaskManager {
         identityKeyPair: ECKeyPair,
         targets: PreKeyTargets,
         tx: DBWriteTransaction,
-    ) throws -> PartialPreKeyUploadBundle {
+    ) -> PartialPreKeyUploadBundle {
         let protocolStore = self.protocolStoreManager.signalProtocolStore(
             for: identity,
         )
@@ -332,7 +329,7 @@ struct PreKeyTaskManager {
             lastResortPreKey: lastResortPreKey,
             pqPreKeyRecords: pqPreKeyRecords,
         )
-        try persistKeysPriorToUpload(bundle: result, tx: tx)
+        persistKeysPriorToUpload(bundle: result, tx: tx)
         return result
     }
 
@@ -414,7 +411,7 @@ struct PreKeyTaskManager {
     private func persistKeysPriorToUpload(
         bundle: PreKeyUploadBundle,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         let protocolStore = protocolStoreManager.signalProtocolStore(for: bundle.identity)
         if let signedPreKeyRecord = bundle.getSignedPreKey() {
             protocolStore.signedPreKeyStore.storeSignedPreKey(signedPreKeyRecord, tx: tx)
@@ -433,7 +430,7 @@ struct PreKeyTaskManager {
     private func persistStateAfterUpload(
         bundle: PreKeyUploadBundle,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         let protocolStore = protocolStoreManager.signalProtocolStore(for: bundle.identity)
 
         if let signedPreKeyRecord = bundle.getSignedPreKey() {
@@ -499,8 +496,8 @@ struct PreKeyTaskManager {
             break
         case .success:
             logger.info("[\(identity)] Successfully uploaded prekeys")
-            try await db.awaitableWrite { tx in
-                try self.persistStateAfterUpload(bundle: bundle, tx: tx)
+            await db.awaitableWrite { tx in
+                self.persistStateAfterUpload(bundle: bundle, tx: tx)
             }
             Task {
                 try await self.messageProcessor.waitForFetchingAndProcessing()

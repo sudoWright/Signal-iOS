@@ -183,7 +183,8 @@ public class PreKeyManagerImpl: PreKeyManager {
         /// because this operation does not generate one time prekeys, so we
         /// shouldn't mark the routine refresh as having been "checked".
         return Self.taskQueue.enqueueCancellingPrevious { [taskManager] in
-            return try await taskManager.createForRegistration()
+            try Task.checkCancellation()
+            return await taskManager.createForRegistration()
         }
     }
 
@@ -196,7 +197,8 @@ public class PreKeyManagerImpl: PreKeyManager {
         /// because this operation does not generate one time prekeys, so we
         /// shouldn't mark the routine refresh as having been "checked".
         return Self.taskQueue.enqueueCancellingPrevious { [taskManager] in
-            return try await taskManager.createForProvisioning(
+            try Task.checkCancellation()
+            return await taskManager.createForProvisioning(
                 aciIdentityKeyPair: aciIdentityKeyPair,
                 pniIdentityKeyPair: pniIdentityKeyPair,
             )
@@ -209,7 +211,8 @@ public class PreKeyManagerImpl: PreKeyManager {
     ) -> Task<Void, Error> {
         logger.info("Finalize registration prekeys")
         return Self.taskQueue.enqueue { [taskManager] in
-            try await taskManager.persistAfterRegistration(
+            try Task.checkCancellation()
+            await taskManager.persistAfterRegistration(
                 bundles: bundles,
                 uploadDidSucceed: uploadDidSucceed,
             )
