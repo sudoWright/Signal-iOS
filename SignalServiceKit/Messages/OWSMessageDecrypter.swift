@@ -124,10 +124,10 @@ public class OWSMessageDecrypter {
             return
         }
 
-        let profileKeyMessage = OWSProfileKeyMessage(
+        let profileKeyMessage = ProfileKeyMessage(
             thread: contactThread,
-            profileKey: profileKey.serialize(),
-            transaction: transaction,
+            profileKey: profileKey,
+            tx: transaction,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: profileKeyMessage,

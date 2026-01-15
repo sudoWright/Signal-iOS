@@ -405,10 +405,10 @@ private extension RecipientHidingManagerImpl {
             ),
             let profileKey = profileManager.localProfileKey(tx: tx)
         {
-            let profileKeyMessage = OWSProfileKeyMessage(
+            let profileKeyMessage = ProfileKeyMessage(
                 thread: thread,
-                profileKey: profileKey.serialize(),
-                transaction: tx,
+                profileKey: profileKey,
+                tx: tx,
             )
             Logger.info("[Recipient hiding][side effects] Share profile key.")
             let preparedMessage = PreparedOutgoingMessage.preprepared(

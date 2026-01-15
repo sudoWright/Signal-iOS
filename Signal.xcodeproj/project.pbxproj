@@ -805,6 +805,7 @@
 		50D8796A2A16D2C20031345D /* MessageLoaderBatchTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D879692A16D2C20031345D /* MessageLoaderBatchTest.swift */; };
 		50D9CD8D2C52D78000273D6C /* StoryRecipientManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D9CD8C2C52D78000273D6C /* StoryRecipientManager.swift */; };
 		50DCCBFA2F1817280024D124 /* DisappearingMessagesConfigurationMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DCCBF92F1817280024D124 /* DisappearingMessagesConfigurationMessage.swift */; };
+		50DCCBFC2F181A790024D124 /* ProfileKeyMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DCCBFB2F181A790024D124 /* ProfileKeyMessage.swift */; };
 		50E42FEA2C1BA3B900554BD6 /* CallHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E42FE92C1BA3B900554BD6 /* CallHTTPClient.swift */; };
 		50E51A3B2AE989C4004F9069 /* AccountAttributesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E51A3A2AE989C4004F9069 /* AccountAttributesTest.swift */; };
 		50E5E4B129932D9B00E15A1C /* DeviceMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E5E4B029932D9B00E15A1C /* DeviceMessage.swift */; };
@@ -3622,7 +3623,6 @@
 		F9C5CC2B289453B300548EEE /* TSInvalidIdentityKeyReceivingErrorMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C93A289453B100548EEE /* TSInvalidIdentityKeyReceivingErrorMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CC2C289453B300548EEE /* OWSIdentityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C93B289453B100548EEE /* OWSIdentityManager.swift */; };
 		F9C5CC31289453B300548EEE /* BlockingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C940289453B100548EEE /* BlockingManager.swift */; };
-		F9C5CC32289453B300548EEE /* OWSProfileKeyMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C941289453B100548EEE /* OWSProfileKeyMessage.m */; };
 		F9C5CC34289453B300548EEE /* DeliveryReceiptContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C943289453B100548EEE /* DeliveryReceiptContext.swift */; };
 		F9C5CC36289453B300548EEE /* OWSGroupCallMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C945289453B100548EEE /* OWSGroupCallMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CC37289453B300548EEE /* OWSOutgoingNullMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C946289453B100548EEE /* OWSOutgoingNullMessage.m */; };
@@ -3665,7 +3665,6 @@
 		F9C5CC6B289453B300548EEE /* OWSGroupCallMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C97D289453B100548EEE /* OWSGroupCallMessage.m */; };
 		F9C5CC6D289453B300548EEE /* MessageFetcherJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C97F289453B100548EEE /* MessageFetcherJob.swift */; };
 		F9C5CC6E289453B300548EEE /* OWSRecoverableDecryptionPlaceholder+SDS.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C980289453B100548EEE /* OWSRecoverableDecryptionPlaceholder+SDS.swift */; };
-		F9C5CC6F289453B300548EEE /* OWSProfileKeyMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C981289453B100548EEE /* OWSProfileKeyMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CC71289453B300548EEE /* OWSMessageDecrypter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C983289453B100548EEE /* OWSMessageDecrypter.swift */; };
 		F9C5CC74289453B300548EEE /* BlurHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C987289453B100548EEE /* BlurHash.swift */; };
 		F9C5CC75289453B300548EEE /* OWSMediaUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C988289453B100548EEE /* OWSMediaUtils.swift */; };
@@ -4977,6 +4976,7 @@
 		50D879692A16D2C20031345D /* MessageLoaderBatchTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageLoaderBatchTest.swift; sourceTree = "<group>"; };
 		50D9CD8C2C52D78000273D6C /* StoryRecipientManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryRecipientManager.swift; sourceTree = "<group>"; };
 		50DCCBF92F1817280024D124 /* DisappearingMessagesConfigurationMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisappearingMessagesConfigurationMessage.swift; sourceTree = "<group>"; };
+		50DCCBFB2F181A790024D124 /* ProfileKeyMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileKeyMessage.swift; sourceTree = "<group>"; };
 		50E42FE52C1B9EB900554BD6 /* CallLinkState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallLinkState.swift; sourceTree = "<group>"; };
 		50E42FE92C1BA3B900554BD6 /* CallHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallHTTPClient.swift; sourceTree = "<group>"; };
 		50E51A3A2AE989C4004F9069 /* AccountAttributesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountAttributesTest.swift; sourceTree = "<group>"; };
@@ -7845,7 +7845,6 @@
 		F9C5C93A289453B100548EEE /* TSInvalidIdentityKeyReceivingErrorMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSInvalidIdentityKeyReceivingErrorMessage.h; sourceTree = "<group>"; };
 		F9C5C93B289453B100548EEE /* OWSIdentityManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OWSIdentityManager.swift; sourceTree = "<group>"; };
 		F9C5C940289453B100548EEE /* BlockingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockingManager.swift; sourceTree = "<group>"; };
-		F9C5C941289453B100548EEE /* OWSProfileKeyMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OWSProfileKeyMessage.m; sourceTree = "<group>"; };
 		F9C5C943289453B100548EEE /* DeliveryReceiptContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeliveryReceiptContext.swift; sourceTree = "<group>"; };
 		F9C5C945289453B100548EEE /* OWSGroupCallMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OWSGroupCallMessage.h; sourceTree = "<group>"; };
 		F9C5C946289453B100548EEE /* OWSOutgoingNullMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OWSOutgoingNullMessage.m; sourceTree = "<group>"; };
@@ -7888,7 +7887,6 @@
 		F9C5C97D289453B100548EEE /* OWSGroupCallMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OWSGroupCallMessage.m; sourceTree = "<group>"; };
 		F9C5C97F289453B100548EEE /* MessageFetcherJob.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageFetcherJob.swift; sourceTree = "<group>"; };
 		F9C5C980289453B100548EEE /* OWSRecoverableDecryptionPlaceholder+SDS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "OWSRecoverableDecryptionPlaceholder+SDS.swift"; sourceTree = "<group>"; };
-		F9C5C981289453B100548EEE /* OWSProfileKeyMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OWSProfileKeyMessage.h; sourceTree = "<group>"; };
 		F9C5C983289453B100548EEE /* OWSMessageDecrypter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OWSMessageDecrypter.swift; sourceTree = "<group>"; };
 		F9C5C987289453B100548EEE /* BlurHash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurHash.swift; sourceTree = "<group>"; };
 		F9C5C988289453B100548EEE /* OWSMediaUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OWSMediaUtils.swift; sourceTree = "<group>"; };
@@ -14433,8 +14431,6 @@
 				508C72232C2DFCB2000811F3 /* OWSOutgoingResendResponseTest.swift */,
 				F9C5C953289453B100548EEE /* OWSOutgoingSenderKeyDistributionMessage.h */,
 				F9C5C99C289453B100548EEE /* OWSOutgoingSenderKeyDistributionMessage.m */,
-				F9C5C981289453B100548EEE /* OWSProfileKeyMessage.h */,
-				F9C5C941289453B100548EEE /* OWSProfileKeyMessage.m */,
 				7273280A2CA797320080E2C7 /* OWSReadTracking.h */,
 				F9C5C993289453B100548EEE /* OWSReceiptManager.swift */,
 				F9C5C980289453B100548EEE /* OWSRecoverableDecryptionPlaceholder+SDS.swift */,
@@ -14448,6 +14444,7 @@
 				F9C5C952289453B100548EEE /* OWSUnknownProtocolVersionMessage.h */,
 				F9C5C99E289453B100548EEE /* OWSUnknownProtocolVersionMessage.m */,
 				50B62C732AB211E800705A89 /* PniSignatureProcessor.swift */,
+				50DCCBFB2F181A790024D124 /* ProfileKeyMessage.swift */,
 				500CC1E62F15C20B001A86F7 /* ReceiptMessage.swift */,
 				F9C5C996289453B100548EEE /* ReceiptSender.swift */,
 				66D13F092A731E590092D47B /* RecipientHidingManager+SignalServiceAddress.swift */,
@@ -15377,7 +15374,6 @@
 				6642A8702A8D7B4B00E591C2 /* OWSPaymentActivationRequestFinishedMessage.h in Headers */,
 				6642A8742A8D80CB00E591C2 /* OWSPaymentActivationRequestMessage.h in Headers */,
 				6605D4FD2A85AD17004DC345 /* OWSPaymentMessage.h in Headers */,
-				F9C5CC6F289453B300548EEE /* OWSProfileKeyMessage.h in Headers */,
 				F9C5CD00289453B300548EEE /* OWSReadReceiptsForLinkedDevicesMessage.h in Headers */,
 				7273280B2CA797370080E2C7 /* OWSReadTracking.h in Headers */,
 				F9C5CC47289453B300548EEE /* OWSRecoverableDecryptionPlaceholder.h in Headers */,
@@ -19222,7 +19218,6 @@
 				6642A8762A8D80F400E591C2 /* OWSPaymentActivationRequestMessage.m in Sources */,
 				72C9058D2B9AC81B00E586B8 /* OWSPaymentsLock.swift in Sources */,
 				04A573702E4D4BD50019651F /* OWSPoll.swift in Sources */,
-				F9C5CC32289453B300548EEE /* OWSProfileKeyMessage.m in Sources */,
 				724D47B82B97C301001BE973 /* OWSProfileManager.swift in Sources */,
 				66A830442CEBFCC700A7656D /* OWSProgress.swift in Sources */,
 				F9C5CC3A289453B300548EEE /* OWSReaction.swift in Sources */,
@@ -19331,6 +19326,7 @@
 				F9C5CE39289453B400548EEE /* ProfileFetcher.swift in Sources */,
 				F9C5CE38289453B400548EEE /* ProfileFetcherJob.swift in Sources */,
 				50D146CD2D1F4E5800D628DE /* ProfileKey.swift in Sources */,
+				50DCCBFC2F181A790024D124 /* ProfileKeyMessage.swift in Sources */,
 				503BD2892B44D666009624FC /* ProfileManager.swift in Sources */,
 				72901D2D2C9B129B000406DC /* ProfileManagerProtocol.swift in Sources */,
 				B93296692BBB3FF200B8BD39 /* ProfileName.swift in Sources */,

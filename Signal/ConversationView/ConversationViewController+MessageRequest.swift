@@ -320,10 +320,10 @@ private extension ConversationViewController {
                 }
                 // If this is a contact thread, we should give the
                 // now-unblocked contact our profile key.
-                let profileKeyMessage = OWSProfileKeyMessage(
+                let profileKeyMessage = ProfileKeyMessage(
                     thread: thread,
-                    profileKey: profileManager.localProfileKey(tx: transaction)!.serialize(),
-                    transaction: transaction,
+                    profileKey: profileManager.localProfileKey(tx: transaction)!,
+                    tx: transaction,
                 )
                 let preparedMessage = PreparedOutgoingMessage.preprepared(
                     transientMessageWithoutAttachments: profileKeyMessage,

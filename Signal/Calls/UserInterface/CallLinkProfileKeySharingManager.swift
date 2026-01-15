@@ -64,10 +64,10 @@ public class CallLinkProfileKeySharingManager {
 
     private func sendProfileKey(_ profileKey: ProfileKey, toAci aci: Aci, tx: DBWriteTransaction) {
         let thread = TSContactThread.getOrCreateThread(withContactAddress: SignalServiceAddress(aci), transaction: tx)
-        let profileKeyMessage = OWSProfileKeyMessage(
+        let profileKeyMessage = ProfileKeyMessage(
             thread: thread,
-            profileKey: profileKey.serialize(),
-            transaction: tx,
+            profileKey: profileKey,
+            tx: tx,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: profileKeyMessage,

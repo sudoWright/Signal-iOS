@@ -17,11 +17,10 @@ class ProtoUtils: NSObject {
         }
     }
 
-    @objc
-    static func addLocalProfileKeyIfNecessary(forThread thread: TSThread, profileKeySnapshot: Data?, dataMessageBuilder: SSKProtoDataMessageBuilder, transaction: DBReadTransaction) {
+    static func addLocalProfileKeyIfNecessary(forThread thread: TSThread, profileKeySnapshot: ProfileKey?, dataMessageBuilder: SSKProtoDataMessageBuilder, transaction: DBReadTransaction) {
         let profileKey = localProfileKey(tx: transaction)
         let canAddLocalProfileKey: Bool = (
-            profileKeySnapshot?.ows_constantTimeIsEqual(to: profileKey.serialize()) == true
+            profileKeySnapshot?.serialize().ows_constantTimeIsEqual(to: profileKey.serialize()) == true
                 || shouldMessageHaveLocalProfileKey(thread, transaction: transaction),
         )
         if canAddLocalProfileKey {
@@ -29,7 +28,6 @@ class ProtoUtils: NSObject {
         }
     }
 
-    @objc
     static func addLocalProfileKeyIfNecessary(_ thread: TSThread, callMessageBuilder: SSKProtoCallMessageBuilder, transaction: DBReadTransaction) {
         if shouldMessageHaveLocalProfileKey(thread, transaction: transaction) {
             callMessageBuilder.setProfileKey(localProfileKey(tx: transaction).serialize())
