@@ -1527,25 +1527,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
             // Perform a HEAD request to get the byte length & last modified date from cdn.
             let request = try urlSession.endpoint.buildRequest(urlPath, method: .head, headers: headers)
             let response = try await urlSession.performRequest(request: request, ignoreAppExpiry: true)
-            guard
-                let contentLengthRaw = response.headers["Content-Length"],
-                let contentLengthBytes = UInt(contentLengthRaw)
-            else {
-                Logger.error("Missing content length from cdn")
-                throw OWSUnretryableError()
-            }
-
-            guard
-                let lastModifiedRaw = response.headers["Last-Modified"],
-                let lastModifiedDate = Date.ows_parseFromHTTPDateString(lastModifiedRaw)
-            else {
-                Logger.error("Missing last modified from cdn")
-                throw OWSUnretryableError()
-            }
-            return AttachmentDownloads.CdnInfo(
-                contentLength: contentLengthBytes,
-                lastModified: lastModifiedDate,
-            )
+            return try AttachmentDownloads.CdnInfo(response.headers)
         }
 
         /// Fetch the first `length` bytes of the object from the CDN, returning the fetched bytes,
@@ -1570,26 +1552,8 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
 
             let request = try urlSession.endpoint.buildRequest(urlPath, method: .get, headers: headers)
             let response = try await urlSession.performRequest(request: request, ignoreAppExpiry: true)
+            let cdnInfo = try AttachmentDownloads.CdnInfo(response.headers)
 
-            guard
-                let contentLengthRaw = response.headers["Content-Length"],
-                let contentLengthBytes = UInt(contentLengthRaw)
-            else {
-                Logger.error("Missing content length from cdn")
-                throw OWSUnretryableError()
-            }
-
-            guard
-                let lastModifiedRaw = response.headers["Last-Modified"],
-                let lastModifiedDate = Date.ows_parseFromHTTPDateString(lastModifiedRaw)
-            else {
-                Logger.error("Missing last modified from cdn")
-                throw OWSUnretryableError()
-            }
-            let cdnInfo = AttachmentDownloads.CdnInfo(
-                contentLength: contentLengthBytes,
-                lastModified: lastModifiedDate,
-            )
             return (cdnInfo, response.responseBodyData)
         }
 

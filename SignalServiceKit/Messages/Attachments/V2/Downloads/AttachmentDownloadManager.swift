@@ -117,6 +117,31 @@ public enum AttachmentDownloads {
     public struct CdnInfo {
         public let contentLength: UInt
         public let lastModified: Date
+
+        public init(contentLength: UInt, lastModified: Date) {
+            self.contentLength = contentLength
+            self.lastModified = lastModified
+        }
+
+        init(_ headers: HttpHeaders) throws {
+            guard
+                let contentLengthRaw = headers["Content-Length"],
+                let contentLengthBytes = UInt(contentLengthRaw)
+            else {
+                Logger.error("Missing content length from cdn")
+                throw OWSUnretryableError()
+            }
+            self.contentLength = contentLengthBytes
+
+            guard
+                let lastModifiedRaw = headers["Last-Modified"],
+                let lastModifiedDate = Date.ows_parseFromHTTPDateString(lastModifiedRaw)
+            else {
+                Logger.error("Missing last modified from cdn")
+                throw OWSUnretryableError()
+            }
+            self.lastModified = lastModifiedDate
+        }
     }
 }
 
