@@ -44,27 +44,14 @@
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    [super encodeWithCoder:coder];
-    [coder encodeObject:[self valueForKey:@"isSentOnBehalfOfOnlineMessage"] forKey:@"isSentOnBehalfOfOnlineMessage"];
-    [coder encodeObject:[self valueForKey:@"isSentOnBehalfOfStoryMessage"] forKey:@"isSentOnBehalfOfStoryMessage"];
-    NSData *serializedSKDM = self.serializedSKDM;
-    if (serializedSKDM != nil) {
-        [coder encodeObject:serializedSKDM forKey:@"serializedSKDM"];
-    }
+    OWSFail(@"Doesn't support serialization.");
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
-    if (!self) {
-        return self;
-    }
-    self->_isSentOnBehalfOfOnlineMessage =
-        [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:@"isSentOnBehalfOfOnlineMessage"] boolValue];
-    self->_isSentOnBehalfOfStoryMessage =
-        [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:@"isSentOnBehalfOfStoryMessage"] boolValue];
-    self->_serializedSKDM = [coder decodeObjectOfClass:[NSData class] forKey:@"serializedSKDM"];
-    return self;
+    // Doesn't support serialization.
+    return nil;
 }
 
 - (NSUInteger)hash
