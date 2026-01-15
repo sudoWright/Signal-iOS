@@ -388,10 +388,10 @@ public class GroupManager: NSObject {
             return
         }
         let newConfiguration = updateResult.newConfiguration
-        let message = OWSDisappearingMessagesConfigurationMessage(
+        let message = DisappearingMessagesConfigurationMessage(
             configuration: newConfiguration,
             thread: contactThread,
-            transaction: transaction,
+            tx: transaction,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: message,
