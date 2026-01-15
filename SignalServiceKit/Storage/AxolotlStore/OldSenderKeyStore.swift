@@ -185,42 +185,20 @@ public class OldSenderKeyStore {
         sendingDistributionIdStore.removeAll(transaction: writeTx)
     }
 
-    public func skdmBytesForThread(_ thread: TSThread, tx: DBWriteTransaction) -> Data? {
-        guard let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx) else {
-            return nil
-        }
-        return skdmBytesForThread(
-            thread,
-            localAci: localIdentifiers.aci,
-            localDeviceId: DependenciesBridge.shared.tsAccountManager.storedDeviceId(tx: tx),
-            tx: tx,
-        )
-    }
-
-    public func skdmBytesForThread(
-        _ thread: TSThread,
+    public func senderKeyDistributionMessage(
+        forThread thread: TSThread,
         localAci: Aci,
-        localDeviceId: LocalDeviceId,
+        localDeviceId: DeviceId,
         tx: DBWriteTransaction,
-    ) -> Data? {
-        guard let localDeviceId = localDeviceId.ifValid else {
-            owsFailDebug("Can't construct sender key message if we're not registered")
-            return nil
-        }
-        do {
-            let localAddress = ProtocolAddress(localAci, deviceId: localDeviceId)
-            let distributionId = distributionIdForSendingToThread(thread, writeTx: tx)
-            let skdm = try SenderKeyDistributionMessage(
-                from: localAddress,
-                distributionId: distributionId,
-                store: self,
-                context: tx,
-            )
-            return skdm.serialize()
-        } catch {
-            owsFailDebug("Failed to construct sender key message: \(error)")
-            return nil
-        }
+    ) throws -> SenderKeyDistributionMessage {
+        let localAddress = ProtocolAddress(localAci, deviceId: localDeviceId)
+        let distributionId = distributionIdForSendingToThread(thread, writeTx: tx)
+        return try LibSignalClient.SenderKeyDistributionMessage(
+            from: localAddress,
+            distributionId: distributionId,
+            store: self,
+            context: tx,
+        )
     }
 }
 

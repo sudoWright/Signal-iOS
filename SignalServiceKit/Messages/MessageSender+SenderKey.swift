@@ -351,17 +351,18 @@ extension MessageSender {
         tx writeTx: DBWriteTransaction,
     ) throws -> PrepareDistributionResult {
         let senderKeyStore = SSKEnvironment.shared.senderKeyStoreRef
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
 
-        guard
-            let skdmData = senderKeyStore.skdmBytesForThread(
-                thread,
-                localAci: localIdentifiers.aci,
-                localDeviceId: DependenciesBridge.shared.tsAccountManager.storedDeviceId(tx: writeTx),
-                tx: writeTx,
-            )
-        else {
-            throw OWSAssertionError("Couldn't build SKDM")
+        guard let localDeviceId = tsAccountManager.storedDeviceId(tx: writeTx).ifValid else {
+            throw NotRegisteredError()
         }
+
+        let senderKeyDistributionMessage = try senderKeyStore.senderKeyDistributionMessage(
+            forThread: thread,
+            localAci: localIdentifiers.aci,
+            localDeviceId: localDeviceId,
+            tx: writeTx,
+        )
 
         var result = PrepareDistributionResult()
         for serviceId in recipients {
@@ -371,23 +372,24 @@ extension MessageSender {
                 withContactAddress: SignalServiceAddress(serviceId),
                 transaction: writeTx,
             )
-            let skdmMessage = OWSOutgoingSenderKeyDistributionMessage(
-                thread: contactThread,
-                senderKeyDistributionMessageBytes: skdmData,
-                transaction: writeTx,
+            let outgoingSKDM = OutgoingSenderKeyDistributionMessage(
+                recipientThread: contactThread,
+                senderKeyDistributionMessage: senderKeyDistributionMessage,
+                onBehalfOfMessage: originalMessage,
+                inThread: thread,
+                tx: writeTx,
             )
-            skdmMessage.configureAsSentOnBehalfOf(originalMessage, in: thread)
 
             let serializedMessage: SerializedMessage
             do {
-                serializedMessage = try self.buildAndRecordMessage(skdmMessage, in: contactThread, tx: writeTx)
+                serializedMessage = try self.buildAndRecordMessage(outgoingSKDM, in: contactThread, tx: writeTx)
             } catch {
                 result.failedRecipients.append((serviceId, error))
                 continue
             }
 
             let messageSend = OWSMessageSend(
-                message: skdmMessage,
+                message: outgoingSKDM,
                 plaintextContent: serializedMessage.plaintextData,
                 plaintextPayloadId: serializedMessage.payloadId,
                 thread: contactThread,
@@ -396,7 +398,7 @@ extension MessageSender {
             )
 
             let sealedSenderParameters = SealedSenderParameters(
-                message: skdmMessage,
+                message: outgoingSKDM,
                 senderCertificate: senderCertificate,
                 accessKey: (serviceId as? Aci).flatMap { udAccessMap[$0] },
                 endorsement: endorsements?.tokenBuilder(forServiceId: serviceId),

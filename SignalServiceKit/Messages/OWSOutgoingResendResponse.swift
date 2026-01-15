@@ -165,18 +165,29 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
             return nullMessageProtoBuilder()
         }()
 
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         if
             let originalThreadId,
             let originalThread = TSThread.anyFetch(uniqueId: originalThreadId, transaction: tx),
             originalThread.usesSenderKey,
             let recipientAddress = self.recipientAddresses().first,
-            originalThread.recipientAddresses(with: tx).contains(recipientAddress)
+            originalThread.recipientAddresses(with: tx).contains(recipientAddress),
+            let registeredState = try? tsAccountManager.registeredState(tx: tx),
+            let deviceId = tsAccountManager.storedDeviceId(tx: tx).ifValid
         {
-            let skdmData = SSKEnvironment.shared.senderKeyStoreRef.skdmBytesForThread(originalThread, tx: tx)
-            if let skdmData {
-                contentBuilder.setSenderKeyDistributionMessage(skdmData)
+            let senderKeyStore = SSKEnvironment.shared.senderKeyStoreRef
+            do {
+                let senderKeyDistributionMessage = try senderKeyStore.senderKeyDistributionMessage(
+                    forThread: originalThread,
+                    localAci: registeredState.localIdentifiers.aci,
+                    localDeviceId: deviceId,
+                    tx: tx,
+                )
+                contentBuilder.setSenderKeyDistributionMessage(senderKeyDistributionMessage.serialize())
+                self.didAppendSKDM = true
+            } catch {
+                owsFailDebug("couldn't append SKDM: \(error)")
             }
-            self.didAppendSKDM = skdmData != nil
         }
 
         do {

@@ -1725,7 +1725,7 @@ public final class MessageReceiver {
         transaction tx: DBWriteTransaction,
     ) {
         do {
-            let skdm = try SenderKeyDistributionMessage(bytes: skdmData)
+            let skdm = try LibSignalClient.SenderKeyDistributionMessage(bytes: skdmData)
             let sourceAci = decryptedEnvelope.sourceAci
             let sourceDeviceId = decryptedEnvelope.sourceDeviceId
             let protocolAddress = ProtocolAddress(sourceAci, deviceId: sourceDeviceId)

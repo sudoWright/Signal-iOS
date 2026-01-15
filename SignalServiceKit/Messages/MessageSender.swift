@@ -10,7 +10,7 @@ import LibSignalClient
 
 private extension TSOutgoingMessage {
     var isTransientSKDM: Bool {
-        (self as? OWSOutgoingSenderKeyDistributionMessage)?.isSentOnBehalfOfOnlineMessage ?? false
+        (self as? OutgoingSenderKeyDistributionMessage)?.isSentOnBehalfOfOnlineMessage ?? false
     }
 
     var isResendRequest: Bool {
