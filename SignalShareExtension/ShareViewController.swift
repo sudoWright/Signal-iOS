@@ -422,11 +422,12 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate, SA
                 self.shareViewWasCancelled()
             }
         default:
+            Logger.warn("building attachment failed with error: \(error)")
+
             let alertTitle = OWSLocalizedString(
                 "SHARE_EXTENSION_UNABLE_TO_BUILD_ATTACHMENT_ALERT_TITLE",
                 comment: "Shown when trying to share content to a Signal user for the share extension. Followed by failure details.",
             )
-
             OWSActionSheets.showActionSheet(
                 title: alertTitle,
                 message: error.userErrorDescription,
@@ -434,7 +435,6 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate, SA
             ) { _ in
                 self.shareViewWasCancelled()
             }
-            owsFailDebug("building attachment failed with error: \(error)")
         }
     }
 
