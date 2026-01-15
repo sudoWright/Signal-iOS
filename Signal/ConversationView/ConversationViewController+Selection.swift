@@ -445,11 +445,7 @@ extension ConversationViewController {
                 return
             }
 
-            let deleteMessage = TSOutgoingDeleteMessage(
-                thread: latestThread,
-                message: message,
-                transaction: tx,
-            )
+            let deleteMessage = OutgoingDeleteMessage(thread: latestThread, message: message, tx: tx)
 
             message.updateWithRecipientAddressStates(
                 deleteMessage.recipientAddressStates,

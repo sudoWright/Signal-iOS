@@ -67,7 +67,7 @@ public enum DeleteForMeSyncMessage {
 ///
 /// - Note
 /// This is contrasted with "delete for everyone" actions, which use a
-/// ``TSOutgoingDeleteMessage`` to ask the recipients of a "target message" to
+/// ``OutgoingDeleteMessage`` to ask the recipients of a "target message" to
 /// delete that message and replace it with a tombstone.
 public protocol DeleteForMeIncomingSyncMessageManager {
     typealias Conversation = DeleteForMeSyncMessage.Incoming.Conversation

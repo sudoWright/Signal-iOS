@@ -127,14 +127,14 @@ public extension TSInteraction {
                             // We can't reach this point in the UI if a message doesn't have a thread.
                             return owsFailDebug("Trying to delete a message without a thread.")
                         }
-                        let deleteMessage = TSOutgoingDeleteMessage(
+                        let deleteMessage = OutgoingDeleteMessage(
                             thread: latestThread,
                             message: latestMessage,
-                            transaction: tx,
+                            tx: tx,
                         )
-                        // Reset the sending states, so we can render the sending state of the deleted message.
-                        // TSOutgoingDeleteMessage will automatically pass through it's send state to the message
-                        // record that it is deleting.
+                        // Reset the sending states, so we can render the sending state of the
+                        // deleted message. OutgoingDeleteMessage will automatically pass through
+                        // it's send state to the message record that it is deleting.
                         latestMessage.updateWithRecipientAddressStates(deleteMessage.recipientAddressStates, tx: tx)
 
                         if let aci = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aci {

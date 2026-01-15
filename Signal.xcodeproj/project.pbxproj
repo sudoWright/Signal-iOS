@@ -769,6 +769,7 @@
 		50B6BCB12AEC4F4D0010FB3B /* AuthorMergeHelperBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B6BCB02AEC4F4D0010FB3B /* AuthorMergeHelperBuilder.swift */; };
 		50B6BCB42AEC58250010FB3B /* AuthorMergeHelperBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B6BCB32AEC58250010FB3B /* AuthorMergeHelperBuilderTest.swift */; };
 		50B6BCB62AEC68940010FB3B /* AuthorMergeHelperTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B6BCB52AEC68940010FB3B /* AuthorMergeHelperTest.swift */; };
+		50B74C752F1716F500F59813 /* OutgoingDeleteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B74C742F1716F500F59813 /* OutgoingDeleteMessage.swift */; };
 		50BD86AF2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BD86AE2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift */; };
 		50BDC3682C88B7FA002294D0 /* AudioWaveformSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BDC3672C88B7FA002294D0 /* AudioWaveformSampler.swift */; };
 		50BDC36A2C88C2C8002294D0 /* AudioWaveformSamplerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BDC3692C88C2C8002294D0 /* AudioWaveformSamplerTest.swift */; };
@@ -3550,7 +3551,6 @@
 		F9C5CBD5289453B300548EEE /* TSIncomingMessage+SDS.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8E1289453B100548EEE /* TSIncomingMessage+SDS.swift */; };
 		F9C5CBD6289453B300548EEE /* TSInfoMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8E2289453B100548EEE /* TSInfoMessage.swift */; };
 		F9C5CBD7289453B300548EEE /* OWSLinkPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8E3289453B100548EEE /* OWSLinkPreview.swift */; };
-		F9C5CBD8289453B300548EEE /* TSOutgoingDeleteMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C8E4289453B100548EEE /* TSOutgoingDeleteMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CBD9289453B300548EEE /* TSUnreadIndicatorInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8E5289453B100548EEE /* TSUnreadIndicatorInteraction.m */; };
 		F9C5CBDA289453B300548EEE /* TSInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8E6289453B100548EEE /* TSInteraction.m */; };
 		F9C5CBDB289453B300548EEE /* TSIncomingMessage+Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8E7289453B100548EEE /* TSIncomingMessage+Builder.swift */; };
@@ -3576,7 +3576,6 @@
 		F9C5CBF0289453B300548EEE /* TSIncomingMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8FC289453B100548EEE /* TSIncomingMessage.m */; };
 		F9C5CBF1289453B300548EEE /* TSUnreadIndicatorInteraction.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C8FD289453B100548EEE /* TSUnreadIndicatorInteraction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CBF2289453B300548EEE /* TSInteraction.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C8FE289453B100548EEE /* TSInteraction.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F9C5CBF3289453B300548EEE /* TSOutgoingDeleteMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8FF289453B100548EEE /* TSOutgoingDeleteMessage.m */; };
 		F9C5CBF4289453B300548EEE /* TSMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C900289453B100548EEE /* TSMessage.swift */; };
 		F9C5CBF6289453B300548EEE /* TSOutgoingMessage+SDS.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C902289453B100548EEE /* TSOutgoingMessage+SDS.swift */; };
 		F9C5CBF7289453B300548EEE /* TSMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C903289453B100548EEE /* TSMessage.m */; };
@@ -4952,6 +4951,7 @@
 		50B6BCB02AEC4F4D0010FB3B /* AuthorMergeHelperBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorMergeHelperBuilder.swift; sourceTree = "<group>"; };
 		50B6BCB32AEC58250010FB3B /* AuthorMergeHelperBuilderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorMergeHelperBuilderTest.swift; sourceTree = "<group>"; };
 		50B6BCB52AEC68940010FB3B /* AuthorMergeHelperTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorMergeHelperTest.swift; sourceTree = "<group>"; };
+		50B74C742F1716F500F59813 /* OutgoingDeleteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingDeleteMessage.swift; sourceTree = "<group>"; };
 		50BD86AE2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendMessagePromptBuilder.swift; sourceTree = "<group>"; };
 		50BDC3672C88B7FA002294D0 /* AudioWaveformSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformSampler.swift; sourceTree = "<group>"; };
 		50BDC3692C88C2C8002294D0 /* AudioWaveformSamplerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformSamplerTest.swift; sourceTree = "<group>"; };
@@ -7775,7 +7775,6 @@
 		F9C5C8E1289453B100548EEE /* TSIncomingMessage+SDS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TSIncomingMessage+SDS.swift"; sourceTree = "<group>"; };
 		F9C5C8E2289453B100548EEE /* TSInfoMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSInfoMessage.swift; sourceTree = "<group>"; };
 		F9C5C8E3289453B100548EEE /* OWSLinkPreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OWSLinkPreview.swift; sourceTree = "<group>"; };
-		F9C5C8E4289453B100548EEE /* TSOutgoingDeleteMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSOutgoingDeleteMessage.h; sourceTree = "<group>"; };
 		F9C5C8E5289453B100548EEE /* TSUnreadIndicatorInteraction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSUnreadIndicatorInteraction.m; sourceTree = "<group>"; };
 		F9C5C8E6289453B100548EEE /* TSInteraction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSInteraction.m; sourceTree = "<group>"; };
 		F9C5C8E7289453B100548EEE /* TSIncomingMessage+Builder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TSIncomingMessage+Builder.swift"; sourceTree = "<group>"; };
@@ -7801,7 +7800,6 @@
 		F9C5C8FC289453B100548EEE /* TSIncomingMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSIncomingMessage.m; sourceTree = "<group>"; };
 		F9C5C8FD289453B100548EEE /* TSUnreadIndicatorInteraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSUnreadIndicatorInteraction.h; sourceTree = "<group>"; };
 		F9C5C8FE289453B100548EEE /* TSInteraction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSInteraction.h; sourceTree = "<group>"; };
-		F9C5C8FF289453B100548EEE /* TSOutgoingDeleteMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSOutgoingDeleteMessage.m; sourceTree = "<group>"; };
 		F9C5C900289453B100548EEE /* TSMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSMessage.swift; sourceTree = "<group>"; };
 		F9C5C902289453B100548EEE /* TSOutgoingMessage+SDS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TSOutgoingMessage+SDS.swift"; sourceTree = "<group>"; };
 		F9C5C903289453B100548EEE /* TSMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSMessage.m; sourceTree = "<group>"; };
@@ -14504,6 +14502,7 @@
 				D9247EA92BFD424800DFEF6F /* InteractionDeleteManager.swift */,
 				50468F2829EE130A00948E02 /* InteractionStore.swift */,
 				F9C5C8EB289453B100548EEE /* MentionFinder.swift */,
+				50B74C742F1716F500F59813 /* OutgoingDeleteMessage.swift */,
 				F9C5C908289453B100548EEE /* OWSDisappearingConfigurationUpdateInfoMessage+SDS.swift */,
 				F9C5C8F1289453B100548EEE /* OWSDisappearingConfigurationUpdateInfoMessage.h */,
 				F9C5C90E289453B100548EEE /* OWSDisappearingConfigurationUpdateInfoMessage.m */,
@@ -14555,8 +14554,6 @@
 				F9C5C8EC289453B100548EEE /* TSMessage.h */,
 				F9C5C903289453B100548EEE /* TSMessage.m */,
 				F9C5C900289453B100548EEE /* TSMessage.swift */,
-				F9C5C8E4289453B100548EEE /* TSOutgoingDeleteMessage.h */,
-				F9C5C8FF289453B100548EEE /* TSOutgoingDeleteMessage.m */,
 				D93086262C616391008E3A27 /* TSOutgoingMessage+Builder.swift */,
 				F9C5C902289453B100548EEE /* TSOutgoingMessage+SDS.swift */,
 				F9C5C8DE289453B100548EEE /* TSOutgoingMessage.h */,
@@ -15419,7 +15416,6 @@
 				F9C5CC2B289453B300548EEE /* TSInvalidIdentityKeyReceivingErrorMessage.h in Headers */,
 				F9C5CC25289453B300548EEE /* TSInvalidIdentityKeySendingErrorMessage.h in Headers */,
 				F9C5CBE0289453B300548EEE /* TSMessage.h in Headers */,
-				F9C5CBD8289453B300548EEE /* TSOutgoingDeleteMessage.h in Headers */,
 				F9C5CBD2289453B300548EEE /* TSOutgoingMessage.h in Headers */,
 				F9C5CD7C289453B300548EEE /* TSPaymentModel.h in Headers */,
 				F9C5CD82289453B300548EEE /* TSPaymentModels.h in Headers */,
@@ -19130,6 +19126,7 @@
 				5060EBBA2C7D211A00DF77AD /* OutgoingCallLinkUpdateMessage.swift in Sources */,
 				D9DB37F32B71B037007B16C8 /* OutgoingCallLogEventSyncMessage.swift in Sources */,
 				500CC1E92F15C8A7001A86F7 /* OutgoingCallMessage.swift in Sources */,
+				50B74C752F1716F500F59813 /* OutgoingDeleteMessage.swift in Sources */,
 				D9AA7D6E2D11F08A0014137C /* OutgoingDeviceNameChangeSyncMessage.swift in Sources */,
 				C13B9BB62A1819C7007F74C4 /* OutgoingEditMessage.swift in Sources */,
 				C1EAECDF2A1EFC21008A3D58 /* OutgoingEditMessageSyncTranscript.swift in Sources */,
@@ -19637,7 +19634,6 @@
 				F9C5CBF7289453B300548EEE /* TSMessage.m in Sources */,
 				F9C5CBF4289453B300548EEE /* TSMessage.swift in Sources */,
 				668A00E92C2B5F59007B8808 /* TSMutex.swift in Sources */,
-				F9C5CBF3289453B300548EEE /* TSOutgoingDeleteMessage.m in Sources */,
 				D93086272C616391008E3A27 /* TSOutgoingMessage+Builder.swift in Sources */,
 				F9C5CBF6289453B300548EEE /* TSOutgoingMessage+SDS.swift in Sources */,
 				F9C5CBEB289453B300548EEE /* TSOutgoingMessage.m in Sources */,

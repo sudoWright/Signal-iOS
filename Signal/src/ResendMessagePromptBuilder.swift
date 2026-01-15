@@ -27,7 +27,7 @@ class ResendMessagePromptBuilder {
                 // rather than the message itself.
                 let preparedMessage: PreparedOutgoingMessage
                 if latestMessage.wasRemotelyDeleted {
-                    let messageToSend = TSOutgoingDeleteMessage(thread: latestThread, message: latestMessage, transaction: tx)
+                    let messageToSend = OutgoingDeleteMessage(thread: latestThread, message: latestMessage, tx: tx)
                     preparedMessage = PreparedOutgoingMessage.preprepared(
                         transientMessageWithoutAttachments: messageToSend,
                     )

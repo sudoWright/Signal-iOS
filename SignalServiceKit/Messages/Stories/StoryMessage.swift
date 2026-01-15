@@ -811,11 +811,11 @@ public final class StoryMessage: NSObject, SDSCodableModel, Decodable {
             Logger.info("Remotely deleting group story with timestamp \(timestamp)")
 
             // Group story deletes are simple, just delete for everyone in the group
-            let deleteMessage = TSOutgoingDeleteMessage(
+            let deleteMessage = OutgoingDeleteMessage(
                 thread: thread,
                 storyMessage: self,
                 skippedRecipients: [],
-                transaction: transaction,
+                tx: transaction,
             )
             let preparedMessage = PreparedOutgoingMessage.preprepared(
                 transientMessageWithoutAttachments: deleteMessage,
@@ -852,11 +852,11 @@ public final class StoryMessage: NSObject, SDSCodableModel, Decodable {
                 recipientStates[serviceId] = state
             }
 
-            let deleteMessage = TSOutgoingDeleteMessage(
+            let deleteMessage = OutgoingDeleteMessage(
                 thread: thread,
                 storyMessage: self,
-                skippedRecipients: skippedRecipients.map { ServiceIdObjC.wrapValue($0) },
-                transaction: transaction,
+                skippedRecipients: skippedRecipients,
+                tx: transaction,
             )
             let preparedDeleteMessage = PreparedOutgoingMessage.preprepared(
                 transientMessageWithoutAttachments: deleteMessage,
