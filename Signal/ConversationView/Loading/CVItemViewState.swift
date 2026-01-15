@@ -414,12 +414,22 @@ struct CVItemModelBuilder: CVItemBuilding {
 
                     shouldShowSenderName = incomingSenderAddress != previousIncomingSenderAddress
                 }
+
+                var memberLabel: String?
+                if
+                    BuildFlags.memberLabels, let groupThread = thread as? TSGroupThread,
+                    let senderAci = incomingSenderAddress.aci
+                {
+                    memberLabel = groupThread.groupModel.groupMembership.memberLabel(for: senderAci)
+                }
+
                 if shouldShowSenderName {
                     let senderName = NSAttributedString(string: authorName)
                     let senderNameColor = groupNameColors.color(for: incomingSenderAddress.aci)
                     itemViewState.senderNameState = CVComponentState.SenderName(
                         senderName: senderName,
                         senderNameColor: senderNameColor,
+                        memberLabel: memberLabel,
                     )
                 }
 

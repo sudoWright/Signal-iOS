@@ -2290,6 +2290,9 @@
 /* Label for 'member requests & invites' action in conversation settings view. */
 "CONVERSATION_SETTINGS_MEMBER_REQUESTS_AND_INVITES" = "Requests & Invites";
 
+/* Label for 'member label' action in conversation settings view. */
+"CONVERSATION_SETTINGS_MEMBER_TAG" = "Member Label";
+
 /* label for 'always' option for mention notifications in conversation settings */
 "CONVERSATION_SETTINGS_MENTION_MODE_AlWAYS" = "Always Notify";
 
@@ -4983,6 +4986,9 @@
 
 /* toast indicating that we will remind the user later */
 "MEGAPHONE_WILL_REMIND_LATER" = "We’ll remind you later.";
+
+/* Label for an action to add a member label */
+"MEMBER_LABEL_ADD" = "Add a Member Label";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Copy Message Text";

@@ -112,6 +112,7 @@ public struct CVComponentState: Equatable {
     struct SenderName: Equatable {
         let senderName: NSAttributedString
         let senderNameColor: UIColor
+        let memberLabel: String?
     }
 
     let senderName: SenderName?

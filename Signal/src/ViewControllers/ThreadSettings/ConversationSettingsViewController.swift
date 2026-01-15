@@ -322,10 +322,23 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
             owsFailDebug("Invalid address.")
             return
         }
+
+        var memberLabel: MemberLabel?
+        if
+            let groupThread = thread as? TSGroupThread,
+            let memberAci = memberAddress.aci,
+            let memberLabelString = groupThread.groupModel.groupMembership.memberLabel(for: memberAci),
+            let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aci
+        {
+            let groupNameColors = GroupNameColors.forThread(groupThread, localAci: localAci)
+            memberLabel = MemberLabel(label: memberLabelString, groupNameColor: groupNameColors.color(for: memberAci))
+        }
+
         ProfileSheetSheetCoordinator(
             address: memberAddress,
             groupViewHelper: groupViewHelper,
             spoilerState: spoilerState,
+            memberLabel: memberLabel,
         )
         .presentAppropriateSheet(from: self)
     }

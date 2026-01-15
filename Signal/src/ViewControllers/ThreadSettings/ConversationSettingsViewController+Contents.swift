@@ -737,6 +737,11 @@ extension ConversationSettingsViewController {
             membersToRender = Array(membersToRender.prefix(maxMembersToShow - 1))
         }
 
+        var groupNameColors: GroupNameColors?
+        if let localAci = SSKEnvironment.shared.databaseStorageRef.read(block: { tx in DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aci }) {
+            groupNameColors = GroupNameColors.forThread(self.thread, localAci: localAci)
+        }
+
         for memberAddress in membersToRender {
             guard let verificationState = groupMemberStateMap[memberAddress] else {
                 owsFailDebug("Missing verificationState.")
@@ -779,6 +784,15 @@ extension ConversationSettingsViewController {
                         cell.selectionStyle = .none
                     } else {
                         cell.selectionStyle = .default
+                    }
+
+                    if BuildFlags.memberLabels, let memberAci = memberAddress.aci {
+                        if
+                            let memberLabel = groupModel.groupMembership.memberLabel(for: memberAci),
+                            let groupNameColors
+                        {
+                            configuration.memberLabel = MemberLabel(label: memberLabel, groupNameColor: groupNameColors.color(for: memberAddress.aci))
+                        }
                     }
 
                     if isVerified {
@@ -873,6 +887,21 @@ extension ConversationSettingsViewController {
                 },
             ),
         )
+
+        if BuildFlags.memberLabels {
+            section.add(
+                OWSTableItem.disclosureItem(
+                    icon: .memberLabel,
+                    withText: OWSLocalizedString(
+                        "CONVERSATION_SETTINGS_MEMBER_TAG",
+                        comment: "Label for 'member label' action in conversation settings view.",
+                    ),
+                    actionBlock: {
+                        print("Unimplemented!")
+                    },
+                ),
+            )
+        }
 
         let itemTitle = OWSLocalizedString(
             "CONVERSATION_SETTINGS_MEMBER_REQUESTS_AND_INVITES",

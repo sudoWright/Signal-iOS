@@ -53,6 +53,8 @@ public class ContactCellConfiguration: NSObject {
 
     public var avatarSizeClass: ConversationAvatarView.Configuration.SizeClass?
 
+    public var memberLabel: MemberLabel?
+
     public init(address: SignalServiceAddress, localUserDisplayMode: LocalUserDisplayMode) {
         self.dataSource = .address(address)
         self.localUserDisplayMode = localUserDisplayMode
@@ -225,11 +227,22 @@ public class ContactCellView: ManualStackView {
 
             // Configure textStack.
             do {
-                var textStackSubviews = [nameLabel]
+                var textStackSubviews: [UILabel] = [nameLabel]
                 let nameSize = nameLabel.sizeThatFits(.square(.greatestFiniteMagnitude))
                 var textStackSubviewInfos = [nameSize.asManualSubviewInfo]
 
-                if let attributedSubtitle = configuration.attributedSubtitle?.nilIfEmpty {
+                if
+                    let memberLabel = configuration.memberLabel
+                {
+                    let memberLabelLabel = CVMemberLabel(
+                        label: memberLabel.label,
+                        font: .dynamicTypeCaption1,
+                        backgroundColor: memberLabel.groupNameColor,
+                    )
+                    textStackSubviews.append(memberLabelLabel)
+                    let memberLabelSize = memberLabelLabel.sizeThatFits(.square(.greatestFiniteMagnitude))
+                    textStackSubviewInfos.append(memberLabelSize.asManualSubviewInfo)
+                } else if let attributedSubtitle = configuration.attributedSubtitle?.nilIfEmpty {
                     subtitleLabel.attributedText = attributedSubtitle
 
                     textStackSubviews.append(subtitleLabel)

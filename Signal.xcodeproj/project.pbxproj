@@ -50,6 +50,8 @@
 		04441DDC2F115CAF0095E1F4 /* chat_item_pin_message_11.binproto in Resources */ = {isa = PBXBuildFile; fileRef = 04441DAD2F115CAF0095E1F4 /* chat_item_pin_message_11.binproto */; };
 		04441DDD2F115CAF0095E1F4 /* chat_item_pin_message_14.binproto in Resources */ = {isa = PBXBuildFile; fileRef = 04441DB32F115CAF0095E1F4 /* chat_item_pin_message_14.binproto */; };
 		04441DDE2F115CAF0095E1F4 /* chat_item_pin_message_04.txtproto in Resources */ = {isa = PBXBuildFile; fileRef = 04441DA02F115CAF0095E1F4 /* chat_item_pin_message_04.txtproto */; };
+		04441DEA2F17EF6C0095E1F4 /* CVMemberLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04441DE92F17EF690095E1F4 /* CVMemberLabel.swift */; };
+		04441DED2F1816BB0095E1F4 /* MemberLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04441DEB2F18121C0095E1F4 /* MemberLabel.swift */; };
 		04472D5E2E8AD74200D69EE0 /* OutgoingPollVote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04472D5D2E8AD73A00D69EE0 /* OutgoingPollVote.swift */; };
 		044A2C6E2EEB444E00AA3CA0 /* BackupArchivePinMessageChatUpdateArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044A2C6D2EEB443E00AA3CA0 /* BackupArchivePinMessageChatUpdateArchiver.swift */; };
 		044D77782E5E6D750048C21A /* PollVoteRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044D77772E5E6D700048C21A /* PollVoteRecord.swift */; };
@@ -4108,6 +4110,8 @@
 		04441DB82F115CAF0095E1F4 /* chat_item_pin_message_update_01.txtproto */ = {isa = PBXFileReference; lastKnownFileType = text; path = chat_item_pin_message_update_01.txtproto; sourceTree = "<group>"; };
 		04441DB92F115CAF0095E1F4 /* chat_item_pin_message_update_02.binproto */ = {isa = PBXFileReference; lastKnownFileType = file; path = chat_item_pin_message_update_02.binproto; sourceTree = "<group>"; };
 		04441DBA2F115CAF0095E1F4 /* chat_item_pin_message_update_02.txtproto */ = {isa = PBXFileReference; lastKnownFileType = text; path = chat_item_pin_message_update_02.txtproto; sourceTree = "<group>"; };
+		04441DE92F17EF690095E1F4 /* CVMemberLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVMemberLabel.swift; sourceTree = "<group>"; };
+		04441DEB2F18121C0095E1F4 /* MemberLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberLabel.swift; sourceTree = "<group>"; };
 		04472D5D2E8AD73A00D69EE0 /* OutgoingPollVote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingPollVote.swift; sourceTree = "<group>"; };
 		044A2C6D2EEB443E00AA3CA0 /* BackupArchivePinMessageChatUpdateArchiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupArchivePinMessageChatUpdateArchiver.swift; sourceTree = "<group>"; };
 		044D77772E5E6D700048C21A /* PollVoteRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollVoteRecord.swift; sourceTree = "<group>"; };
@@ -8984,6 +8988,7 @@
 			children = (
 				34A95523271B510400B05242 /* CVCellMeasurement.swift */,
 				764981442A23194F00EC1287 /* CVItemViewModel.swift */,
+				04441DE92F17EF690095E1F4 /* CVMemberLabel.swift */,
 				34A95525271B510400B05242 /* CVText.swift */,
 				34A95522271B510400B05242 /* CVTextLabel.swift */,
 				34A95524271B510400B05242 /* CVUtils.swift */,
@@ -15291,6 +15296,7 @@
 				34BB3C5B23C6644B001651FC /* GroupV2Params.swift */,
 				34BB3C5A23C6644B001651FC /* GroupV2Snapshot.swift */,
 				340B870D23DF3E3A00BE0AFC /* GroupV2UpdatesImpl.swift */,
+				04441DEB2F18121C0095E1F4 /* MemberLabel.swift */,
 				F9C5CBAC289453B200548EEE /* NewGroupSeed.swift */,
 				340B06C623C8DA2600929588 /* StorageService+GroupsV2.swift */,
 				F9C5C9FD289453B100548EEE /* TSGroupMember.swift */,
@@ -17405,6 +17411,7 @@
 				3402AA7B271D9E180084CBAE /* CustomKeyboard.swift in Sources */,
 				3402AA87271D9E180084CBAE /* CVCellMeasurement.swift in Sources */,
 				764981452A23194F00EC1287 /* CVItemViewModel.swift in Sources */,
+				04441DEA2F17EF6C0095E1F4 /* CVMemberLabel.swift in Sources */,
 				3402AA92271D9E180084CBAE /* CVText.swift in Sources */,
 				3402AAB3271D9E180084CBAE /* CVTextLabel.swift in Sources */,
 				3402AA7A271D9E180084CBAE /* CVUtils.swift in Sources */,
@@ -19005,6 +19012,7 @@
 				663A18A02BCD8F16005C1B41 /* MediaGalleryAttachmentFinder.swift in Sources */,
 				66A64D342D00E52400203F4B /* MediaGalleryChangeInfo.swift in Sources */,
 				C17586642E2AC3CE008B3A13 /* MediaRootBackupKey.swift in Sources */,
+				04441DED2F1816BB0095E1F4 /* MemberLabel.swift in Sources */,
 				66FC637A29DF8C6D00F00DAC /* MentionAttribute.swift in Sources */,
 				F9C5CBDF289453B300548EEE /* MentionFinder.swift in Sources */,
 				66FC637629DF7FCC00F00DAC /* MentionHydrator.swift in Sources */,

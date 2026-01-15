@@ -139,6 +139,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
 
     fileprivate typealias MemberStateMap = [SignalServiceAddress: GroupMemberState]
     fileprivate typealias InvalidInviteMap = [Data: InvalidInviteModel]
+    fileprivate typealias MemberLabelsMap = [Aci: String]
 
     private typealias LegacyMemberStateMap = [SignalServiceAddress: LegacyMemberState]
 
@@ -147,6 +148,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
     fileprivate var memberStates: MemberStateMap
     public fileprivate(set) var bannedMembers: BannedMembersMap
     private var invalidInviteMap: InvalidInviteMap
+    private var memberLabels: MemberLabelsMap
 
     public var invalidInviteUserIds: [Data] {
         return Array(invalidInviteMap.keys)
@@ -157,6 +159,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
         self.memberStates = [:]
         self.bannedMembers = [:]
         self.invalidInviteMap = [:]
+        self.memberLabels = [:]
 
         super.init()
     }
@@ -207,6 +210,18 @@ public class GroupMembership: NSObject, NSSecureCoding {
             self.bannedMembers = [:]
         }
 
+        if
+            let memberLabels = coder.decodeDictionary(
+                withKeyClass: NSUUID.self,
+                objectClass: NSString.self,
+                forKey: Self.memberLabelsMapKey,
+            ) as [UUID: String]?
+        {
+            self.memberLabels = memberLabels.mapKeys(injectiveTransform: { Aci(fromUUID: $0) })
+        } else {
+            self.memberLabels = [:]
+        }
+
         super.init()
     }
 
@@ -214,6 +229,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
     private static var legacyMemberStatesKey: String { "memberStateMap" }
     private static var bannedMembersKey: String { "bannedMembers" }
     private static var invalidInviteMapKey: String { "invalidInviteMap" }
+    private static var memberLabelsMapKey: String { "memberLabelsMap" }
 
     public func encode(with aCoder: NSCoder) {
         let encoder = JSONEncoder()
@@ -226,16 +242,19 @@ public class GroupMembership: NSObject, NSSecureCoding {
 
         aCoder.encode(bannedMembers.mapKeys(injectiveTransform: { $0.rawUUID }), forKey: Self.bannedMembersKey)
         aCoder.encode(invalidInviteMap, forKey: Self.invalidInviteMapKey)
+        aCoder.encode(memberLabels.mapKeys(injectiveTransform: { $0.rawUUID }), forKey: Self.memberLabelsMapKey)
     }
 
     fileprivate init(
         memberStates: MemberStateMap,
         bannedMembers: BannedMembersMap,
         invalidInviteMap: InvalidInviteMap,
+        memberLabels: MemberLabelsMap,
     ) {
         self.memberStates = memberStates
         self.bannedMembers = bannedMembers
         self.invalidInviteMap = invalidInviteMap
+        self.memberLabels = memberLabels
 
         super.init()
     }
@@ -247,6 +266,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
         self.memberStates = builder.memberStates
         self.bannedMembers = [:]
         self.invalidInviteMap = [:]
+        self.memberLabels = [:]
 
         super.init()
     }
@@ -277,6 +297,10 @@ public class GroupMembership: NSObject, NSSecureCoding {
         }
 
         guard self.bannedMembers == other.bannedMembers else {
+            return false
+        }
+
+        guard self.memberLabels == other.memberLabels else {
             return false
         }
 
@@ -355,6 +379,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
             memberStates: memberStates,
             bannedMembers: bannedMembers,
             invalidInviteMap: invalidInviteMap,
+            memberLabels: memberLabels,
         )
     }
 
@@ -603,12 +628,19 @@ public class GroupMembership: NSObject, NSSecureCoding {
         )
     }
 
+    // MARK:
+
+    public func memberLabel(for aci: Aci) -> String? {
+        return memberLabels[aci]
+    }
+
     // MARK: - Builder
 
     public struct Builder {
         fileprivate var memberStates = MemberStateMap()
         private var bannedMembers = BannedMembersMap()
         private var invalidInviteMap = InvalidInviteMap()
+        private var memberLabels = MemberLabelsMap()
 
         public init() {}
 
@@ -616,10 +648,12 @@ public class GroupMembership: NSObject, NSSecureCoding {
             memberStates: MemberStateMap,
             bannedMembers: BannedMembersMap,
             invalidInviteMap: InvalidInviteMap,
+            memberLabels: MemberLabelsMap,
         ) {
             self.memberStates = memberStates
             self.bannedMembers = bannedMembers
             self.invalidInviteMap = invalidInviteMap
+            self.memberLabels = memberLabels
         }
 
         // MARK: Member states
@@ -775,6 +809,12 @@ public class GroupMembership: NSObject, NSSecureCoding {
             nil != invalidInviteMap[userId]
         }
 
+        // MARK: Member labels
+
+        public mutating func setMemberLabel(label: String?, aci: Aci) {
+            memberLabels[aci] = label
+        }
+
         // MARK: Build
 
         public func build() -> GroupMembership {
@@ -790,6 +830,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
                 memberStates: memberStates,
                 bannedMembers: bannedMembers,
                 invalidInviteMap: invalidInviteMap,
+                memberLabels: memberLabels,
             )
         }
     }

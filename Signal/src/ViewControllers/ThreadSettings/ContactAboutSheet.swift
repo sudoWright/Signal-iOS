@@ -28,16 +28,19 @@ class ContactAboutSheet: StackSheetViewController {
     private let isLocalUser: Bool
     private let spoilerState: SpoilerRenderState
     private let context: Context
+    private let memberLabel: MemberLabel?
 
     init(
         thread: TSContactThread,
         spoilerState: SpoilerRenderState,
         context: Context = .default,
+        memberLabel: MemberLabel? = nil,
     ) {
         self.thread = thread
         self.isLocalUser = thread.isNoteToSelf
         self.spoilerState = spoilerState
         self.context = context
+        self.memberLabel = memberLabel
         super.init()
         DependenciesBridge.shared.databaseChangeObserver.appendDatabaseChangeDelegate(self)
     }
@@ -189,6 +192,10 @@ class ContactAboutSheet: StackSheetViewController {
                 }
             }
             stackView.addArrangedSubview(label)
+        }
+
+        if BuildFlags.memberLabels {
+            stackView.addArrangedSubview(ProfileDetailLabel.memberLabel(memberLabel?.label))
         }
 
         if isVerified {

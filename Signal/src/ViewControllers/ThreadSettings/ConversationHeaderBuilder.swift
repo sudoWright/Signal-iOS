@@ -34,6 +34,7 @@ struct ConversationHeaderBuilder {
         for thread: TSThread,
         sizeClass: ConversationAvatarView.Configuration.SizeClass,
         options: Options,
+        memberLabel: MemberLabel?,
         delegate: ConversationHeaderDelegate,
     ) -> UIView {
         if let groupThread = thread as? TSGroupThread {
@@ -48,6 +49,7 @@ struct ConversationHeaderBuilder {
                 contactThread: contactThread,
                 sizeClass: sizeClass,
                 options: options,
+                memberLabel: memberLabel,
                 delegate: delegate,
             )
         } else {
@@ -129,6 +131,7 @@ struct ConversationHeaderBuilder {
         contactThread: TSContactThread,
         sizeClass: ConversationAvatarView.Configuration.SizeClass,
         options: Options,
+        memberLabel: MemberLabel?,
         delegate: ConversationHeaderDelegate,
     ) -> UIView {
         // Make sure the view is loaded before we open a transaction,
@@ -139,6 +142,7 @@ struct ConversationHeaderBuilder {
                 contactThread: contactThread,
                 sizeClass: sizeClass,
                 options: options,
+                memberLabel: memberLabel,
                 delegate: delegate,
                 transaction: transaction,
             )
@@ -149,6 +153,7 @@ struct ConversationHeaderBuilder {
         contactThread: TSContactThread,
         sizeClass: ConversationAvatarView.Configuration.SizeClass,
         options: Options,
+        memberLabel: MemberLabel?,
         delegate: ConversationHeaderDelegate,
         transaction: DBReadTransaction,
     ) -> UIView {
@@ -158,6 +163,12 @@ struct ConversationHeaderBuilder {
             options: options,
             transaction: transaction,
         )
+
+        if BuildFlags.memberLabels, let memberLabel {
+            let memberLabelLabel = builder.addMemberLabel(label: memberLabel.label, backgroundColor: memberLabel.groupNameColor)
+            memberLabelLabel.numberOfLines = 0
+            memberLabelLabel.textAlignment = .center
+        }
 
         let address = contactThread.contactAddress
         if !address.isLocalAddress, let bioText = SSKEnvironment.shared.profileManagerRef.userProfile(for: address, tx: transaction)?.bioForDisplay {
@@ -513,6 +524,19 @@ struct ConversationHeaderBuilder {
         return label
     }
 
+    mutating func addMemberLabel(label: String, backgroundColor: UIColor) -> UILabel {
+        subviews.append(UIView.spacer(withHeight: 4))
+        let memberLabelLabel = CVMemberLabel(
+            label: label,
+            font: .dynamicTypeSubheadlineClamped,
+            backgroundColor: backgroundColor,
+        )
+
+        subviews.append(memberLabelLabel)
+        hasSubtitleLabel = true
+        return memberLabelLabel
+    }
+
     mutating func addLegacyGroupView() {
         subviews.append(UIView.spacer(withHeight: 12))
 
@@ -692,6 +716,7 @@ extension ConversationSettingsViewController: ConversationHeaderDelegate {
             for: thread,
             sizeClass: .eightyEight,
             options: options,
+            memberLabel: nil,
             delegate: self,
         )
     }

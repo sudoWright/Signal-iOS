@@ -170,6 +170,29 @@ public extension ProfileDetailLabel {
         )
     }
 
+    static func memberLabel(_ label: String?) -> UIView {
+        guard let label else {
+            return ProfileDetailLabel(
+                title: OWSLocalizedString("MEMBER_LABEL_ADD", comment: "Label for an action to add a member label"),
+                icon: .memberLabel,
+                font: .dynamicTypeBody,
+                showDetailDisclosure: true,
+                tapAction: {
+                    print("Unimplemented!")
+                },
+            )
+        }
+        return ProfileDetailLabel(
+            title: label,
+            icon: .memberLabel,
+            font: .dynamicTypeBody,
+            showDetailDisclosure: true,
+            tapAction: {
+                print("Unimplemented!")
+            },
+        )
+    }
+
     static func verified(
         font: UIFont = .dynamicTypeBody,
     ) -> ProfileDetailLabel {

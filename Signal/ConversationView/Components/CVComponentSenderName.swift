@@ -13,6 +13,7 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
     private let state: CVComponentState.SenderName
     private var senderName: NSAttributedString { state.senderName }
     private var senderNameColor: UIColor { state.senderNameColor }
+    private var memberLabel: String? { state.memberLabel }
 
     init(itemModel: CVItemModel, senderNameState: CVComponentState.SenderName) {
         self.state = senderNameState
@@ -57,12 +58,24 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
         }
 
         labelConfig.applyForRendering(label: label)
+        var subviews: [UIView] = []
+        subviews.append(label)
+
+        if let memberLabel {
+            let memberLabelLabel = CVMemberLabel(
+                label: memberLabel,
+                font: UIFont.dynamicTypeFootnote,
+                backgroundColor: senderNameColor,
+            )
+            memberLabelConfig.applyForRendering(label: memberLabelLabel)
+            subviews.append(memberLabelLabel)
+        }
 
         innerStack.configure(
             config: innerStackConfig,
             cellMeasurement: cellMeasurement,
             measurementKey: Self.measurementKey_innerStack,
-            subviews: [label],
+            subviews: subviews,
         )
         outerStack.configure(
             config: outerStackConfig,
@@ -88,6 +101,18 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
         )
     }
 
+    private var memberLabelConfig: CVLabelConfig {
+        let font = UIFont.dynamicTypeFootnote
+        return CVLabelConfig(
+            text: .text(memberLabel ?? ""),
+            displayConfig: .forUnstyledText(font: font, textColor: senderNameColor),
+            font: font,
+            textColor: senderNameColor,
+            numberOfLines: 0,
+            lineBreakMode: .byWordWrapping,
+        )
+    }
+
     private var outerStackConfig: CVStackViewConfig {
         CVStackViewConfig(
             axis: .vertical,
@@ -102,9 +127,9 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
             ? UIEdgeInsets(hMargin: 12, vMargin: 3)
             : .zero)
         return CVStackViewConfig(
-            axis: .vertical,
+            axis: .horizontal,
             alignment: .center,
-            spacing: 0,
+            spacing: 4,
             layoutMargins: layoutMargins,
         )
     }
@@ -117,13 +142,27 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
 
         let maxWidth = maxWidth - (outerStackConfig.layoutMargins.totalWidth +
             innerStackConfig.layoutMargins.totalWidth)
-        let labelSize = CVText.measureLabel(config: labelConfig, maxWidth: maxWidth)
+
+        var subviewInfos: [ManualStackSubviewInfo] = []
+        var maxSenderNameWidth = maxWidth
+        if memberLabel != nil {
+            let memberLabelSize = CVMemberLabel.measureLabel(config: memberLabelConfig, maxWidth: maxWidth)
+            let memberLabelInfo = memberLabelSize.asManualSubviewInfo
+
+            // TODO: handle long profile names better
+            maxSenderNameWidth = maxWidth - memberLabelSize.width - innerStackConfig.spacing
+            subviewInfos.append(memberLabelInfo)
+        }
+
+        let labelSize = CVText.measureLabel(config: labelConfig, maxWidth: maxSenderNameWidth)
         let labelInfo = labelSize.asManualSubviewInfo
+        subviewInfos.insert(labelInfo, at: 0)
+
         let innerStackMeasurement = ManualStackView.measure(
             config: innerStackConfig,
             measurementBuilder: measurementBuilder,
             measurementKey: Self.measurementKey_innerStack,
-            subviewInfos: [labelInfo],
+            subviewInfos: subviewInfos,
         )
         let innerStackInfo = innerStackMeasurement.measuredSize.asManualSubviewInfo
         let outerStackMeasurement = ManualStackView.measure(

@@ -98,7 +98,7 @@ class BlockingAnnouncementOnlyView: ConversationBottomPanelView {
             return
         }
 
-        let sheet = MessageUserSubsetSheet(addresses: groupAdmins, forceDarkMode: forceDarkMode)
+        let sheet = MessageUserSubsetSheet(addresses: groupAdmins, forceDarkMode: forceDarkMode, groupThread: thread as? TSGroupThread)
         fromViewController.present(sheet, animated: true)
     }
 }
@@ -108,11 +108,13 @@ class BlockingAnnouncementOnlyView: ConversationBottomPanelView {
 class MessageUserSubsetSheet: OWSTableSheetViewController {
     private let addresses: [SignalServiceAddress]
     private let forceDarkMode: Bool
+    private let groupThread: TSGroupThread?
 
-    init(addresses: [SignalServiceAddress], forceDarkMode: Bool) {
+    init(addresses: [SignalServiceAddress], forceDarkMode: Bool, groupThread: TSGroupThread?) {
         owsAssertDebug(!addresses.isEmpty)
         self.addresses = addresses
         self.forceDarkMode = forceDarkMode
+        self.groupThread = groupThread
 
         super.init()
 
@@ -139,6 +141,15 @@ class MessageUserSubsetSheet: OWSTableSheetViewController {
             comment: "Label indicating the user can contact a group administrators of an 'announcement-only' group.",
         )
         contents.add(section)
+
+        var groupNameColors: GroupNameColors?
+        if
+            let groupThread,
+            let localAci = SSKEnvironment.shared.databaseStorageRef.read(block: { tx in DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aci })
+        {
+            groupNameColors = GroupNameColors.forThread(groupThread, localAci: localAci)
+        }
+
         for address in addresses {
             section.add(OWSTableItem(
                 dequeueCellBlock: { [weak self] tableView in
@@ -151,6 +162,16 @@ class MessageUserSubsetSheet: OWSTableSheetViewController {
 
                     let configuration = ContactCellConfiguration(address: address, localUserDisplayMode: .asLocalUser)
                     configuration.forceDarkAppearance = self?.forceDarkMode ?? false
+
+                    if
+                        BuildFlags.memberLabels,
+                        let groupThread = self?.groupThread,
+                        let senderAci = address.aci,
+                        let memberLabelString = groupThread.groupModel.groupMembership.memberLabel(for: senderAci),
+                        let groupNameColors
+                    {
+                        configuration.memberLabel = MemberLabel(label: memberLabelString, groupNameColor: groupNameColors.color(for: senderAci))
+                    }
 
                     SSKEnvironment.shared.databaseStorageRef.read {
                         cell.configure(configuration: configuration, transaction: $0)

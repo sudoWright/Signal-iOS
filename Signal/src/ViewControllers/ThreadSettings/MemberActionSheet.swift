@@ -11,15 +11,18 @@ struct ProfileSheetSheetCoordinator {
     private let address: SignalServiceAddress
     private let groupViewHelper: GroupViewHelper?
     private let spoilerState: SpoilerRenderState
+    private let memberLabel: MemberLabel?
 
     init(
         address: SignalServiceAddress,
         groupViewHelper: GroupViewHelper?,
         spoilerState: SpoilerRenderState,
+        memberLabel: MemberLabel? = nil,
     ) {
         self.address = address
         self.groupViewHelper = groupViewHelper
         self.spoilerState = spoilerState
+        self.memberLabel = memberLabel
     }
 
     /// Present a ``MemberActionSheet`` for other users, and present a
@@ -29,7 +32,7 @@ struct ProfileSheetSheetCoordinator {
         let thread = threadViewModel.threadRecord
 
         if thread.isNoteToSelf, let contactThread = thread as? TSContactThread {
-            ContactAboutSheet(thread: contactThread, spoilerState: spoilerState)
+            ContactAboutSheet(thread: contactThread, spoilerState: spoilerState, memberLabel: memberLabel)
                 .present(from: viewController)
             return
         }
@@ -39,6 +42,7 @@ struct ProfileSheetSheetCoordinator {
             address: address,
             groupViewHelper: groupViewHelper,
             spoilerState: spoilerState,
+            memberLabel: memberLabel,
         )
         if viewController.overrideUserInterfaceStyle == .dark {
             sheet.overrideUserInterfaceStyle = .dark
@@ -64,17 +68,20 @@ class MemberActionSheet: OWSTableSheetViewController {
     var threadViewModel: ThreadViewModel
     let address: SignalServiceAddress
     let spoilerState: SpoilerRenderState
+    let memberLabel: MemberLabel?
 
     fileprivate init(
         threadViewModel: ThreadViewModel,
         address: SignalServiceAddress,
         groupViewHelper: GroupViewHelper?,
         spoilerState: SpoilerRenderState,
+        memberLabel: MemberLabel?,
     ) {
         self.threadViewModel = threadViewModel
         self.groupViewHelper = groupViewHelper
         self.address = address
         self.spoilerState = spoilerState
+        self.memberLabel = memberLabel
 
         if #available(iOS 26.0, *) {
             super.init(visualEffect: UIGlassEffect())
@@ -147,6 +154,7 @@ class MemberActionSheet: OWSTableSheetViewController {
             for: thread,
             sizeClass: .eighty,
             options: [.message, .videoCall, .audioCall, .noBackground],
+            memberLabel: memberLabel,
             delegate: self,
         )
 
