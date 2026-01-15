@@ -734,6 +734,7 @@
 		5079F3C22DA47554008430EC /* NotificationPreconditionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5079F3C02DA47554008430EC /* NotificationPreconditionTest.swift */; };
 		507B69112C503FA800F1C6D7 /* CallLinkTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50552C302BAC079A00815474 /* CallLinkTest.swift */; };
 		507B69122C5044F800F1C6D7 /* LinkPreviewGroupLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A95517271B510400B05242 /* LinkPreviewGroupLink.swift */; };
+		507C07402F116E9200ECFEFA /* NormalizedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507C073F2F116E9200ECFEFA /* NormalizedImage.swift */; };
 		507C6AF52ED10BD900A7C74C /* RegisteredState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507C6AF42ED10BD900A7C74C /* RegisteredState.swift */; };
 		507CD5E529660D5100E47DAC /* ServiceId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507CD5E429660D5100E47DAC /* ServiceId.swift */; };
 		508622AD2D026F5200931BF9 /* CanonicalPhoneNumberTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508622AC2D026F5200931BF9 /* CanonicalPhoneNumberTest.swift */; };
@@ -809,6 +810,7 @@
 		50E642C929E4E9CD00566D5D /* SSKEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E642C829E4E9CD00566D5D /* SSKEnvironment.swift */; };
 		50EA40912E3A899F009CB839 /* RegistrationWebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EA40902E3A899F009CB839 /* RegistrationWebSocketManager.swift */; };
 		50EA76E52EEA1C6000DA8CD0 /* PasteboardAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EA76E42EEA1C6000DA8CD0 /* PasteboardAttachment.swift */; };
+		50ED28022F0EDB0B00E57C54 /* ImageQualityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED28012F0EDB0B00E57C54 /* ImageQualityTest.swift */; };
 		50EF8DCA2A1885C000A00935 /* AppIconBadgeUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EF8DC92A1885C000A00935 /* AppIconBadgeUpdater.swift */; };
 		50EF8DCC2A189B3000A00935 /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EF8DCB2A189B3000A00935 /* ConversationViewModel.swift */; };
 		50EF8DD32A1EC6B100A00935 /* OWSDisappearingMessagesConfigurationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EF8DD22A1EC6B100A00935 /* OWSDisappearingMessagesConfigurationTest.swift */; };
@@ -4910,6 +4912,7 @@
 		50791B1C2D037A9800D747F8 /* PhoneNumberCountryTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberCountryTest.swift; sourceTree = "<group>"; };
 		5079F3B52DA4713C008430EC /* NotificationPrecondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPrecondition.swift; sourceTree = "<group>"; };
 		5079F3C02DA47554008430EC /* NotificationPreconditionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPreconditionTest.swift; sourceTree = "<group>"; };
+		507C073F2F116E9200ECFEFA /* NormalizedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalizedImage.swift; sourceTree = "<group>"; };
 		507C6AF42ED10BD900A7C74C /* RegisteredState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisteredState.swift; sourceTree = "<group>"; };
 		507CD5E429660D5100E47DAC /* ServiceId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceId.swift; sourceTree = "<group>"; };
 		507D614B2BE433EE00DA7BA3 /* be */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = be; path = translations/be.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -4982,6 +4985,7 @@
 		50E642C829E4E9CD00566D5D /* SSKEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSKEnvironment.swift; sourceTree = "<group>"; };
 		50EA40902E3A899F009CB839 /* RegistrationWebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationWebSocketManager.swift; sourceTree = "<group>"; };
 		50EA76E42EEA1C6000DA8CD0 /* PasteboardAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteboardAttachment.swift; sourceTree = "<group>"; };
+		50ED28012F0EDB0B00E57C54 /* ImageQualityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageQualityTest.swift; sourceTree = "<group>"; };
 		50EF8DC42A1860EF00A00935 /* BadgeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeManager.swift; sourceTree = "<group>"; };
 		50EF8DC92A1885C000A00935 /* AppIconBadgeUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconBadgeUpdater.swift; sourceTree = "<group>"; };
 		50EF8DCB2A189B3000A00935 /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
@@ -9765,6 +9769,14 @@
 			path = Reactions;
 			sourceTree = "<group>";
 		};
+		50ED28002F0EDAFB00E57C54 /* Attachments */ = {
+			isa = PBXGroup;
+			children = (
+				50ED28012F0EDB0B00E57C54 /* ImageQualityTest.swift */,
+			);
+			path = Attachments;
+			sourceTree = "<group>";
+		};
 		6600BB1B2BA3ABCC0005A035 /* Manager */ = {
 			isa = PBXGroup;
 			children = (
@@ -11612,6 +11624,7 @@
 		B99CD9422DA99A1F0035C77B /* Attachments */ = {
 			isa = PBXGroup;
 			children = (
+				507C073F2F116E9200ECFEFA /* NormalizedImage.swift */,
 				5011C8D92ED77482005DF488 /* PreviewableAttachment.swift */,
 				5011C8D72ED77478005DF488 /* SendableAttachment.swift */,
 				34D913491F62D4A500722898 /* SignalAttachment.swift */,
@@ -14328,6 +14341,7 @@
 			isa = PBXGroup;
 			children = (
 				F94261FF289B1B5400460798 /* Account */,
+				50ED28002F0EDAFB00E57C54 /* Attachments */,
 				F945FE4B298481D800C835C7 /* Calls */,
 				D985D86229B91C2B0087C90C /* ChangePhoneNumber */,
 				50E0198E2CC2491A0063EA48 /* Concurrency */,
@@ -17492,6 +17506,7 @@
 				880FB3F328CC161800FA1C10 /* NewStoryHeaderView.swift in Sources */,
 				8868A089287F4514000E74A5 /* NewStorySheet.swift in Sources */,
 				3402AAAC271D9E180084CBAE /* NonContactTableViewCell.swift in Sources */,
+				507C07402F116E9200ECFEFA /* NormalizedImage.swift in Sources */,
 				3402AAAB271D9E180084CBAE /* OWSActionSheets.swift in Sources */,
 				3402AA74271D9E180084CBAE /* OWSBubbleShapeView.swift in Sources */,
 				3402AA99271D9E180084CBAE /* OWSButton.swift in Sources */,
@@ -19794,6 +19809,7 @@
 				D9F399B02A967664001599EC /* IdentityKeyCheckerTest.swift in Sources */,
 				D9F399B42A96E54C001599EC /* IdentityKeyMismatchManagerTest.swift in Sources */,
 				501631CA2EA03615006F9B0E /* ImageMetadataTest.swift in Sources */,
+				50ED28022F0EDB0B00E57C54 /* ImageQualityTest.swift in Sources */,
 				D9C0AE672BD7162300FCB05E /* InactiveLinkedDeviceFinderTest.swift in Sources */,
 				04BBBE942E26F00900E914B1 /* InactivePrimaryDeviceStoreTest.swift in Sources */,
 				D979CC4F2AD4DECB006AAC49 /* IncomingCallEventSyncMessageManagerTest.swift in Sources */,

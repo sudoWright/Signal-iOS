@@ -5,11 +5,11 @@
 
 import CoreServices
 import SignalServiceKit
-import SignalUI
 import UniformTypeIdentifiers
 import XCTest
+@testable import SignalUI
 
-class SignalAttachmentTest: SignalBaseTest {
+class SignalAttachmentTest: XCTestCase {
     // MARK: - Utilities
 
     func testMetadataStrippingDoesNotChangeOrientation(url: URL) throws {
@@ -64,13 +64,11 @@ class SignalAttachmentTest: SignalBaseTest {
             "Test is not set up correctly. Fixture doesn't have the expected chunks",
         )
 
-        let attachment = try PreviewableAttachment.imageAttachment(
-            dataSource: dataSource,
-            dataUTI: UTType.png.identifier,
-        )
+        let normalizedImage = try NormalizedImage.forDataSource(dataSource, dataUTI: UTType.png.identifier)
+        let finalizedImage = try normalizedImage.finalizeImage(imageQuality: .three)
 
         XCTAssertEqual(
-            try pngChunkTypes(data: try attachment.dataSource.readData()),
+            try pngChunkTypes(data: try finalizedImage.dataSource.readData()),
             ["IHDR", "PLTE", "sRGB", "IDAT", "IEND"],
         )
     }
@@ -130,13 +128,11 @@ class SignalAttachmentTest: SignalBaseTest {
         )
         let dataSource = try DataSourcePath(writingTempFileData: pngData, fileExtension: "png")
 
-        let attachment = try PreviewableAttachment.imageAttachment(
-            dataSource: dataSource,
-            dataUTI: UTType.png.identifier,
-        )
+        let normalizedImage = try NormalizedImage.forDataSource(dataSource, dataUTI: UTType.png.identifier)
+        let finalizedImage = try normalizedImage.finalizeImage(imageQuality: .three)
 
         XCTAssert(
-            !(try pngChunkTypes(data: try attachment.dataSource.readData())).contains("tEXt"),
+            !(try pngChunkTypes(data: try finalizedImage.dataSource.readData())).contains("tEXt"),
             "Result contained unexpected chunk",
         )
     }

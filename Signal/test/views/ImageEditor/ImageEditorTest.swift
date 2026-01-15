@@ -40,20 +40,15 @@ class ImageEditorTest: SignalBaseTest {
         XCTAssertEqual(0, contentsCopy.itemMap.count)
     }
 
-    private func writeDummyImage() -> String {
+    private func writeDummyImage() -> NormalizedImage {
         let image = UIImage.image(color: .red, size: CGSize(square: 1))
-        guard let data = image.pngData() else {
-            owsFail("Couldn't export dummy image.")
-        }
-        let filePath = OWSFileSystem.temporaryFilePath(fileExtension: "png")
-        try! data.write(to: URL(fileURLWithPath: filePath))
-        return filePath
+        return try! NormalizedImage.forImage(image)
     }
 
     func testImageEditor() {
-        let imagePath = writeDummyImage()
+        let image = writeDummyImage()
 
-        let imageEditor = try! ImageEditorModel(srcImagePath: imagePath)
+        let imageEditor = try! ImageEditorModel(normalizedImage: image)
         XCTAssertFalse(imageEditor.canUndo())
         XCTAssertFalse(imageEditor.canRedo())
         XCTAssertEqual(0, imageEditor.itemCount())

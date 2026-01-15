@@ -44,39 +44,34 @@ public struct SendableAttachment {
 
     @concurrent
     public static func forPreviewableAttachment(
-        _ previewableAttachment: PreviewableAttachment,
+        _ attachment: PreviewableAttachment,
         imageQualityLevel: ImageQualityLevel,
-    ) async throws(SignalAttachmentError) -> Self {
-        // We only bother converting/compressing non-animated images
-        if previewableAttachment.isImage, !previewableAttachment.isAnimatedImage {
-            let dataSource = previewableAttachment.dataSource
-            guard let imageMetadata = try? dataSource.imageSource().imageMetadata(ignorePerTypeFileSizeLimits: true) else {
-                throw .invalidData
-            }
-            guard let fileSize = try? dataSource.readLength() else {
-                throw .invalidData
-            }
-            let isValidOriginal = SignalAttachment.isOriginalImageValid(
-                forImageQuality: imageQualityLevel,
-                fileSize: fileSize,
-                dataUTI: previewableAttachment.dataUTI,
-                imageMetadata: imageMetadata,
+    ) async throws -> Self {
+        switch attachment.attachmentType {
+        case .animatedImage where attachment.dataUTI == UTType.png.identifier:
+            let strippedData = try NormalizedImage.removeImageMetadata(fromPngData: attachment.dataSource.readData())
+            let dataSource = try DataSourcePath(writingTempFileData: strippedData, fileExtension: "png")
+            return SendableAttachment(
+                dataSource: dataSource,
+                dataUTI: attachment.dataUTI,
+                mimeType: attachment.mimeType,
+                renderingFlag: attachment.renderingFlag,
             )
-            if !isValidOriginal {
-                let (dataSource, containerType) = try SignalAttachment.convertAndCompressImage(
-                    toImageQuality: imageQualityLevel,
-                    dataSource: dataSource,
-                    imageMetadata: imageMetadata,
-                )
-                return SendableAttachment(
-                    dataSource: dataSource,
-                    dataUTI: containerType.dataType.identifier,
-                    mimeType: containerType.mimeType,
-                    renderingFlag: previewableAttachment.renderingFlag,
-                )
-            }
+        case .animatedImage:
+            // Other animated images aren't re-encoded.
+            break
+        case .image(let normalizedImage):
+            let finalizedImage = try normalizedImage.finalizeImage(imageQuality: imageQualityLevel)
+            return SendableAttachment(
+                dataSource: finalizedImage.dataSource,
+                dataUTI: finalizedImage.dataUTI,
+                mimeType: MimeTypeUtil.mimeTypeForDataSource(finalizedImage.dataSource, dataUTI: finalizedImage.dataUTI),
+                renderingFlag: attachment.renderingFlag,
+            )
+        case .other:
+            break
         }
-        return Self(nonImagePreviewableAttachment: previewableAttachment)
+        return Self(nonImagePreviewableAttachment: attachment)
     }
 
     /// A default filename to use if one isn't provided by the user.

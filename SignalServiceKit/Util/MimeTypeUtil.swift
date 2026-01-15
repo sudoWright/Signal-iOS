@@ -95,6 +95,22 @@ public enum MimeTypeUtil {
         return UTType(filenameExtension: fileExtension)?.identifier
     }
 
+    public static func mimeTypeForDataSource(_ dataSource: DataSourcePath, dataUTI: String) -> String {
+        if let filename = dataSource.sourceFilename?.filterFilename() {
+            let fileExtension = (filename as NSString).pathExtension
+            if !fileExtension.isEmpty {
+                if let mimeType = mimeTypeForFileExtension(fileExtension) {
+                    // UTI types are an imperfect means of representing file type;
+                    // file extensions are also imperfect but far more reliable and
+                    // comprehensive so we always prefer to try to deduce MIME type
+                    // from the file extension.
+                    return mimeType
+                }
+            }
+        }
+        return UTType(dataUTI)?.preferredMIMEType ?? MimeType.applicationOctetStream.rawValue
+    }
+
     public static func mimeTypeForFileExtension(_ fileExtension: String) -> String? {
         owsAssertDebug(!fileExtension.isEmpty)
         return genericExtensionTypesToMimeTypes[fileExtension]

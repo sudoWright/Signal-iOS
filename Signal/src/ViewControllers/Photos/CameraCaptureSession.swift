@@ -988,23 +988,16 @@ extension CameraCaptureSession: VideoCaptureDelegate {
 
 extension CameraCaptureSession: PhotoCaptureDelegate {
 
-    fileprivate func photoCaptureDidProduce(result: Result<Data, Error>) {
+    fileprivate func photoCaptureDidProduce(result: Result<UIImage, Error>) {
         AssertIsOnMainThread()
         guard let delegate else { return }
 
-        switch result {
-        case .failure(let error):
+        do {
+            let normalizedImage = try NormalizedImage.forImage(result.get())
+            let previewableAttachment = PreviewableAttachment.imageAttachmentForNormalizedImage(normalizedImage)
+            delegate.cameraCaptureSession(self, didFinishProcessing: previewableAttachment)
+        } catch {
             delegate.cameraCaptureSession(self, didFailWith: error)
-        case .success(let photoData):
-            let attachment: PreviewableAttachment
-            do {
-                let dataSource = try DataSourcePath(writingTempFileData: photoData, fileExtension: "jpg")
-                attachment = try PreviewableAttachment.imageAttachment(dataSource: dataSource, dataUTI: UTType.jpeg.identifier)
-            } catch {
-                delegate.cameraCaptureSession(self, didFailWith: error)
-                return
-            }
-            delegate.cameraCaptureSession(self, didFinishProcessing: attachment)
         }
     }
 }
@@ -1473,7 +1466,7 @@ private class VideoCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
 
 private protocol PhotoCaptureDelegate: AnyObject {
 
-    func photoCaptureDidProduce(result: Result<Data, Error>)
+    func photoCaptureDidProduce(result: Result<UIImage, Error>)
 }
 
 private class PhotoCapture {
@@ -1525,17 +1518,17 @@ private class PhotoCapture {
 
             guard let delegate else { return }
 
-            let result: Result<Data, Error>
+            let result: Result<UIImage, Error>
             do {
                 if let error {
                     throw error
                 }
-                guard let rawData = photo.fileDataRepresentation() else {
+                guard let photoData = photo.fileDataRepresentation() else {
                     throw OWSAssertionError("photo data was unexpectedly empty")
                 }
 
-                let resizedData = try crop(photoData: rawData, to: captureRect)
-                result = .success(resizedData)
+                let resizedImage = try crop(photoData: photoData, to: captureRect)
+                result = .success(resizedImage)
             } catch {
                 result = .failure(error)
             }
@@ -1545,12 +1538,9 @@ private class PhotoCapture {
             }
         }
 
-        private func crop(photoData: Data, to outputRect: CGRect) throws -> Data {
-            guard
-                let originalImage = UIImage(data: photoData),
-                let cgImage = originalImage.cgImage
-            else {
-                throw OWSAssertionError("originalImage was unexpectedly nil")
+        private func crop(photoData: Data, to outputRect: CGRect) throws -> UIImage {
+            guard let image = UIImage(data: photoData), let cgImage = image.cgImage else {
+                throw OWSAssertionError("couldn't parse photo data")
             }
 
             guard outputRect.width > 0, outputRect.height > 0 else {
@@ -1566,11 +1556,7 @@ private class PhotoCapture {
                 height: outputRect.size.height * height,
             )
             let croppedCGImage = cgImage.cropping(to: cropRect)!
-            let croppedUIImage = UIImage(cgImage: croppedCGImage, scale: 1, orientation: originalImage.imageOrientation)
-            guard let croppedData = croppedUIImage.jpegData(compressionQuality: 0.9) else {
-                throw OWSAssertionError("croppedData was unexpectedly nil")
-            }
-            return croppedData
+            return UIImage(cgImage: croppedCGImage, scale: 1, orientation: image.imageOrientation)
         }
     }
 }

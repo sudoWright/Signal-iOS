@@ -468,14 +468,9 @@ public class Location: NSObject {
 
     func prepareAttachment() async throws -> SendableAttachment {
         let image = try await generateSnapshot()
-        guard let jpegData = image.jpegData(compressionQuality: 1.0) else {
-            throw LocationError.assertion
-        }
-        let dataSource = try DataSourcePath(writingTempFileData: jpegData, fileExtension: "jpg")
-        return try await SendableAttachment.forPreviewableAttachment(
-            PreviewableAttachment.imageAttachment(dataSource: dataSource, dataUTI: UTType.jpeg.identifier),
-            imageQualityLevel: .one,
-        )
+        let normalizedImage = try NormalizedImage.forImage(image)
+        let previewableAttachment = PreviewableAttachment.imageAttachmentForNormalizedImage(normalizedImage)
+        return try await SendableAttachment.forPreviewableAttachment(previewableAttachment, imageQualityLevel: .one)
     }
 
     public var messageText: String {

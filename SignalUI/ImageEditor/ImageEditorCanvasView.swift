@@ -334,15 +334,13 @@ class ImageEditorCanvasView: UIView {
     }
 
     private func loadSrcImage() -> UIImage? {
-        return ImageEditorCanvasView.loadSrcImage(model: model)
+        return Self.loadSrcImage(model: model)
     }
 
     class func loadSrcImage(model: ImageEditorModel) -> UIImage? {
         let srcImageData: Data
         do {
-            let srcImagePath = model.srcImagePath
-            let srcImageUrl = URL(fileURLWithPath: srcImagePath)
-            srcImageData = try Data(contentsOf: srcImageUrl)
+            srcImageData = try model.srcImage.dataSource.readData()
         } catch {
             owsFailDebug("Couldn't parse srcImageUrl")
             return nil

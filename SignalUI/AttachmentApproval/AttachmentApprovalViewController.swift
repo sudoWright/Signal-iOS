@@ -742,32 +742,14 @@ public final class AttachmentApprovalViewController: UIPageViewController, UIPag
             throw OWSAssertionError("Could not render for output.")
         }
 
-        let containerType: SignalAttachment.ContainerType
-        let dstData: Data?
-        let isLossy: Bool = attachmentApprovalItem.attachment.rawValue.mimeType.caseInsensitiveCompare(MimeType.imageJpeg.rawValue) == .orderedSame
-        if isLossy {
-            containerType = .jpg
-            dstData = dstImage.jpegData(compressionQuality: 0.9)
-        } else {
-            containerType = .png
-            dstData = dstImage.pngData()
-        }
-        guard let dstData else {
-            throw OWSAssertionError("Could not export for output.")
-        }
-        let dataSource = try DataSourcePath(writingTempFileData: dstData, fileExtension: containerType.fileExtension)
+        let oldImage = imageEditorModel.srcImage
+        let newImage = try NormalizedImage.forImage(
+            dstImage,
+            sourceFilename: oldImage.dataSource.sourceFilename,
+            mayHaveTransparency: oldImage.mayHaveTransparency,
+        )
 
-        // Rewrite the filename's extension to reflect the output file format.
-        var filename: String? = attachmentApprovalItem.attachment.rawValue.dataSource.sourceFilename?.filterFilename()
-        if let sourceFilename = attachmentApprovalItem.attachment.rawValue.dataSource.sourceFilename?.filterFilename() {
-            if let fileExtension: String = MimeTypeUtil.fileExtensionForUtiType(containerType.dataType.identifier) {
-                let sourceFilenameWithoutExtension = (sourceFilename as NSString).deletingPathExtension
-                filename = (sourceFilenameWithoutExtension as NSString).appendingPathExtension(fileExtension) ?? sourceFilenameWithoutExtension
-            }
-        }
-        dataSource.sourceFilename = filename
-
-        return try PreviewableAttachment.imageAttachment(dataSource: dataSource, dataUTI: containerType.dataType.identifier)
+        return PreviewableAttachment.imageAttachmentForNormalizedImage(newImage)
     }
 
     private func prepareVideoAttachment(

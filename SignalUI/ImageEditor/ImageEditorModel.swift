@@ -43,7 +43,7 @@ protocol ImageEditorModelObserver: AnyObject {
 // Should be @MainActor.
 class ImageEditorModel: NSObject {
 
-    let srcImagePath: String
+    let srcImage: NormalizedImage
     let srcImageSizePixels: CGSize
     let srcImageMetadata: ImageMetadata
 
@@ -61,37 +61,15 @@ class ImageEditorModel: NSObject {
 
     var color = ColorPickerBarColor.defaultColor()
 
-    // We don't want to allow editing of images if:
-    //
-    // * They are invalid.
-    // * We can't determine their size / aspect-ratio.
-    init(srcImagePath: String) throws {
-        self.srcImagePath = srcImagePath
-
-        let srcFileName = (srcImagePath as NSString).lastPathComponent
-        let srcFileExtension = (srcFileName as NSString).pathExtension
-        guard let mimeType = MimeTypeUtil.mimeTypeForFileExtension(srcFileExtension) else {
-            Logger.error("Couldn't determine MIME type for file.")
-            throw ImageEditorError.invalidInput
-        }
-        guard
-            MimeTypeUtil.isSupportedImageMimeType(mimeType),
-            !MimeTypeUtil.isSupportedDefinitelyAnimatedMimeType(mimeType)
-        else {
-            Logger.error("Invalid MIME type: \(mimeType).")
-            throw ImageEditorError.invalidInput
-        }
-
-        let srcImageMetadata = try? DataImageSource.forPath(srcImagePath).imageMetadata()
+    init(normalizedImage: NormalizedImage) throws {
+        self.srcImage = normalizedImage
+        let srcImageMetadata = try normalizedImage.dataSource.imageSource().imageMetadata(ignorePerTypeFileSizeLimits: true)
         guard let srcImageMetadata else {
-            Logger.error("Invalid image")
             throw ImageEditorError.invalidInput
         }
         self.srcImageMetadata = srcImageMetadata
-
         let srcImageSizePixels = srcImageMetadata.pixelSize
         guard srcImageSizePixels.width > 0, srcImageSizePixels.height > 0 else {
-            Logger.error("Couldn't determine image size.")
             throw ImageEditorError.invalidInput
         }
         self.srcImageSizePixels = srcImageSizePixels

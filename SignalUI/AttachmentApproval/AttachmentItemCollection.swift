@@ -50,11 +50,11 @@ public class AttachmentApprovalItem {
     }
 
     private static func imageEditorModel(for attachment: PreviewableAttachment) -> ImageEditorModel? {
-        guard attachment.rawValue.isImage, !attachment.rawValue.isAnimatedImage else {
+        guard case .image(let normalizedImage) = attachment.attachmentType else {
             return nil
         }
         do {
-            return try ImageEditorModel(srcImagePath: attachment.rawValue.dataSource.fileUrl.path)
+            return try ImageEditorModel(normalizedImage: normalizedImage)
         } catch {
             owsFailDebug("Could not create image editor: \(error)")
             return nil

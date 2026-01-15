@@ -13,7 +13,6 @@ private enum ItemProviderError: Error {
     case unsupportedMedia
     case cannotLoadUIImageObject
     case loadUIImageObjectFailed
-    case uiImageMissingOrCorruptImageData
     case cannotLoadURLObject
     case loadURLObjectFailed
     case cannotLoadStringObject
@@ -357,12 +356,8 @@ public struct TypedItemProvider {
     }
 
     private nonisolated static func createAttachment(withImage image: UIImage) throws -> PreviewableAttachment {
-        guard let imagePng = image.pngData() else {
-            throw ItemProviderError.uiImageMissingOrCorruptImageData
-        }
-        let containerType = SignalAttachment.ContainerType.png
-        let dataSource = try DataSourcePath(writingTempFileData: imagePng, fileExtension: containerType.fileExtension)
-        return try PreviewableAttachment.imageAttachment(dataSource: dataSource, dataUTI: containerType.dataType.identifier)
+        let normalizedImage = try NormalizedImage.forImage(image)
+        return PreviewableAttachment.imageAttachmentForNormalizedImage(normalizedImage)
     }
 
     private nonisolated static func copyFileUrl(
