@@ -33,7 +33,6 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
 
         for referencedAttachment in referencedAttachments {
             let pointerProto = referencedAttachment.asBackupFilePointer(
-                currentBackupAttachmentUploadEra: context.currentBackupAttachmentUploadEra,
                 attachmentByteCounter: context.attachmentByteCounter,
             )
 
@@ -61,7 +60,6 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
         return referencedAttachment.asBackupFilePointer(
-            currentBackupAttachmentUploadEra: context.currentBackupAttachmentUploadEra,
             attachmentByteCounter: context.attachmentByteCounter,
         )
     }
@@ -71,7 +69,6 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
         return referencedAttachment.asBackupFilePointer(
-            currentBackupAttachmentUploadEra: context.currentBackupAttachmentUploadEra,
             attachmentByteCounter: context.attachmentByteCounter,
         )
     }
@@ -81,7 +78,6 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_MessageAttachment {
         let pointerProto = referencedAttachment.asBackupFilePointer(
-            currentBackupAttachmentUploadEra: context.currentBackupAttachmentUploadEra,
             attachmentByteCounter: context.attachmentByteCounter,
         )
 
@@ -99,7 +95,6 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
         return referencedAttachment.asBackupFilePointer(
-            currentBackupAttachmentUploadEra: context.currentBackupAttachmentUploadEra,
             attachmentByteCounter: context.attachmentByteCounter,
         )
     }
@@ -109,7 +104,6 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
         return referencedAttachment.asBackupFilePointer(
-            currentBackupAttachmentUploadEra: context.currentBackupAttachmentUploadEra,
             attachmentByteCounter: context.attachmentByteCounter,
         )
     }
@@ -454,7 +448,6 @@ extension BackupArchive.RestoreFrameError.ErrorType {
 extension ReferencedAttachment {
 
     func asBackupFilePointer(
-        currentBackupAttachmentUploadEra: String,
         attachmentByteCounter: BackupArchiveAttachmentByteCounter,
     ) -> BackupProto_FilePointer {
         var proto = BackupProto_FilePointer()
@@ -485,7 +478,7 @@ extension ReferencedAttachment {
             }
         }
 
-        proto.locatorInfo = self.asBackupFilePointerLocatorInfo(currentBackupAttachmentUploadEra: currentBackupAttachmentUploadEra)
+        proto.locatorInfo = self.asBackupFilePointerLocatorInfo()
 
         if
             attachment.mediaName != nil,
@@ -504,9 +497,7 @@ extension ReferencedAttachment {
         return proto
     }
 
-    private func asBackupFilePointerLocatorInfo(
-        currentBackupAttachmentUploadEra: String,
-    ) -> BackupProto_FilePointer.LocatorInfo {
+    private func asBackupFilePointerLocatorInfo() -> BackupProto_FilePointer.LocatorInfo {
         var locatorInfo = BackupProto_FilePointer.LocatorInfo()
 
         // Include the transit tier cdn info as a fallback, but only

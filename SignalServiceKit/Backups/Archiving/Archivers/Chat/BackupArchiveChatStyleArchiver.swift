@@ -455,7 +455,6 @@ public class BackupArchiveChatStyleArchiver: BackupArchiveProtoStreamWriter {
         }
 
         return .success(referencedAttachment.asBackupFilePointer(
-            currentBackupAttachmentUploadEra: context.currentBackupAttachmentUploadEra,
             attachmentByteCounter: context.attachmentByteCounter,
         ))
     }
