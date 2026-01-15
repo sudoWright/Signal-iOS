@@ -83,17 +83,3 @@ public struct ImageMetadata {
 
     }
 }
-
-public enum ImageMetadataResult {
-    /// Source data exceeded size limit for all attachments;
-    /// as a precaution no validation was performed.
-    case genericSizeLimitExceeded
-
-    /// Exceeded the file size limit for the inferred type of image.
-    /// Smaller than the generic size limit.
-    case imageTypeSizeLimitExceeded
-
-    case invalid
-
-    case valid(ImageMetadata)
-}

@@ -161,7 +161,7 @@ enum PasteboardAttachment {
                 // There is a known bug with the iOS pasteboard where it will randomly give a
                 // single green pixel, and nothing else. Work around this by refetching the
                 // pasteboard after a brief delay (once, then give up).
-                if retrySinglePixelImages, (try? dataSource.imageSource())?.imageMetadata(ignorePerTypeFileSizeLimits: true)?.pixelSize == CGSize(square: 1) {
+                if retrySinglePixelImages, (try? dataSource.imageSource())?.imageMetadata()?.pixelSize == CGSize(square: 1) {
                     try? await Task.sleep(nanoseconds: NSEC_PER_MSEC * 50)
                     return try await loadPreviewableAttachment(atIndex: index, pasteboardUTIs: pasteboardUTIs, retrySinglePixelImages: false)
                 }

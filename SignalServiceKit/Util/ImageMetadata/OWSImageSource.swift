@@ -150,35 +150,23 @@ extension OWSImageSource {
     // MARK: - Image Metadata
 
     /// load image metadata about the current object
-    public func imageMetadata(ignorePerTypeFileSizeLimits: Bool = false) -> ImageMetadata? {
-        let result = _imageMetadataResult(ignorePerTypeFileSizeLimits: ignorePerTypeFileSizeLimits)
-        switch result {
-        case .invalid:
+    public func imageMetadata() -> ImageMetadata? {
+        // The largest image we should be able to handle in most places. This must
+        // be larger than the largest animated image (so that we can check if it's
+        // animated); it must also be larger than the largest image we support in
+        // the image editor. We can handle images larger than this by resizing them
+        // to fit within the dimensions for the highest quality.
+        let byteLimit = 72_000_000
+        assert(byteLimit >= OWSMediaUtils.kMaxFileSizeAnimatedImage)
+        assert(byteLimit >= 4 * Int(ImageQualityTier.seven.maxEdgeSize) ^ 2 + 50_000)
+        guard byteLength < byteLimit else {
             return nil
-        case .valid(let imageMetadata):
-            return imageMetadata
-        case .genericSizeLimitExceeded:
-            return nil
-        case .imageTypeSizeLimitExceeded:
-            return nil
-        }
-    }
-
-    /// Load image metadata about the current Data object.
-    /// Returns nil if metadata could not be determined.
-    public func imageMetadataResult() -> ImageMetadataResult {
-        return _imageMetadataResult(ignorePerTypeFileSizeLimits: false)
-    }
-
-    private func _imageMetadataResult(ignorePerTypeFileSizeLimits: Bool) -> ImageMetadataResult {
-        guard byteLength < OWSMediaUtils.kMaxFileSizeGeneric else {
-            return .genericSizeLimitExceeded
         }
 
         let imageFormat = ows_guessImageFormat()
         guard let imageFormat else {
             Logger.warn("Image does not have valid format.")
-            return .invalid
+            return nil
         }
 
         let isAnimated: Bool
@@ -190,53 +178,38 @@ extension OWSImageSource {
             let webpMetadata = loadWebPMetadata()
             guard let webpMetadata else {
                 Logger.warn("Image does not have valid webpMetadata.")
-                return .invalid
+                return nil
             }
             let imageSize = CGSize(width: webpMetadata.canvasWidth, height: webpMetadata.canvasHeight)
             guard isImageSizeValid(imageSize, depthBytes: 1) else {
                 Logger.warn("Image does not have valid dimensions: \(imageSize)")
-                return .invalid
+                return nil
             }
-            return .valid(ImageMetadata(
+            return ImageMetadata(
                 imageFormat: imageFormat,
                 pixelSize: imageSize,
                 hasAlpha: true,
                 isAnimated: webpMetadata.frameCount > 1,
-            ))
+            )
         case .png:
             guard let isAnimatedPng = isAnimatedPng() else {
                 Logger.warn("Could not determine if png is animated.")
-                return .invalid
+                return nil
             }
             isAnimated = isAnimatedPng
         default:
             isAnimated = false
         }
 
-        if !ignorePerTypeFileSizeLimits {
-            if isAnimated, byteLength > OWSMediaUtils.kMaxFileSizeAnimatedImage {
-                Logger.warn("Oversize image.")
-                return .imageTypeSizeLimitExceeded
-            } else if !isAnimated, byteLength > OWSMediaUtils.kMaxFileSizeImage {
-                Logger.warn("Oversize image.")
-                return .imageTypeSizeLimitExceeded
-            }
-        }
-
         guard let imageSource = try? self.cgImageSource() else {
             Logger.warn("Could not build imageSource.")
-            return .invalid
+            return nil
         }
-        let metadata = imageMetadataWithImageSource(
+        return imageMetadataWithImageSource(
             imageSource,
             imageFormat: imageFormat,
             isAnimated: isAnimated,
         )
-        guard let metadata else {
-            return .invalid
-        }
-
-        return .valid(metadata)
     }
 
     // MARK: - WEBP

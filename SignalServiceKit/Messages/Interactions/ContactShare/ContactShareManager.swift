@@ -110,7 +110,7 @@ class ContactShareManagerImpl: ContactShareManager {
     func validateAndPrepare(
         draft: ContactShareDraft,
     ) async throws -> ContactShareDraft.ForSending {
-        let avatarDataSource: AttachmentDataSource? = try await {
+        let avatarDataSource = try await { () async throws -> AttachmentDataSource? in
             if
                 let existingAvatarAttachment = draft.existingAvatarAttachment,
                 let stream = existingAvatarAttachment.attachment.asStream()
@@ -120,8 +120,12 @@ class ContactShareManagerImpl: ContactShareManager {
                     with: existingAvatarAttachment.reference,
                 )
             } else if let avatarImage = draft.avatarImage {
+                // TODO: Use NormalizedImage.
                 guard let imageData = avatarImage.jpegData(compressionQuality: 0.9) else {
                     throw OWSAssertionError("Failed to get JPEG")
+                }
+                guard imageData.count <= OWSMediaUtils.kMaxFileSizeImage else {
+                    throw OWSGenericError("image is too large")
                 }
                 let mimeType = MimeType.imageJpeg.rawValue
                 let pendingAttachment = try await attachmentValidator.validateDataContents(

@@ -135,7 +135,7 @@ public struct NormalizedImage {
         // final convert and compress before uploading.
 
         let imageQuality = ImageQualityLevel.maximumForCurrentAppContext()
-        let imageMetadata = try? dataSource.imageSource().imageMetadata(ignorePerTypeFileSizeLimits: true)
+        let imageMetadata = try? dataSource.imageSource().imageMetadata()
 
         // If the original has the right dimensions and a valid format, it might be
         // valid, and it's fine to use it as an intermediate normalized image. If

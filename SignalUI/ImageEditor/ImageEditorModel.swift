@@ -63,7 +63,7 @@ class ImageEditorModel: NSObject {
 
     init(normalizedImage: NormalizedImage) throws {
         self.srcImage = normalizedImage
-        let srcImageMetadata = try normalizedImage.dataSource.imageSource().imageMetadata(ignorePerTypeFileSizeLimits: true)
+        let srcImageMetadata = try normalizedImage.dataSource.imageSource().imageMetadata()
         guard let srcImageMetadata else {
             throw ImageEditorError.invalidInput
         }

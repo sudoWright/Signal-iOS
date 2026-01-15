@@ -498,18 +498,9 @@ public class AttachmentContentValidatorImpl: AttachmentContentValidator {
             }
         }()
 
-        let imageMetadataResult = imageSource.imageMetadataResult()
-
-        let imageMetadata: ImageMetadata
-        switch imageMetadataResult {
-        case .genericSizeLimitExceeded:
-            throw OWSAssertionError("Attachment size should have been validated before reaching this point!")
-        case .imageTypeSizeLimitExceeded:
-            throw OWSAssertionError("Image size too large")
-        case .invalid:
+        let imageMetadata = imageSource.imageMetadata()
+        guard let imageMetadata else {
             return (.invalid, nil)
-        case .valid(let metadata):
-            imageMetadata = metadata
         }
 
         if !imageMetadata.imageFormat.isValid(mimeType: mimeType) {
@@ -561,10 +552,6 @@ public class AttachmentContentValidatorImpl: AttachmentContentValidator {
     private func validateVideoContentType(
         _ input: Input,
     ) throws -> (Attachment.ContentType, stillFrame: PendingFile?, blurHash: String?) {
-        guard input.byteSize < OWSMediaUtils.kMaxFileSizeVideo else {
-            throw OWSAssertionError("Video too big!")
-        }
-
         let asset: AVAsset = try {
             switch input.type {
             case .inMemory(let data):

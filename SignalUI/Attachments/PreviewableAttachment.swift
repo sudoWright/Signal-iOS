@@ -58,7 +58,7 @@ public struct PreviewableAttachment {
             throw SignalAttachmentError.invalidData
         }
 
-        let imageMetadata = try? dataSource.imageSource().imageMetadata(ignorePerTypeFileSizeLimits: true)
+        let imageMetadata = try? dataSource.imageSource().imageMetadata()
         let isBorderless = canBeBorderless && (imageMetadata?.hasStickerLikeProperties ?? false)
 
         let isAnimated = imageMetadata?.isAnimated ?? false
