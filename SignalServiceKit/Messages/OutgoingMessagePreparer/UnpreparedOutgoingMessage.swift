@@ -383,10 +383,8 @@ public class UnpreparedOutgoingMessage {
 
         // All editable messages, by definition, should have been inserted.
         // Fail if we have no row id.
-        guard
-            let editedMessage = outgoingEditMessage.editedMessage,
-            let editedMessageRowId = editedMessage.sqliteRowId
-        else {
+        let editedMessage = outgoingEditMessage.editedMessage
+        guard let editedMessageRowId = editedMessage.sqliteRowId else {
             // We failed to insert!
             throw OWSAssertionError("Failed to insert message!")
         }

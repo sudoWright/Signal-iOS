@@ -10,10 +10,25 @@ public class OutgoingPinMessage: TSOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
-        self.pinDurationForever = coder.decodeObject(of: NSNumber.self, forKey: "pinDurationForever")?.boolValue ?? false
-        self.pinDurationSeconds = coder.decodeObject(of: NSNumber.self, forKey: "pinDurationSeconds")?.uint32Value ?? 0
-        self.targetMessageAuthorAciBinary = coder.decodeObject(of: NSData.self, forKey: "targetMessageAuthorAciBinary") as Data?
-        self.targetMessageTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetMessageTimestamp")?.uint64Value ?? 0
+        guard let pinDurationForever = coder.decodeObject(of: NSNumber.self, forKey: "pinDurationForever") else {
+            return nil
+        }
+        self.pinDurationForever = pinDurationForever.boolValue
+        guard let pinDurationSeconds = coder.decodeObject(of: NSNumber.self, forKey: "pinDurationSeconds") else {
+            return nil
+        }
+        self.pinDurationSeconds = pinDurationSeconds.uint32Value
+        guard
+            let targetMessageAuthorAciBinary = coder.decodeObject(of: NSData.self, forKey: "targetMessageAuthorAciBinary") as Data?,
+            let targetMessageAuthorAci = try? Aci.parseFrom(serviceIdBinary: targetMessageAuthorAciBinary)
+        else {
+            return nil
+        }
+        self.targetMessageAuthorAci = targetMessageAuthorAci
+        guard let targetMessageTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetMessageTimestamp") else {
+            return nil
+        }
+        self.targetMessageTimestamp = targetMessageTimestamp.uint64Value
         super.init(coder: coder)
     }
 
@@ -21,9 +36,7 @@ public class OutgoingPinMessage: TSOutgoingMessage {
         super.encode(with: coder)
         coder.encode(NSNumber(value: self.pinDurationForever), forKey: "pinDurationForever")
         coder.encode(NSNumber(value: self.pinDurationSeconds), forKey: "pinDurationSeconds")
-        if let targetMessageAuthorAciBinary {
-            coder.encode(targetMessageAuthorAciBinary, forKey: "targetMessageAuthorAciBinary")
-        }
+        coder.encode(targetMessageAuthorAci.serviceIdBinary, forKey: "targetMessageAuthorAciBinary")
         coder.encode(NSNumber(value: self.targetMessageTimestamp), forKey: "targetMessageTimestamp")
     }
 
@@ -32,7 +45,7 @@ public class OutgoingPinMessage: TSOutgoingMessage {
         hasher.combine(super.hash)
         hasher.combine(pinDurationForever)
         hasher.combine(pinDurationSeconds)
-        hasher.combine(targetMessageAuthorAciBinary)
+        hasher.combine(targetMessageAuthorAci)
         hasher.combine(targetMessageTimestamp)
         return hasher.finalize()
     }
@@ -42,15 +55,15 @@ public class OutgoingPinMessage: TSOutgoingMessage {
         guard super.isEqual(object) else { return false }
         guard self.pinDurationForever == object.pinDurationForever else { return false }
         guard self.pinDurationSeconds == object.pinDurationSeconds else { return false }
-        guard self.targetMessageAuthorAciBinary == object.targetMessageAuthorAciBinary else { return false }
+        guard self.targetMessageAuthorAci == object.targetMessageAuthorAci else { return false }
         guard self.targetMessageTimestamp == object.targetMessageTimestamp else { return false }
         return true
     }
 
-    public private(set) var targetMessageTimestamp: UInt64 = 0
-    public private(set) var targetMessageAuthorAciBinary: Data?
-    public private(set) var pinDurationSeconds: UInt32 = 0
-    private var pinDurationForever: Bool = false
+    public let targetMessageTimestamp: UInt64
+    public let targetMessageAuthorAci: Aci
+    public let pinDurationSeconds: UInt32
+    private let pinDurationForever: Bool
 
     public init(
         thread: TSThread,
@@ -62,7 +75,7 @@ public class OutgoingPinMessage: TSOutgoingMessage {
         tx: DBReadTransaction,
     ) {
         self.targetMessageTimestamp = targetMessageTimestamp
-        self.targetMessageAuthorAciBinary = targetMessageAuthorAciBinary.serviceIdBinary
+        self.targetMessageAuthorAci = targetMessageAuthorAciBinary
         self.pinDurationSeconds = pinDurationSeconds
         self.pinDurationForever = pinDurationForever
 
@@ -109,9 +122,7 @@ public class OutgoingPinMessage: TSOutgoingMessage {
 
         pinMessageBuilder.setTargetSentTimestamp(targetMessageTimestamp)
 
-        if let targetMessageAuthorAciBinary {
-            pinMessageBuilder.setTargetAuthorAciBinary(targetMessageAuthorAciBinary)
-        }
+        pinMessageBuilder.setTargetAuthorAciBinary(targetMessageAuthorAci.serviceIdBinary)
 
         if pinDurationSeconds > 0 {
             pinMessageBuilder.setPinDurationSeconds(pinDurationSeconds)
@@ -128,14 +139,6 @@ public class OutgoingPinMessage: TSOutgoingMessage {
 
     override public func updateWithSendSuccess(tx: DBWriteTransaction) {
         let pinnedMessageManager = DependenciesBridge.shared.pinnedMessageManager
-
-        guard
-            let targetMessageAuthorAciBinary,
-            let targetMessageAuthorAci = try? Aci.parseFrom(serviceIdBinary: targetMessageAuthorAciBinary)
-        else {
-            owsFailDebug("Couldn't parse ACI")
-            return
-        }
 
         let expiresAtMs: UInt64? = pinDurationSeconds > 0 ? Date.ows_millisecondTimestamp() + UInt64(pinDurationSeconds * 1000) : nil
 

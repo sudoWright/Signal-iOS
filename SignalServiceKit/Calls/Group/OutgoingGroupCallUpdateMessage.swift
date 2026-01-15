@@ -38,7 +38,7 @@ public final class OutgoingGroupCallUpdateMessage: TSOutgoingMessage {
     }
 
     /// The era ID of the call with the update.
-    private(set) var eraId: String?
+    let eraId: String?
 
     public init(
         thread: TSGroupThread,

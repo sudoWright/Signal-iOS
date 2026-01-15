@@ -10,7 +10,10 @@ public class OutgoingStorySentMessageTranscript: OWSOutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
-        self.isRecipientUpdate = coder.decodeObject(of: NSNumber.self, forKey: "isRecipientUpdate")
+        guard let isRecipientUpdate = coder.decodeObject(of: NSNumber.self, forKey: "isRecipientUpdate") else {
+            return nil
+        }
+        self.isRecipientUpdate = isRecipientUpdate.boolValue
         self.storyEncodedRecipientStates = coder.decodeObject(of: NSData.self, forKey: "storyEncodedRecipientStates") as Data?
         self.storyMessageUniqueId = coder.decodeObject(of: NSString.self, forKey: "storyMessageUniqueId") as String?
         super.init(coder: coder)
@@ -18,9 +21,7 @@ public class OutgoingStorySentMessageTranscript: OWSOutgoingSyncMessage {
 
     override public func encode(with coder: NSCoder) {
         super.encode(with: coder)
-        if let isRecipientUpdate {
-            coder.encode(isRecipientUpdate, forKey: "isRecipientUpdate")
-        }
+        coder.encode(NSNumber(value: isRecipientUpdate), forKey: "isRecipientUpdate")
         if let storyEncodedRecipientStates {
             coder.encode(storyEncodedRecipientStates, forKey: "storyEncodedRecipientStates")
         }
@@ -47,22 +48,24 @@ public class OutgoingStorySentMessageTranscript: OWSOutgoingSyncMessage {
         return true
     }
 
-    private var storyEncodedRecipientStates: Data?
-    private var storyMessageUniqueId: String?
-    private var isRecipientUpdate: NSNumber!
+    private let storyEncodedRecipientStates: Data?
+    private let storyMessageUniqueId: String?
+    private let isRecipientUpdate: Bool
 
     public init(localThread: TSContactThread, timestamp: UInt64, recipientStates: [ServiceId: StoryRecipientState], transaction: DBReadTransaction) {
         // We need to store the encoded data rather than just the uniqueId
         // of the story message as the story message will have been deleted
         // by the time we're sending this transcript.
         self.storyEncodedRecipientStates = Self.encodeRecipientStates(recipientStates)
-        self.isRecipientUpdate = NSNumber(value: true)
+        self.storyMessageUniqueId = nil
+        self.isRecipientUpdate = true
         super.init(timestamp: timestamp, localThread: localThread, transaction: transaction)
     }
 
     public init(localThread: TSContactThread, storyMessage: StoryMessage, transaction: DBReadTransaction) {
+        self.storyEncodedRecipientStates = nil
         self.storyMessageUniqueId = storyMessage.uniqueId
-        self.isRecipientUpdate = NSNumber(value: false)
+        self.isRecipientUpdate = false
         super.init(timestamp: storyMessage.timestamp, localThread: localThread, transaction: transaction)
     }
 
@@ -90,10 +93,10 @@ public class OutgoingStorySentMessageTranscript: OWSOutgoingSyncMessage {
     override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let sentBuilder = SSKProtoSyncMessageSent.builder()
         sentBuilder.setTimestamp(timestamp)
-        sentBuilder.setIsRecipientUpdate(isRecipientUpdate.boolValue)
+        sentBuilder.setIsRecipientUpdate(isRecipientUpdate)
 
         if let storyMessage = storyMessage(transaction: transaction) {
-            if !isRecipientUpdate.boolValue {
+            if !isRecipientUpdate {
                 guard let storyMessageProto = storyMessageProto(for: storyMessage, transaction: transaction) else {
                     owsFailDebug("Failed to build sync proto for story message with timestamp \(storyMessage.timestamp)")
                     return nil

@@ -9,13 +9,13 @@ import Foundation
 /// sent a message. This way the message you just sent can appear on all
 /// your devices.
 class OutgoingSentMessageTranscript: OWSOutgoingSyncMessage {
-    private(set) var message: TSOutgoingMessage!
-    private(set) var messageThread: TSThread!
-    private(set) var isRecipientUpdate: Bool = false
+    let message: TSOutgoingMessage
+    let messageThread: TSThread
+    let isRecipientUpdate: Bool
 
     // sentRecipientAddress is the recipient of message, for contact thread messages.
     // It is used to identify the thread/conversation to desktop.
-    private(set) var sentRecipientAddress: SignalServiceAddress?
+    let sentRecipientAddress: SignalServiceAddress?
 
     init(
         localThread: TSContactThread,

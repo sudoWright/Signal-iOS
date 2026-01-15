@@ -10,15 +10,16 @@ public class OutgoingDeviceNameChangeSyncMessage: OWSOutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
-        self.deviceId = coder.decodeObject(of: NSNumber.self, forKey: "deviceId")
+        guard let deviceId = coder.decodeObject(of: NSNumber.self, forKey: "deviceId") else {
+            return nil
+        }
+        self.deviceId = deviceId.uint32Value
         super.init(coder: coder)
     }
 
     override public func encode(with coder: NSCoder) {
         super.encode(with: coder)
-        if let deviceId {
-            coder.encode(deviceId, forKey: "deviceId")
-        }
+        coder.encode(NSNumber(value: deviceId), forKey: "deviceId")
     }
 
     override public var hash: Int {
@@ -35,14 +36,14 @@ public class OutgoingDeviceNameChangeSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    private(set) var deviceId: NSNumber!
+    private let deviceId: UInt32
 
     init(
         deviceId: UInt32,
         localThread: TSContactThread,
         tx: DBReadTransaction,
     ) {
-        self.deviceId = NSNumber(value: deviceId)
+        self.deviceId = deviceId
         super.init(localThread: localThread, transaction: tx)
     }
 
@@ -50,7 +51,7 @@ public class OutgoingDeviceNameChangeSyncMessage: OWSOutgoingSyncMessage {
 
     override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let deviceNameChangeBuilder = SSKProtoSyncMessageDeviceNameChange.builder()
-        deviceNameChangeBuilder.setDeviceID(deviceId.uint32Value)
+        deviceNameChangeBuilder.setDeviceID(deviceId)
 
         let builder = SSKProtoSyncMessage.builder()
         builder.setDeviceNameChange(deviceNameChangeBuilder.buildInfallibly())

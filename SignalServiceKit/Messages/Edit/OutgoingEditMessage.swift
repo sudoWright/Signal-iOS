@@ -11,16 +11,20 @@ public final class OutgoingEditMessage: TSOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
-        self.editedMessage = coder.decodeObject(of: TSOutgoingMessage.self, forKey: "editedMessage")
-        self.targetMessageTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetMessageTimestamp")?.uint64Value ?? 0
+        guard let editedMessage = coder.decodeObject(of: TSOutgoingMessage.self, forKey: "editedMessage") else {
+            return nil
+        }
+        self.editedMessage = editedMessage
+        guard let targetMessageTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetMessageTimestamp") else {
+            return nil
+        }
+        self.targetMessageTimestamp = targetMessageTimestamp.uint64Value
         super.init(coder: coder)
     }
 
     override public func encode(with coder: NSCoder) {
         super.encode(with: coder)
-        if let editedMessage {
-            coder.encode(editedMessage, forKey: "editedMessage")
-        }
+        coder.encode(editedMessage, forKey: "editedMessage")
         coder.encode(NSNumber(value: self.targetMessageTimestamp), forKey: "targetMessageTimestamp")
     }
 
@@ -42,11 +46,8 @@ public final class OutgoingEditMessage: TSOutgoingMessage {
 
     // MARK: - Edit target data
 
-    @objc
-    private(set) var editedMessage: TSOutgoingMessage?
-
-    @objc
-    private(set) var targetMessageTimestamp: UInt64 = 0
+    let editedMessage: TSOutgoingMessage
+    let targetMessageTimestamp: UInt64
 
     // MARK: - Overrides
 
@@ -97,10 +98,7 @@ public final class OutgoingEditMessage: TSOutgoingMessage {
         let editBuilder = SSKProtoEditMessage.builder()
         let contentBuilder = SSKProtoContent.builder()
 
-        guard
-            let editedMessage,
-            let targetDataMessageBuilder = editedMessage.dataMessageBuilder(with: thread, transaction: tx)
-        else {
+        guard let targetDataMessageBuilder = editedMessage.dataMessageBuilder(with: thread, transaction: tx) else {
             owsFailDebug("failed to build outgoing edit data message")
             return nil
         }
@@ -122,7 +120,7 @@ public final class OutgoingEditMessage: TSOutgoingMessage {
         with thread: TSThread,
         transaction: DBReadTransaction,
     ) -> SSKProtoDataMessageBuilder? {
-        return editedMessage?.dataMessageBuilder(
+        return editedMessage.dataMessageBuilder(
             with: thread,
             transaction: transaction,
         )
@@ -159,10 +157,7 @@ public final class OutgoingEditMessage: TSOutgoingMessage {
     ) {
         super.anyUpdateOutgoingMessage(transaction: tx, block: block)
 
-        if
-            let editedMessage,
-            let editedMessage = TSOutgoingMessage.anyFetchOutgoingMessage(uniqueId: editedMessage.uniqueId, transaction: tx)
-        {
+        if let editedMessage = TSOutgoingMessage.anyFetchOutgoingMessage(uniqueId: editedMessage.uniqueId, transaction: tx) {
             editedMessage.anyUpdateOutgoingMessage(transaction: tx, block: block)
         }
     }

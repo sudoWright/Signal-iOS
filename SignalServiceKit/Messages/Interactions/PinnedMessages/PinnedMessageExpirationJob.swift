@@ -67,7 +67,7 @@ public final class PinnedMessageExpirationJob: ExpirationJob<PinnedMessageRecord
         let unpinMessage = OutgoingUnpinMessage(
             thread: localThread,
             targetMessageTimestamp: targetMessage.timestamp,
-            targetMessageAuthorAciBinary: authorAci,
+            targetMessageAuthorAci: authorAci,
             messageExpiresInSeconds: 0,
             tx: tx,
         )

@@ -36,7 +36,7 @@ public final class TypingIndicatorMessage: TSOutgoingMessage {
         return true
     }
 
-    private var action: TypingIndicatorAction = .started
+    private let action: TypingIndicatorAction
 
     // MARK: Initializers
 

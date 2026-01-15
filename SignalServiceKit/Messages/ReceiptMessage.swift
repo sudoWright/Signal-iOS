@@ -6,9 +6,9 @@
 import Foundation
 
 final class ReceiptMessage: TSOutgoingMessage {
-    private(set) var messageUniqueIds: Set<String> = []
-    private(set) var messageTimestamps: Set<UInt64> = []
-    private(set) var receiptType: SSKProtoReceiptMessageType = .delivery
+    private let messageUniqueIds: Set<String>
+    private let messageTimestamps: Set<UInt64>
+    private let receiptType: SSKProtoReceiptMessageType
 
     init(
         thread: TSThread,

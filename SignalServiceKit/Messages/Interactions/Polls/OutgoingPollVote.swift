@@ -10,29 +10,40 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
-        self.targetPollAuthorAciBinary = coder.decodeObject(of: NSData.self, forKey: "targetPollAuthorAciBinary") as Data?
-        self.targetPollTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetPollTimestamp")?.uint64Value ?? 0
-        self.voteCount = coder.decodeObject(of: NSNumber.self, forKey: "voteCount")?.uint32Value ?? 0
-        self.voteOptionIndexes = coder.decodeArrayOfObjects(ofClass: NSNumber.self, forKey: "voteOptionIndexes").map({ $0.map(\.uint32Value) })
+        guard
+            let targetPollAuthorAciBinary = coder.decodeObject(of: NSData.self, forKey: "targetPollAuthorAciBinary") as Data?,
+            let targetPollAuthorAci = try? Aci.parseFrom(serviceIdBinary: targetPollAuthorAciBinary)
+        else {
+            return nil
+        }
+        self.targetPollAuthorAci = targetPollAuthorAci
+        guard let targetPollTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetPollTimestamp") else {
+            return nil
+        }
+        self.targetPollTimestamp = targetPollTimestamp.uint64Value
+        guard let voteCount = coder.decodeObject(of: NSNumber.self, forKey: "voteCount") else {
+            return nil
+        }
+        self.voteCount = voteCount.uint32Value
+        guard let voteOptionIndexes = coder.decodeArrayOfObjects(ofClass: NSNumber.self, forKey: "voteOptionIndexes") else {
+            return nil
+        }
+        self.voteOptionIndexes = voteOptionIndexes.map(\.uint32Value)
         super.init(coder: coder)
     }
 
     override public func encode(with coder: NSCoder) {
         super.encode(with: coder)
-        if let targetPollAuthorAciBinary {
-            coder.encode(targetPollAuthorAciBinary, forKey: "targetPollAuthorAciBinary")
-        }
+        coder.encode(self.targetPollAuthorAci.serviceIdBinary, forKey: "targetPollAuthorAciBinary")
         coder.encode(NSNumber(value: self.targetPollTimestamp), forKey: "targetPollTimestamp")
         coder.encode(NSNumber(value: self.voteCount), forKey: "voteCount")
-        if let voteOptionIndexes {
-            coder.encode(voteOptionIndexes, forKey: "voteOptionIndexes")
-        }
+        coder.encode(self.voteOptionIndexes, forKey: "voteOptionIndexes")
     }
 
     override public var hash: Int {
         var hasher = Hasher()
         hasher.combine(super.hash)
-        hasher.combine(targetPollAuthorAciBinary)
+        hasher.combine(targetPollAuthorAci)
         hasher.combine(targetPollTimestamp)
         hasher.combine(voteCount)
         hasher.combine(voteOptionIndexes)
@@ -42,17 +53,17 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
     override public func isEqual(_ object: Any?) -> Bool {
         guard let object = object as? Self else { return false }
         guard super.isEqual(object) else { return false }
-        guard self.targetPollAuthorAciBinary == object.targetPollAuthorAciBinary else { return false }
+        guard self.targetPollAuthorAci == object.targetPollAuthorAci else { return false }
         guard self.targetPollTimestamp == object.targetPollTimestamp else { return false }
         guard self.voteCount == object.voteCount else { return false }
         guard self.voteOptionIndexes == object.voteOptionIndexes else { return false }
         return true
     }
 
-    var targetPollTimestamp: UInt64 = 0
-    var targetPollAuthorAciBinary: Data?
-    var voteOptionIndexes: [UInt32]?
-    var voteCount: UInt32 = 0
+    let targetPollTimestamp: UInt64
+    let targetPollAuthorAci: Aci
+    let voteOptionIndexes: [UInt32]
+    let voteCount: UInt32
 
     public init(
         thread: TSGroupThread,
@@ -63,7 +74,7 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
         tx: DBReadTransaction,
     ) {
         self.targetPollTimestamp = targetPollTimestamp
-        self.targetPollAuthorAciBinary = targetPollAuthorAci.serviceIdBinary
+        self.targetPollAuthorAci = targetPollAuthorAci
         self.voteOptionIndexes = voteOptionIndexes
         self.voteCount = voteCount
 
@@ -97,13 +108,9 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
 
         pollVoteBuilder.setTargetSentTimestamp(targetPollTimestamp)
 
-        if let targetPollAuthorAciBinary {
-            pollVoteBuilder.setTargetAuthorAciBinary(targetPollAuthorAciBinary)
-        }
+        pollVoteBuilder.setTargetAuthorAciBinary(targetPollAuthorAci.serviceIdBinary)
 
-        if let voteOptionIndexes {
-            pollVoteBuilder.setOptionIndexes(voteOptionIndexes)
-        }
+        pollVoteBuilder.setOptionIndexes(voteOptionIndexes)
 
         pollVoteBuilder.setVoteCount(voteCount)
 
@@ -115,15 +122,10 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
     }
 
     override public func updateWithSendSuccess(tx: DBWriteTransaction) {
-        guard let targetPollAuthorAciBinary, let voteOptionIndexes else {
-            owsFailDebug("Missing required fields in poll vote message")
-            return
-        }
-
         do {
             try DependenciesBridge.shared.pollMessageManager.processPollVoteMessageDidSend(
                 targetPollTimestamp: targetPollTimestamp,
-                targetPollAuthorAci: Aci.parseFrom(serviceIdBinary: targetPollAuthorAciBinary),
+                targetPollAuthorAci: targetPollAuthorAci,
                 optionIndexes: voteOptionIndexes,
                 voteCount: voteCount,
                 tx: tx,
@@ -164,13 +166,6 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
         Logger.error("Failed to send vote to all recipients.")
 
         do {
-            guard let targetPollAuthorAciBinary else {
-                owsFailDebug("Can't parse author aci")
-                return
-            }
-
-            let targetPollAuthorAci = try Aci.parseFrom(serviceIdBinary: targetPollAuthorAciBinary)
-
             guard
                 let targetMessage = try DependenciesBridge.shared.interactionStore.fetchMessage(
                     timestamp: targetPollTimestamp,

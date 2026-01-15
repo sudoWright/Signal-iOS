@@ -9,7 +9,10 @@ class OutgoingPollTerminateMessage: TSOutgoingMessage {
     override class var supportsSecureCoding: Bool { true }
 
     required init?(coder: NSCoder) {
-        self.targetPollTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetPollTimestamp")?.uint64Value ?? 0
+        guard let targetPollTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetPollTimestamp") else {
+            return nil
+        }
+        self.targetPollTimestamp = targetPollTimestamp.uint64Value
         super.init(coder: coder)
     }
 
@@ -32,7 +35,7 @@ class OutgoingPollTerminateMessage: TSOutgoingMessage {
         return true
     }
 
-    var targetPollTimestamp: UInt64 = 0
+    let targetPollTimestamp: UInt64
 
     init(
         thread: TSGroupThread,

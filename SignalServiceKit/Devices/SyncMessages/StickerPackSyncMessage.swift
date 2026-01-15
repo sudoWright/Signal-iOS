@@ -12,8 +12,8 @@ enum StickerPackOperationType: UInt {
 
 @objc(OWSStickerPackSyncMessage)
 final class StickerPackSyncMessage: OWSOutgoingSyncMessage {
-    private var packs: [StickerPackInfo] = []
-    private var operationType: StickerPackOperationType = .install
+    private let packs: [StickerPackInfo]
+    private let operationType: StickerPackOperationType
 
     override class var supportsSecureCoding: Bool { true }
 

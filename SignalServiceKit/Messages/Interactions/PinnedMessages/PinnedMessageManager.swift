@@ -383,7 +383,7 @@ public class PinnedMessageManager {
         return OutgoingUnpinMessage(
             thread: thread,
             targetMessageTimestamp: interaction.timestamp,
-            targetMessageAuthorAciBinary: authorAci,
+            targetMessageAuthorAci: authorAci,
             messageExpiresInSeconds: disappearingMessagesConfigurationStore.durationSeconds(for: thread, tx: tx),
             tx: tx,
         )

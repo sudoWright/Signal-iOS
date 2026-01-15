@@ -10,37 +10,42 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
-        self._storyMessageRowId = coder.decodeObject(of: NSNumber.self, forKey: "_storyMessageRowId")
-        self.isPrivateStorySend = coder.decodeObject(of: NSNumber.self, forKey: "isPrivateStorySend")
-        self.skipSyncTranscript = coder.decodeObject(of: NSNumber.self, forKey: "skipSyncTranscript")
-        self.storyAllowsReplies = coder.decodeObject(of: NSNumber.self, forKey: "storyAllowsReplies")
-        self.storyMessageId = coder.decodeObject(of: NSString.self, forKey: "storyMessageId") as String?
+        guard let storyMessageRowId = coder.decodeObject(of: NSNumber.self, forKey: "_storyMessageRowId") else {
+            return nil
+        }
+        self.storyMessageRowId = storyMessageRowId.int64Value
+        guard let isPrivateStorySend = coder.decodeObject(of: NSNumber.self, forKey: "isPrivateStorySend") else {
+            return nil
+        }
+        self.isPrivateStorySend = isPrivateStorySend.boolValue
+        guard let skipSyncTranscript = coder.decodeObject(of: NSNumber.self, forKey: "skipSyncTranscript") else {
+            return nil
+        }
+        self.skipSyncTranscript = skipSyncTranscript.boolValue
+        guard let storyAllowsReplies = coder.decodeObject(of: NSNumber.self, forKey: "storyAllowsReplies") else {
+            return nil
+        }
+        self.storyAllowsReplies = storyAllowsReplies.boolValue
+        guard let storyMessageId = coder.decodeObject(of: NSString.self, forKey: "storyMessageId") as String? else {
+            return nil
+        }
+        self.storyMessageId = storyMessageId
         super.init(coder: coder)
     }
 
     override public func encode(with coder: NSCoder) {
         super.encode(with: coder)
-        if let _storyMessageRowId {
-            coder.encode(_storyMessageRowId, forKey: "_storyMessageRowId")
-        }
-        if let isPrivateStorySend {
-            coder.encode(isPrivateStorySend, forKey: "isPrivateStorySend")
-        }
-        if let skipSyncTranscript {
-            coder.encode(skipSyncTranscript, forKey: "skipSyncTranscript")
-        }
-        if let storyAllowsReplies {
-            coder.encode(storyAllowsReplies, forKey: "storyAllowsReplies")
-        }
-        if let storyMessageId {
-            coder.encode(storyMessageId, forKey: "storyMessageId")
-        }
+        coder.encode(NSNumber(value: storyMessageRowId), forKey: "_storyMessageRowId")
+        coder.encode(NSNumber(value: isPrivateStorySend), forKey: "isPrivateStorySend")
+        coder.encode(NSNumber(value: skipSyncTranscript), forKey: "skipSyncTranscript")
+        coder.encode(NSNumber(value: storyAllowsReplies), forKey: "storyAllowsReplies")
+        coder.encode(storyMessageId, forKey: "storyMessageId")
     }
 
     override public var hash: Int {
         var hasher = Hasher()
         hasher.combine(super.hash)
-        hasher.combine(_storyMessageRowId)
+        hasher.combine(storyMessageRowId)
         hasher.combine(isPrivateStorySend)
         hasher.combine(skipSyncTranscript)
         hasher.combine(storyAllowsReplies)
@@ -51,7 +56,7 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
     override public func isEqual(_ object: Any?) -> Bool {
         guard let object = object as? Self else { return false }
         guard super.isEqual(object) else { return false }
-        guard self._storyMessageRowId == object._storyMessageRowId else { return false }
+        guard self.storyMessageRowId == object.storyMessageRowId else { return false }
         guard self.isPrivateStorySend == object.isPrivateStorySend else { return false }
         guard self.skipSyncTranscript == object.skipSyncTranscript else { return false }
         guard self.storyAllowsReplies == object.storyAllowsReplies else { return false }
@@ -59,12 +64,11 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
         return true
     }
 
-    public private(set) var storyMessageId: String!
-    public private(set) var _storyMessageRowId: NSNumber!
-    public var storyMessageRowId: Int64! { _storyMessageRowId?.int64Value }
-    public private(set) var storyAllowsReplies: NSNumber!
-    public private(set) var isPrivateStorySend: NSNumber!
-    public private(set) var skipSyncTranscript: NSNumber!
+    public let storyMessageId: String
+    public let storyMessageRowId: Int64
+    public let storyAllowsReplies: Bool
+    public let isPrivateStorySend: Bool
+    public let skipSyncTranscript: Bool
 
     public init(
         thread: TSThread,
@@ -76,10 +80,10 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
         transaction: DBReadTransaction,
     ) {
         self.storyMessageId = storyMessage.uniqueId
-        self._storyMessageRowId = NSNumber(value: storyMessageRowId)
-        self.storyAllowsReplies = NSNumber(value: storyAllowsReplies)
-        self.isPrivateStorySend = NSNumber(value: isPrivateStorySend)
-        self.skipSyncTranscript = NSNumber(value: skipSyncTranscript)
+        self.storyMessageRowId = storyMessageRowId
+        self.storyAllowsReplies = storyAllowsReplies
+        self.isPrivateStorySend = isPrivateStorySend
+        self.skipSyncTranscript = skipSyncTranscript
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(
             thread: thread,
             timestamp: storyMessage.timestamp,
@@ -119,7 +123,7 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
 
     override public var isStorySend: Bool { true }
 
-    override public func shouldSyncTranscript() -> Bool { !skipSyncTranscript.boolValue }
+    override public func shouldSyncTranscript() -> Bool { !skipSyncTranscript }
 
     override public func buildTranscriptSyncMessage(
         localThread: TSContactThread,
@@ -156,10 +160,7 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
 
     @objc
     public func storyMessageProto(with thread: TSThread, transaction: DBReadTransaction) -> SSKProtoStoryMessage? {
-        guard
-            let storyMessageId,
-            let storyMessage = StoryMessage.anyFetch(uniqueId: storyMessageId, transaction: transaction)
-        else {
+        guard let storyMessage = StoryMessage.anyFetch(uniqueId: storyMessageId, transaction: transaction) else {
             Logger.warn("Missing story message for outgoing story.")
             return nil
         }
@@ -221,13 +222,7 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
     override public func anyUpdateOutgoingMessage(transaction: DBWriteTransaction, block: (TSOutgoingMessage) -> Void) {
         super.anyUpdateOutgoingMessage(transaction: transaction, block: block)
 
-        guard
-            let storyMessageId,
-            let storyMessage = StoryMessage.anyFetch(
-                uniqueId: storyMessageId,
-                transaction: transaction,
-            )
-        else {
+        guard let storyMessage = StoryMessage.anyFetch(uniqueId: storyMessageId, transaction: transaction) else {
             owsFailDebug("Missing story message for outgoing story message")
             return
         }

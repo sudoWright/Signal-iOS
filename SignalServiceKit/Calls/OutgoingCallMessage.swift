@@ -20,8 +20,8 @@ public final class OutgoingCallMessage: TSOutgoingMessage {
         case opaqueMessage(SSKProtoCallMessageOpaque)
     }
 
-    private(set) var messageType: MessageType!
-    private(set) var destinationDeviceId: UInt32?
+    let messageType: MessageType
+    private let destinationDeviceId: UInt32?
 
     public init(
         thread: TSThread,
@@ -90,9 +90,6 @@ public final class OutgoingCallMessage: TSOutgoingMessage {
             builder.setBusy(busyMessage)
         case .opaqueMessage(let opaqueMessage):
             builder.setOpaque(opaqueMessage)
-        case nil:
-            owsFailDebug("must have type for call message")
-            return nil
         }
 
         if let destinationDeviceId {
@@ -147,8 +144,6 @@ public final class OutgoingCallMessage: TSOutgoingMessage {
             payloadType = "busyMessage"
         case .opaqueMessage:
             payloadType = "opaqueMessage"
-        case nil:
-            payloadType = "nil"
         }
         return "\(type(of: self)) with payload: \(payloadType)"
     }

@@ -12,15 +12,16 @@ public class OutgoingCallLogEventSyncMessage: OWSOutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
-        self.callLogEvent = coder.decodeObject(of: CallLogEvent.self, forKey: "callLogEvent")
+        guard let callLogEvent = coder.decodeObject(of: CallLogEvent.self, forKey: "callLogEvent") else {
+            return nil
+        }
+        self.callLogEvent = callLogEvent
         super.init(coder: coder)
     }
 
     override public func encode(with coder: NSCoder) {
         super.encode(with: coder)
-        if let callLogEvent {
-            coder.encode(callLogEvent, forKey: "callLogEvent")
-        }
+        coder.encode(callLogEvent, forKey: "callLogEvent")
     }
 
     override public var hash: Int {
@@ -38,7 +39,7 @@ public class OutgoingCallLogEventSyncMessage: OWSOutgoingSyncMessage {
     }
 
     /// The call log event.
-    private(set) var callLogEvent: CallLogEvent!
+    private let callLogEvent: CallLogEvent
 
     init(
         callLogEvent: CallLogEvent,

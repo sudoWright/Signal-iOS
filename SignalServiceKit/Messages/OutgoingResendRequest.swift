@@ -7,8 +7,8 @@ import LibSignalClient
 
 @objc(OWSOutgoingResendRequest)
 final class OutgoingResendRequest: TSOutgoingMessage {
-    private(set) var decryptionErrorData: Data = Data()
-    private(set) var failedEnvelopeGroupId: Data?
+    let decryptionErrorData: Data
+    private let failedEnvelopeGroupId: Data?
 
     init(
         errorMessageBytes: Data,
@@ -43,7 +43,10 @@ final class OutgoingResendRequest: TSOutgoingMessage {
     }
 
     required init?(coder: NSCoder) {
-        self.decryptionErrorData = coder.decodeObject(of: NSData.self, forKey: "decryptionErrorData") as Data? ?? Data()
+        guard let decryptionErrorData = coder.decodeObject(of: NSData.self, forKey: "decryptionErrorData") as Data? else {
+            return nil
+        }
+        self.decryptionErrorData = decryptionErrorData
         self.failedEnvelopeGroupId = coder.decodeObject(of: NSData.self, forKey: "failedEnvelopeGroupId") as Data?
         super.init(coder: coder)
     }

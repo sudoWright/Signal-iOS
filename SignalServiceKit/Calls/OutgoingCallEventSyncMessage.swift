@@ -107,15 +107,16 @@ public class OutgoingCallEventSyncMessage: OWSOutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
-        self.callEvent = coder.decodeObject(of: OutgoingCallEvent.self, forKey: "event")
+        guard let callEvent = coder.decodeObject(of: OutgoingCallEvent.self, forKey: "event") else {
+            return nil
+        }
+        self.callEvent = callEvent
         super.init(coder: coder)
     }
 
     override public func encode(with coder: NSCoder) {
         super.encode(with: coder)
-        if let callEvent {
-            coder.encode(callEvent, forKey: "event")
-        }
+        coder.encode(callEvent, forKey: "event")
     }
 
     override public var hash: Int {
@@ -133,7 +134,7 @@ public class OutgoingCallEventSyncMessage: OWSOutgoingSyncMessage {
     }
 
     /// The call event.
-    private(set) var callEvent: OutgoingCallEvent!
+    let callEvent: OutgoingCallEvent
 
     init(
         localThread: TSContactThread,

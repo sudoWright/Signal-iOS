@@ -14,15 +14,16 @@ class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
     override class var supportsSecureCoding: Bool { true }
 
     required init?(coder: NSCoder) {
-        self.contents = coder.decodeObject(of: NSData.self, forKey: "contents") as Data?
+        guard let contents = coder.decodeObject(of: NSData.self, forKey: "contents") as Data? else {
+            return nil
+        }
+        self.contents = contents
         super.init(coder: coder)
     }
 
     override func encode(with coder: NSCoder) {
         super.encode(with: coder)
-        if let contents {
-            coder.encode(contents, forKey: "contents")
-        }
+        coder.encode(contents, forKey: "contents")
     }
 
     override var hash: Int {
@@ -96,7 +97,7 @@ class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
     }
 
     /// A JSON-serialized ``Contents`` struct.
-    private(set) var contents: Data!
+    private(set) var contents: Data
 
     init?(
         contents: Contents,

@@ -12,7 +12,10 @@ public class OutgoingCallLinkUpdateMessage: OWSOutgoingSyncMessage {
 
     public required init?(coder: NSCoder) {
         self.adminPasskey = coder.decodeObject(of: NSData.self, forKey: "adminPasskey") as Data?
-        self.rootKey = coder.decodeObject(of: NSData.self, forKey: "rootKey") as Data?
+        guard let rootKey = coder.decodeObject(of: NSData.self, forKey: "rootKey") as Data? else {
+            return nil
+        }
+        self.rootKey = rootKey
         super.init(coder: coder)
     }
 
@@ -21,9 +24,7 @@ public class OutgoingCallLinkUpdateMessage: OWSOutgoingSyncMessage {
         if let adminPasskey {
             coder.encode(adminPasskey, forKey: "adminPasskey")
         }
-        if let rootKey {
-            coder.encode(rootKey, forKey: "rootKey")
-        }
+        coder.encode(rootKey, forKey: "rootKey")
     }
 
     override public var hash: Int {
@@ -42,8 +43,8 @@ public class OutgoingCallLinkUpdateMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    private var rootKey: Data!
-    private var adminPasskey: Data?
+    private let rootKey: Data
+    private let adminPasskey: Data?
 
     public init(
         localThread: TSContactThread,

@@ -38,8 +38,8 @@ final class OutgoingGroupUpdateMessage: TSOutgoingMessage {
         return true
     }
 
-    private var isUpdateUrgent: Bool = false
-    private(set) var isDeletingAccount: Bool = false
+    private let isUpdateUrgent: Bool
+    let isDeletingAccount: Bool
 
     init(
         in thread: TSGroupThread,
