@@ -244,6 +244,11 @@ public class SignalAttachment: CustomDebugStringConvertible {
         if #available(iOS 18.2, *) {
             additionalTypes.append(.jpegxl)
         }
+        if #available(iOS 18.0, *) {
+            additionalTypes.append(.dng)
+        } else {
+            additionalTypes.append(UTType("com.adobe.raw-image")!)
+        }
         additionalTypes.append(.heif)
         additionalTypes.append(.heic)
         additionalTypes.append(.webP)
