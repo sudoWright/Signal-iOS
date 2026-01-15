@@ -529,6 +529,7 @@ public enum OWSRequestFactory {
             parameters: parameters,
         )
         request.auth = .identified(auth)
+        request.timeoutInterval = 45
         return request
     }
 
