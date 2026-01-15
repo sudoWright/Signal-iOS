@@ -185,7 +185,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
         progress: OWSProgressSink?,
     ) async throws -> URL {
         // We want to avoid large downloads from a compromised or buggy service.
-        let maxDownloadSize = UInt64(safeCast: RemoteConfig.current.attachmentMaxEncryptedReceiveBytes)
+        let maxDownloadSize = RemoteConfig.current.attachmentMaxEncryptedReceiveBytes
         let downloadState = DownloadState(type: .transientAttachment(metadata, uuid: UUID()))
         let encryptedFileUrl = try await self.downloadQueue.enqueueDownload(
             downloadState: downloadState,
@@ -842,7 +842,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
             do {
                 downloadedFileUrl = try await downloadQueue.enqueueDownload(
                     downloadState: .init(type: .attachment(downloadMetadata, id: attachment.id)),
-                    maxDownloadSizeBytes: UInt64(safeCast: RemoteConfig.current.attachmentMaxEncryptedReceiveBytes),
+                    maxDownloadSizeBytes: RemoteConfig.current.attachmentMaxEncryptedReceiveBytes,
                     expectedDownloadSize: downloadSizeSource,
                     progress: nil,
                 )

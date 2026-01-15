@@ -219,18 +219,18 @@ public class RemoteConfig {
         getUInt32Value(forFlag: .maxNicknameLength, defaultValue: 32)
     }
 
-    public var attachmentMaxEncryptedBytes: UInt {
-        return getUIntValue(forFlag: .attachmentMaxEncryptedBytes, defaultValue: 100 * 1024 * 1024)
+    public var attachmentMaxEncryptedBytes: UInt64 {
+        return getUInt64Value(forFlag: .attachmentMaxEncryptedBytes, defaultValue: 100 * 1024 * 1024)
     }
 
-    public var attachmentMaxEncryptedReceiveBytes: UInt {
+    public var attachmentMaxEncryptedReceiveBytes: UInt64 {
         // TODO: Use the Remote Config value and new fallback value.
         return self.attachmentMaxEncryptedBytes
     }
 
     public var attachmentMaxPlaintextVideoBytes: UInt64 {
         if BuildFlags.useNewAttachmentLimits {
-            return PaddingBucket.forEncryptedSizeLimit(UInt64(safeCast: self.attachmentMaxEncryptedBytes)).plaintextSize
+            return PaddingBucket.forEncryptedSizeLimit(self.attachmentMaxEncryptedBytes).plaintextSize
         } else {
             return OWSMediaUtils.kMaxFileSizeVideo
         }
@@ -270,9 +270,6 @@ public class RemoteConfig {
     public var mediaTierFallbackCdnNumber: UInt32 {
         getUInt32Value(forFlag: .mediaTierFallbackCdnNumber, defaultValue: 3)
     }
-
-    // Hardcoded value (but lives alongside `attachmentMaxEncryptedBytes`).
-    public var maxMediaTierThumbnailDownloadSizeBytes: UInt = 1024 * 8
 
     public var enableGifSearch: Bool {
         return isEnabled(.enableGifSearch, defaultValue: true)
