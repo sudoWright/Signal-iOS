@@ -749,15 +749,13 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                 return .unretryableError(OWSAssertionError("Failed local clone"))
             }
 
-            let downloadMetadata: DownloadMetadata?
-            let downloadSizeSource: DownloadQueue.DownloadSizeSource?
+            let downloadMetadata: DownloadMetadata
+            let downloadSizeSource: DownloadQueue.DownloadSizeSource
             switch record.sourceType {
             case .transitTier:
                 // We only download from the latest transit tier info.
                 guard let transitTierInfo = attachment.latestTransitTierInfo else {
-                    downloadMetadata = nil
-                    downloadSizeSource = nil
-                    break
+                    return .unretryableError(OWSAssertionError("Attempting to download an attachment without cdn info"))
                 }
                 downloadMetadata = .init(
                     mimeType: attachment.mimeType,
@@ -783,9 +781,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                     let encryptionMetadata = buildCdnEncryptionMetadata(mediaName: mediaName, backupKey: backupKey, type: .outerLayerFullsizeOrThumbnail),
                     let cdnCredential = await fetchBackupCdnReadCredential(for: cdnNumber, backupKey: backupKey)
                 else {
-                    downloadMetadata = nil
-                    downloadSizeSource = nil
-                    break
+                    return .unretryableError(OWSAssertionError("Attempting to download an attachment without cdn info"))
                 }
                 let integrityCheck = AttachmentIntegrityCheck.sha256ContentHash(mediaTierInfo.sha256ContentHash)
                 downloadMetadata = .init(
@@ -822,9 +818,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                     ),
                     let cdnReadCredential = await fetchBackupCdnReadCredential(for: cdnNumber, backupKey: backupKey)
                 else {
-                    downloadMetadata = nil
-                    downloadSizeSource = nil
-                    break
+                    return .unretryableError(OWSAssertionError("Attempting to download an attachment without cdn info"))
                 }
 
                 downloadMetadata = .init(
@@ -842,10 +836,6 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                 downloadSizeSource = .estimatedSizeBytes(UInt(Cryptography.estimatedMediaTierCDNSize(
                     unencryptedSize: UInt64(safeCast: AttachmentThumbnailQuality.backupThumbnailMaxSizeBytes),
                 ) ?? UInt64(UInt32.max)))
-            }
-
-            guard let downloadMetadata, let downloadSizeSource else {
-                return .unretryableError(OWSAssertionError("Attempting to download an attachment without cdn info"))
             }
 
             let downloadedFileUrl: URL
