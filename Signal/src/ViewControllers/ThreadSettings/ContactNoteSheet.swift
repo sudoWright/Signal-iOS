@@ -13,6 +13,16 @@ class ContactNoteSheet: OWSTableSheetViewController {
         let nicknameManager: any NicknameManager
     }
 
+    override var sheetBackgroundColor: UIColor {
+        if #available(iOS 26, *) {
+            .clear
+        } else {
+            super.sheetBackgroundColor
+        }
+    }
+
+    override var placeOnGlassIfAvailable: Bool { true }
+
     private let contactNoteTableViewController: ContactNoteTableViewController
     override var tableViewController: OWSTableViewController2 {
         get { contactNoteTableViewController }
@@ -34,6 +44,8 @@ class ContactNoteSheet: OWSTableSheetViewController {
         self.context = context
         self.contactNoteTableViewController = ContactNoteTableViewController(thread: thread, context: context)
         super.init()
+        self.tableViewController.backgroundStyle = .clear
+        self.tableViewController.tableView.clipsToBounds = false
         self.contactNoteTableViewController.didTapEdit = { [weak self] in
             self?.didTapEdit()
         }
@@ -85,13 +97,20 @@ private class ContactNoteTableViewController: OWSTableViewController2, TextViewW
     }
 
     func tableContents() -> OWSTableContents {
+        // This is trying to fake a navigation bar.
+        // TODO: Make a general-purpose, navigable, self-sizing native sheet like what's used in the Call Quality Survey flow
         let header: UIView = {
             let headerContainer = UIView()
+            let hMargin: CGFloat = if #available(iOS 26, *) {
+                0
+            } else {
+                16
+            }
             headerContainer.layoutMargins = .init(
                 top: 0,
-                left: 16,
+                left: hMargin,
                 bottom: 24,
-                right: 16,
+                right: hMargin,
             )
 
             let titleLabel = UILabel()
@@ -105,9 +124,11 @@ private class ContactNoteTableViewController: OWSTableViewController2, TextViewW
             titleLabel.autoCenterInSuperviewMargins()
             titleLabel.autoPinHeightToSuperviewMargins()
 
-            let editButton = OWSButton(
-                title: CommonStrings.editButton,
-                block: { [weak self] in
+            var config = UIButton.Configuration.mediumSecondary(title: CommonStrings.editButton)
+            config.baseForegroundColor = .Signal.label
+            let editButton = UIButton(
+                configuration: config,
+                primaryAction: UIAction { [weak self] _ in
                     self?.didTapEdit?()
                 },
             )
@@ -115,7 +136,6 @@ private class ContactNoteTableViewController: OWSTableViewController2, TextViewW
             editButton.autoAlignAxis(.horizontal, toSameAxisOf: titleLabel)
             editButton.autoPinEdge(toSuperviewMargin: .trailing)
             editButton.autoPinEdge(.leading, to: .trailing, of: titleLabel, withOffset: 8, relation: .greaterThanOrEqual)
-            editButton.setTitleColor(Theme.primaryTextColor, for: .normal)
 
             return headerContainer
         }()
