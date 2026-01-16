@@ -928,7 +928,11 @@ private class BackupAttachmentDownloadProgressView: UIView {
                         comment: "generic button text to acknowledge that the corresponding text was read.",
                     ),
                     action: { sheet in
-                        self.backupAttachmentDownloadQueueStatusReporter.reattemptDiskSpaceChecks()
+                        // Clear previous out of space errors, so they can try
+                        // again to download.
+                        self.backupAttachmentDownloadQueueStatusReporter.checkAvailableDiskSpace(
+                            clearPreviousOutOfSpaceErrors: true,
+                        )
                         sheet.dismiss(animated: true)
                     },
                 ),

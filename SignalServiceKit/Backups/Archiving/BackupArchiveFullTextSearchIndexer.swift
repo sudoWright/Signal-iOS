@@ -47,11 +47,9 @@ public class BackupArchiveFullTextSearchIndexerImpl: BackupArchiveFullTextSearch
         self.searchableNameIndexer = searchableNameIndexer
         self.taskQueue = SerialTaskQueue()
 
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            Task {
-                try await self.taskQueue.enqueue(operation: { [weak self] in
-                    try await self?.runMessagesJobIfNeeded()
-                }).value
+        appReadiness.runNowOrWhenAppDidBecomeReadyAsync { [self] in
+            taskQueue.enqueue { [self] in
+                try await runMessagesJobIfNeeded()
             }
         }
     }

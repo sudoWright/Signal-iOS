@@ -319,7 +319,7 @@ private class MockDownloadQueueStatusReporter: BackupAttachmentDownloadQueueStat
         minimumRequiredDiskSpaceMock
     }
 
-    func reattemptDiskSpaceChecks() {
-        owsFail("Unused by BackupSettingsAttachmentDownloadTracker.")
+    func checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: Bool) {
+        // Nothing
     }
 }

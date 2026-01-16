@@ -258,10 +258,9 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             struct NeedsInternetError: Error {}
             struct NeedsToBeRegisteredError: Error {}
 
-            await statusManager.quickCheckDiskSpaceForDownloads()
+            await statusManager.checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: false)
 
             let (status, statusToken) = await statusManager.currentStatusAndToken(for: mode)
-
             switch status {
             case .running:
                 break

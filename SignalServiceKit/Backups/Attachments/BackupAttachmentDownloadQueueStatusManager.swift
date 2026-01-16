@@ -66,9 +66,9 @@ public protocol BackupAttachmentDownloadQueueStatusReporter {
     /// Synchronously returns the minimum required disk space for downloads.
     nonisolated func minimumRequiredDiskSpaceToCompleteDownloads() -> UInt64
 
-    /// Re-triggers disk space checks and clears any in-memory state for past disk space errors,
-    /// in order to attempt download resumption.
-    func reattemptDiskSpaceChecks()
+    /// Check available disk space, optionally clearing in-memory state
+    /// regarding past "out of space" errors.
+    func checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: Bool)
 }
 
 extension BackupAttachmentDownloadQueueStatusReporter {
@@ -95,11 +95,6 @@ public protocol BackupAttachmentDownloadQueueStatusManager: BackupAttachmentDown
 
     /// Begin observing status updates, if necessary.
     func beginObservingIfNecessary(for mode: BackupAttachmentDownloadQueueMode) -> BackupAttachmentDownloadQueueStatus
-
-    /// Synchronously check remaining disk space.
-    /// If there is sufficient space, early exit.
-    /// Otherwise, await a full state update.
-    nonisolated func quickCheckDiskSpaceForDownloads() async
 
     /// Checks if the error should change the status (e.g. out of disk space errors should stop subsequent downloads)
     /// Returns nil if the error has no effect on the status (though note the status may be changed for any other concurrent
@@ -143,15 +138,12 @@ public class BackupAttachmentDownloadQueueStatusManagerImpl: BackupAttachmentDow
         return getRequiredDiskSpace()
     }
 
-    public func reattemptDiskSpaceChecks() {
-        // Check for disk space available now in case the user freed up space.
-        availableDiskSpaceMaybeDidChange()
-        // Also, if we had experienced an error for some individual download before,
-        // clear that now. If our check for disk space says we've got space but then
-        // actual downloads fail with a disk space error...this will put us in a
-        // loop of attempting over and over when the user acks. But if we don't do
-        // this, the user has no (obvious) way to get out of running out of space.
-        state.downloadDidExperienceOutOfSpaceError = false
+    public func checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: Bool) {
+        state.availableDiskSpace = getAvailableDiskSpace()
+
+        if clearPreviousOutOfSpaceErrors {
+            state.downloadDidExperienceOutOfSpaceError = false
+        }
     }
 
     // MARK: - BackupAttachmentDownloadQueueStatusManager
@@ -191,16 +183,6 @@ public class BackupAttachmentDownloadQueueStatusManagerImpl: BackupAttachmentDow
         }
         await MainActor.run {
             self.resetNetworkErrorRetriesAfterSuccess(token: token)
-        }
-    }
-
-    public nonisolated func quickCheckDiskSpaceForDownloads() async {
-        let requiredDiskSpace = getRequiredDiskSpace()
-        if
-            let availableDiskSpace = getAvailableDiskSpace(),
-            availableDiskSpace < requiredDiskSpace
-        {
-            await availableDiskSpaceMaybeDidChange()
         }
     }
 
@@ -632,18 +614,10 @@ public class BackupAttachmentDownloadQueueStatusManagerImpl: BackupAttachmentDow
     }
 
     @objc
-    private func availableDiskSpaceMaybeDidChange() {
-        state.availableDiskSpace = getAvailableDiskSpace()
-    }
-
-    @objc
     private func willEnterForeground() {
-        // Besides errors we get when writing downloaded attachment files to disk,
-        // there isn't a good trigger for available disk space changes (and it
-        // would be overkill to learn about every byte, anyway). Just check
-        // when the app is foregrounded, so we can be proactive about stopping
-        // downloads before we use up the last sliver of disk space.
-        availableDiskSpaceMaybeDidChange()
+        // The user may have freed up disk space while we were backgrounded; use
+        // this as a trigger to check so the download queue behaves accordingly.
+        checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: false)
     }
 
     private func downloadDidExperienceOutOfSpaceError(mode: BackupAttachmentDownloadQueueMode) -> BackupAttachmentDownloadQueueStatus {
@@ -749,16 +723,12 @@ class MockBackupAttachmentDownloadQueueStatusManager: BackupAttachmentDownloadQu
         0
     }
 
-    func reattemptDiskSpaceChecks() {
+    func checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: Bool) {
         // Nothing
     }
 
     func beginObservingIfNecessary(for mode: BackupAttachmentDownloadQueueMode) -> BackupAttachmentDownloadQueueStatus {
         return currentStatus(for: mode)
-    }
-
-    func quickCheckDiskSpaceForDownloads() async {
-        // Nothing
     }
 
     func jobDidExperienceError(
