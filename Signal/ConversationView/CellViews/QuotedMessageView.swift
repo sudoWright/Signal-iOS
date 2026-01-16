@@ -421,6 +421,7 @@ public class QuotedMessageView: ManualStackViewWithLayer {
                 text,
                 font: UIFont.dynamicTypeFootnote,
                 textColor: conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming),
+                numberOfLines: 0,
             )
         }
 
