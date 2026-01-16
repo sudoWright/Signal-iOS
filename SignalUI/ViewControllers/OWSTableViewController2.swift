@@ -619,7 +619,7 @@ extension OWSTableViewController2: UITableViewDataSource, UITableViewDelegate, O
     public static var defaultHeaderFont: UIFont { .dynamicTypeHeadlineClamped }
 
     public var defaultHeaderTextColor: UIColor {
-        forceDarkMode ? Theme.darkThemePrimaryColor : Theme.primaryTextColor
+        UIColor.Signal.label
     }
 
     public var defaultHeaderTextStyle: BonMot.StringStyle {
@@ -632,7 +632,7 @@ extension OWSTableViewController2: UITableViewDataSource, UITableViewDelegate, O
     public static var defaultFooterFont: UIFont { .dynamicTypeFootnoteClamped }
 
     public var defaultFooterTextColor: UIColor {
-        forceDarkMode ? Theme.darkThemeSecondaryTextAndIconColor : Theme.secondaryTextAndIconColor
+        UIColor.Signal.secondaryLabel
     }
 
     public var defaultFooterTextStyle: BonMot.StringStyle {
