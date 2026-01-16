@@ -87,7 +87,7 @@ public enum BuildFlags {
 
     public static let useNewAttachmentLimits = false
 
-    public static let memberLabels = build <= .internal
+    public static let memberLabels = build <= .dev
 }
 
 // MARK: -
