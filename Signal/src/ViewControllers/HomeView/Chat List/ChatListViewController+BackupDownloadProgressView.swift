@@ -172,12 +172,6 @@ public class CLVBackupDownloadProgressView {
         completeDismissAction: @escaping () -> Void,
         backupAttachmentDownloadQueueStatusReporter: BackupAttachmentDownloadQueueStatusReporter,
     ) -> BackupAttachmentDownloadProgressView.State? {
-        switch viewState.backupPlan {
-        case nil, .disabled, .free:
-            return .none
-        case .disabling, .paid, .paidExpiringSoon, .paidAsTester:
-            break
-        }
         switch viewState.downloadQueueStatus {
         case .none, .notRegisteredAndReady, .suspended, .appBackgrounded:
             return nil
