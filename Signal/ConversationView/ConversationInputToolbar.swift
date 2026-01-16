@@ -1050,16 +1050,16 @@ public class ConversationInputToolbar: UIView, QuotedReplyPreviewDelegate {
         if let animator {
             if doLayout, hasLayoutChanged {
                 animator.addAnimations {
-                    self.contentView.setNeedsLayout()
-                    self.contentView.layoutIfNeeded()
+                    self.setNeedsLayout()
+                    self.layoutIfNeeded()
                 }
             }
 
             animator.startAnimation()
         } else {
             if doLayout, hasLayoutChanged {
-                self.contentView.setNeedsLayout()
-                self.contentView.layoutIfNeeded()
+                self.setNeedsLayout()
+                self.layoutIfNeeded()
             }
         }
 
