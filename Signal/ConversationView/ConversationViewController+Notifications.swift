@@ -58,6 +58,18 @@ extension ConversationViewController {
             name: UserProfileNotifications.profileWhitelistDidChange,
             object: nil,
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(registrationStateDidChange),
+            name: .registrationStateDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appExpiryDidChange),
+            name: AppExpiry.AppExpiryDidChange,
+            object: nil,
+        )
 
         NotificationCenter.default.addObserver(
             self,
@@ -178,6 +190,18 @@ extension ConversationViewController {
         AssertIsOnMainThread()
 
         finishRecordingVoiceMessage(sendImmediately: false)
+    }
+
+    @objc
+    private func registrationStateDidChange(_ notification: Notification) {
+        AssertIsOnMainThread()
+        ensureBottomViewType()
+    }
+
+    @objc
+    private func appExpiryDidChange(_ notification: Notification) {
+        AssertIsOnMainThread()
+        ensureBottomViewType()
     }
 }
 

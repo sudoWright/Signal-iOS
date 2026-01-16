@@ -3,34 +3,25 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import Foundation
 import SignalServiceKit
 import SignalUI
 
-class BlockingLegacyGroupView: ConversationBottomPanelView {
+class BlockingErrorBottomPanelView: ConversationBottomPanelView {
+    private let onTap: () -> Void
 
-    private weak var fromViewController: UIViewController?
-
-    init(fromViewController: UIViewController) {
-        self.fromViewController = fromViewController
+    init(
+        text: NSAttributedString,
+        onTap: @escaping () -> Void,
+    ) {
+        self.onTap = onTap
 
         super.init(frame: .zero)
-
-        let format = OWSLocalizedString(
-            "LEGACY_GROUP_UNSUPPORTED_MESSAGE",
-            comment: "Message explaining that this group can no longer be used because it is unsupported. Embeds a {{ learn more link }}.",
-        )
-        let learnMoreText = CommonStrings.learnMore
-
-        let attributedString = NSMutableAttributedString(string: String(format: format, learnMoreText))
-        attributedString.setAttributes(
-            [.foregroundColor: UIColor.Signal.link],
-            forSubstring: learnMoreText,
-        )
 
         let label = UILabel()
         label.font = .dynamicTypeSubheadlineClamped
         label.textColor = .Signal.secondaryLabel
-        label.attributedText = attributedString
+        label.attributedText = text
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
         label.textAlignment = .center
@@ -52,15 +43,7 @@ class BlockingLegacyGroupView: ConversationBottomPanelView {
     }
 
     @objc
-    func didTapLearnMore() {
-        guard let fromViewController = self.fromViewController else {
-            owsFailDebug("Missing fromViewController.")
-            return
-        }
-
-        fromViewController.presentFormSheet(
-            LegacyGroupLearnMoreViewController(mode: .explainUnsupportedLegacyGroups),
-            animated: true,
-        )
+    private func didTapLearnMore() {
+        onTap()
     }
 }

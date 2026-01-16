@@ -362,7 +362,7 @@
 		347C384B252D085900F3D941 /* CVComponentUnreadIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347C384A252D085900F3D941 /* CVComponentUnreadIndicator.swift */; };
 		347C384D252D0FDC00F3D941 /* CVComponentTypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347C384C252D0FDC00F3D941 /* CVComponentTypingIndicator.swift */; };
 		347C3857252E1E2300F3D941 /* CVComponentThreadDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347C3856252E1E2300F3D941 /* CVComponentThreadDetails.swift */; };
-		347DE5BC2548967900C32CDC /* BlockingLegacyGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347DE5BB2548967900C32CDC /* BlockingLegacyGroupView.swift */; };
+		347DE5BC2548967900C32CDC /* BlockingErrorBottomPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347DE5BB2548967900C32CDC /* BlockingErrorBottomPanelView.swift */; };
 		348433DF243CA94600C7F64A /* ReplaceAdminViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 348433DE243CA94500C7F64A /* ReplaceAdminViewController.swift */; };
 		34848D5E25D43ADD00E5034B /* cash-out.json in Resources */ = {isa = PBXBuildFile; fileRef = 34848D5A25D43ADD00E5034B /* cash-out.json */; };
 		34848D5F25D43ADD00E5034B /* about-mobilecoin.json in Resources */ = {isa = PBXBuildFile; fileRef = 34848D5B25D43ADD00E5034B /* about-mobilecoin.json */; };
@@ -4372,7 +4372,7 @@
 		347C384A252D085900F3D941 /* CVComponentUnreadIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CVComponentUnreadIndicator.swift; sourceTree = "<group>"; };
 		347C384C252D0FDC00F3D941 /* CVComponentTypingIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CVComponentTypingIndicator.swift; sourceTree = "<group>"; };
 		347C3856252E1E2300F3D941 /* CVComponentThreadDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CVComponentThreadDetails.swift; sourceTree = "<group>"; };
-		347DE5BB2548967900C32CDC /* BlockingLegacyGroupView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockingLegacyGroupView.swift; sourceTree = "<group>"; };
+		347DE5BB2548967900C32CDC /* BlockingErrorBottomPanelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockingErrorBottomPanelView.swift; sourceTree = "<group>"; };
 		348433DE243CA94500C7F64A /* ReplaceAdminViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReplaceAdminViewController.swift; sourceTree = "<group>"; };
 		34848D5A25D43ADD00E5034B /* cash-out.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "cash-out.json"; sourceTree = "<group>"; };
 		34848D5B25D43ADD00E5034B /* about-mobilecoin.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "about-mobilecoin.json"; sourceTree = "<group>"; };
@@ -8611,7 +8611,7 @@
 				88594E592335B08000390B19 /* AudioMessagePresenter.swift */,
 				45A1684C2A1C308800C2432D /* AudioPresentation.swift */,
 				3491899A269CD68D008A18AF /* BlockingAnnouncementOnlyView.swift */,
-				347DE5BB2548967900C32CDC /* BlockingLegacyGroupView.swift */,
+				347DE5BB2548967900C32CDC /* BlockingErrorBottomPanelView.swift */,
 				76CDEB182EAD980F00ADCCD6 /* ConversationBottomPanelView.swift */,
 				3457794226828A9A00732869 /* ConversationCollectionView.swift */,
 				45DDA6232090CEB500DE97F8 /* ConversationHeaderView.swift */,
@@ -17741,7 +17741,7 @@
 				D9EB221F2A4B636C00C73E1D /* Bitmaps+Shapes.swift in Sources */,
 				D9EB22222A4B636C00C73E1D /* Bitmaps.swift in Sources */,
 				3491899B269CD68E008A18AF /* BlockingAnnouncementOnlyView.swift in Sources */,
-				347DE5BC2548967900C32CDC /* BlockingLegacyGroupView.swift in Sources */,
+				347DE5BC2548967900C32CDC /* BlockingErrorBottomPanelView.swift in Sources */,
 				76847C962A1346A8008E2EAB /* BlockListViewController.swift in Sources */,
 				14E4A340278EE999008408FD /* BlurredToolbarContainer.swift in Sources */,
 				D9E43C142CC194140001536E /* CallAudioService.swift in Sources */,

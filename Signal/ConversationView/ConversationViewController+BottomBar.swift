@@ -17,6 +17,9 @@ enum CVCBottomViewType: Equatable {
     case selection
     case blockingLegacyGroup
     case announcementOnlyGroup
+    case appExpired
+    case notRegistered
+    case notLinked
 }
 
 protocol ConversationBottomBar: UIView {
@@ -55,35 +58,52 @@ public extension ConversationViewController {
             return
         }
 
+        let appExpiry = DependenciesBridge.shared.appExpiry
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+
         bottomViewType = { () -> CVCBottomViewType in
             // The ordering of this method determines
             // precedence of the bottom views.
 
             if !hasViewWillAppearEverBegun {
                 return .none
-            } else if threadViewModel.hasPendingMessageRequest {
+            }
+            if appExpiry.isExpired(now: Date()) {
+                return .appExpired
+            }
+            switch tsAccountManager.registrationStateWithMaybeSneakyTransaction.deregistrationState {
+            case .deregistered:
+                return .notRegistered
+            case .delinked:
+                return .notLinked
+            case nil:
+                break
+            }
+            if threadViewModel.hasPendingMessageRequest {
                 let messageRequestType = SSKEnvironment.shared.databaseStorageRef.read { tx in
                     return MessageRequestView.messageRequestType(forThread: self.threadViewModel.threadRecord, transaction: tx)
                 }
                 return .messageRequestView(messageRequestType: messageRequestType)
-            } else if isLocalUserRequestingMember {
+            }
+            if isLocalUserRequestingMember {
                 return .memberRequestView
-            } else if hasBlockingLegacyGroup {
+            }
+            if hasBlockingLegacyGroup {
                 return .blockingLegacyGroup
-            } else if isBlockedFromSendingByAnnouncementOnlyGroup {
+            }
+            if isBlockedFromSendingByAnnouncementOnlyGroup {
                 return .announcementOnlyGroup
-            } else {
-                switch uiMode {
-                case .search:
-                    return .search
-                case .selection:
-                    return .selection
-                case .normal:
-                    if viewState.isInPreviewPlatter || userLeftGroup {
-                        return .none
-                    } else {
-                        return .inputToolbar
-                    }
+            }
+            switch uiMode {
+            case .search:
+                return .search
+            case .selection:
+                return .selection
+            case .normal:
+                if viewState.isInPreviewPlatter || userLeftGroup {
+                    return .none
+                } else {
+                    return .inputToolbar
                 }
             }
         }()
@@ -127,7 +147,15 @@ public extension ConversationViewController {
             loadInputToolbarIfNeeded()
             bottomView = inputToolbar
         case .blockingLegacyGroup:
-            let legacyGroupView = BlockingLegacyGroupView(fromViewController: self)
+            let legacyGroupView = BlockingErrorBottomPanelView(
+                text: blockingLegacyGroupText(),
+                onTap: { [weak self] in
+                    self?.presentFormSheet(
+                        LegacyGroupLearnMoreViewController(mode: .explainUnsupportedLegacyGroups),
+                        animated: true,
+                    )
+                },
+            )
             requestView = legacyGroupView
             bottomView = legacyGroupView
         case .announcementOnlyGroup:
@@ -137,6 +165,31 @@ public extension ConversationViewController {
             )
             requestView = announcementOnlyView
             bottomView = announcementOnlyView
+        case .appExpired:
+            let appExpiredView = BlockingErrorBottomPanelView(
+                text: appExpiredErrorText(),
+                onTap: { [weak self] in self?.didTapShowUpgradeAppUI() },
+            )
+            requestView = appExpiredView
+            bottomView = appExpiredView
+        case .notRegistered:
+            let notRegisteredView = BlockingErrorBottomPanelView(
+                text: notRegisteredErrorText(),
+                onTap: { [unowned self] in
+                    RegistrationUtils.showReregistrationUI(fromViewController: self, appReadiness: appReadiness)
+                },
+            )
+            requestView = notRegisteredView
+            bottomView = notRegisteredView
+        case .notLinked:
+            let notRegisteredView = BlockingErrorBottomPanelView(
+                text: notLinkedErrorText(),
+                onTap: { [unowned self] in
+                    RegistrationUtils.showReregistrationUI(fromViewController: self, appReadiness: appReadiness)
+                },
+            )
+            requestView = notRegisteredView
+            bottomView = notRegisteredView
         }
 
         bottomBarContainer.removeAllSubviews()
@@ -165,6 +218,72 @@ public extension ConversationViewController {
         }
 
         updateContentInsets()
+    }
+
+    private func blockingLegacyGroupText() -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "LEGACY_GROUP_UNSUPPORTED_MESSAGE",
+            comment: "Message explaining that this group can no longer be used because it is unsupported. Embeds a {{ learn more link }}.",
+        )
+        let learnMoreText = CommonStrings.learnMore
+
+        let attributedString = NSMutableAttributedString(string: String(format: format, learnMoreText))
+        attributedString.setAttributes(
+            [.foregroundColor: UIColor.Signal.link],
+            forSubstring: learnMoreText,
+        )
+        return attributedString
+    }
+
+    private func appExpiredErrorText() -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "APP_EXPIRED_BOTTOM",
+            comment: "Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link.",
+        )
+        let updateNowText = OWSLocalizedString(
+            "APP_EXPIRED_BOTTOM_UPDATE",
+            comment: "Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence.",
+        )
+        let attributedString = NSMutableAttributedString(string: String(format: format, updateNowText))
+        attributedString.setAttributes(
+            [.foregroundColor: UIColor.Signal.link],
+            forSubstring: updateNowText,
+        )
+        return attributedString
+    }
+
+    private func notRegisteredErrorText() -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "NOT_REGISTERED_BOTTOM",
+            comment: "Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link.",
+        )
+        let updateNowText = OWSLocalizedString(
+            "NOT_REGISTERED_BOTTOM_REREGISTER",
+            comment: "Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence.",
+        )
+        let attributedString = NSMutableAttributedString(string: String(format: format, updateNowText))
+        attributedString.setAttributes(
+            [.foregroundColor: UIColor.Signal.link],
+            forSubstring: updateNowText,
+        )
+        return attributedString
+    }
+
+    private func notLinkedErrorText() -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "NOT_LINKED_BOTTOM",
+            comment: "Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link.",
+        )
+        let updateNowText = OWSLocalizedString(
+            "NOT_LINKED_BOTTOM_RELINK",
+            comment: "Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence.",
+        )
+        let attributedString = NSMutableAttributedString(string: String(format: format, updateNowText))
+        attributedString.setAttributes(
+            [.foregroundColor: UIColor.Signal.link],
+            forSubstring: updateNowText,
+        )
+        return attributedString
     }
 
     func loadInputToolbarIfNeeded() {
