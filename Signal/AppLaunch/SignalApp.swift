@@ -71,8 +71,6 @@ public class SignalApp {
             showConversationSplitView(appReadiness: appReadiness)
         }
 
-        AppUpdateNag.shared.showAppUpgradeNagIfNecessary()
-
         UIViewController.attemptRotationToDeviceOrientation()
     }
 
