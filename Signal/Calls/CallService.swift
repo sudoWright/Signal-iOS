@@ -1191,6 +1191,22 @@ extension CallService: CallManagerDelegate {
         }
     }
 
+    /**
+     * Send a generic call message to an adhoc group. Send to all members of the group
+     * using multi-recipient sealed sender. If the sealed sender request fails,
+     * clients should provide a fallback mechanism.
+     * If there is any error, the UI can reset UI state and invoke the reset() API.
+     */
+    func callManager(
+        _ callManager: CallManager<SignalCall, CallService>,
+        shouldSendCallMessageToAdhocGroup message: Data,
+        urgency: SignalRingRTC.CallMessageUrgency,
+        expiration: Date,
+        recipientsToEndorsements: [UUID: Data],
+    ) {
+        Logger.warn("shouldSendCallMessageToAdhocGroup() not handled yet!")
+    }
+
     private func sendCallMessageToGroup(
         _ opaqueMessage: SSKProtoCallMessageOpaque,
         groupId: Data,
