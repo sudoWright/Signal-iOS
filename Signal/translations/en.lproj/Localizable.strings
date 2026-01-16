@@ -4987,6 +4987,21 @@
 /* Label for an action to add a member label */
 "MEMBER_LABEL_ADD" = "Add a Member Label";
 
+/* Heading shown above the preview of a message bubble with the edited member label. */
+"MEMBER_LABEL_PREVIEW_HEADING" = "Preview";
+
+/* Text shown in the preview message bubble when a user is editing their member label. */
+"MEMBER_LABEL_VIEW_MESSAGE_PREVIEW_TEXT" = "Hello!";
+
+/* Placeholder text in text field where user can edit their member label. */
+"MEMBER_LABEL_VIEW_PLACEHOLDER_TEXT" = "Add your label";
+
+/* Subtitle for a view where users can edit and preview their member label. */
+"MEMBER_LABEL_VIEW_SUBTITLE" = "Set a member label to describe yourself or your role in this group. Member labels are only visible within this group.";
+
+/* Title for a view where users can edit and preview their member label. */
+"MEMBER_LABEL_VIEW_TITLE" = "Member Label";
+
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "Copy Message Text";
 

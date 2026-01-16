@@ -52,6 +52,7 @@
 		04441DDE2F115CAF0095E1F4 /* chat_item_pin_message_04.txtproto in Resources */ = {isa = PBXBuildFile; fileRef = 04441DA02F115CAF0095E1F4 /* chat_item_pin_message_04.txtproto */; };
 		04441DEA2F17EF6C0095E1F4 /* CVMemberLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04441DE92F17EF690095E1F4 /* CVMemberLabel.swift */; };
 		04441DED2F1816BB0095E1F4 /* MemberLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04441DEB2F18121C0095E1F4 /* MemberLabel.swift */; };
+		04441DEF2F194B800095E1F4 /* MemberLabelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04441DEE2F194B770095E1F4 /* MemberLabelViewController.swift */; };
 		04472D5E2E8AD74200D69EE0 /* OutgoingPollVote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04472D5D2E8AD73A00D69EE0 /* OutgoingPollVote.swift */; };
 		044A2C6E2EEB444E00AA3CA0 /* BackupArchivePinMessageChatUpdateArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044A2C6D2EEB443E00AA3CA0 /* BackupArchivePinMessageChatUpdateArchiver.swift */; };
 		044D77782E5E6D750048C21A /* PollVoteRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044D77772E5E6D700048C21A /* PollVoteRecord.swift */; };
@@ -4108,6 +4109,7 @@
 		04441DBA2F115CAF0095E1F4 /* chat_item_pin_message_update_02.txtproto */ = {isa = PBXFileReference; lastKnownFileType = text; path = chat_item_pin_message_update_02.txtproto; sourceTree = "<group>"; };
 		04441DE92F17EF690095E1F4 /* CVMemberLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVMemberLabel.swift; sourceTree = "<group>"; };
 		04441DEB2F18121C0095E1F4 /* MemberLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberLabel.swift; sourceTree = "<group>"; };
+		04441DEE2F194B770095E1F4 /* MemberLabelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberLabelViewController.swift; sourceTree = "<group>"; };
 		04472D5D2E8AD73A00D69EE0 /* OutgoingPollVote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingPollVote.swift; sourceTree = "<group>"; };
 		044A2C6D2EEB443E00AA3CA0 /* BackupArchivePinMessageChatUpdateArchiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupArchivePinMessageChatUpdateArchiver.swift; sourceTree = "<group>"; };
 		044D77772E5E6D700048C21A /* PollVoteRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollVoteRecord.swift; sourceTree = "<group>"; };
@@ -9172,6 +9174,7 @@
 				76C87FE028BE8E2400BD8709 /* LinkPreviewAttachmentViewController.swift */,
 				88A9729322FB4D02004B4FBF /* LocationPicker.swift */,
 				3496744E2076ACCE00080B5F /* LongTextViewController.swift */,
+				04441DEE2F194B770095E1F4 /* MemberLabelViewController.swift */,
 				4CFF4C0920F55BBA005DA313 /* MessageActionsToolbar.swift */,
 				34CA1C261F7156F300E51C51 /* MessageDetailViewController.swift */,
 				881218EF238CA51600E6F271 /* MessageReactionPicker.swift */,
@@ -18134,6 +18137,7 @@
 				4C8A6DFC22E5499300469AE7 /* MediaZoomAnimationController.swift in Sources */,
 				8837F74123DA0B0F00772A32 /* MegaphoneView.swift in Sources */,
 				88A357B923639384009D6B9A /* MemberActionSheet.swift in Sources */,
+				04441DEF2F194B800095E1F4 /* MemberLabelViewController.swift in Sources */,
 				346EAA14250199A400E8AB6F /* MemberRequestView.swift in Sources */,
 				4CB5F26920F7D060004D1B42 /* MessageActions.swift in Sources */,
 				4CB5F26720F6E1E2004D1B42 /* MessageActionsToolbar.swift in Sources */,

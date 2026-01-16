@@ -896,8 +896,9 @@ extension ConversationSettingsViewController {
                         "CONVERSATION_SETTINGS_MEMBER_TAG",
                         comment: "Label for 'member label' action in conversation settings view.",
                     ),
-                    actionBlock: {
-                        print("Unimplemented!")
+                    actionBlock: { [weak self] in
+                        let memberLabelViewController = MemberLabelViewController()
+                        self?.present(OWSNavigationController(rootViewController: memberLabelViewController), animated: true)
                     },
                 ),
             )

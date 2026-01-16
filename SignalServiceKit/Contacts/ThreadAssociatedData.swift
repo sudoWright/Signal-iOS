@@ -71,7 +71,7 @@ public class ThreadAssociatedData: NSObject, Codable, FetchableRecord, Persistab
     ) -> ThreadAssociatedData {
         DependenciesBridge.shared.threadAssociatedDataStore.fetchOrDefault(
             for: threadUniqueId,
-            ignoreMissing: ignoreMissing || CurrentAppContext().isRunningTests || threadUniqueId == "MockThread",
+            ignoreMissing: ignoreMissing || CurrentAppContext().isRunningTests || threadUniqueId == "MockThread" || threadUniqueId == "MockGroupThread",
             tx: transaction,
         )
     }

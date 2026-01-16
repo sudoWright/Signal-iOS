@@ -4,7 +4,7 @@
 //
 
 import LibSignalClient
-import SignalServiceKit
+public import SignalServiceKit
 import SignalUI
 
 protocol MockConversationDelegate: AnyObject {
@@ -215,10 +215,23 @@ private class MockThread: TSContactThread {
     }
 }
 
+public class MockGroupThread: TSGroupThread {
+    override public var shouldBeSaved: Bool {
+        return false
+    }
+
+    override public var uniqueId: String { "MockGroupThread" }
+
+    override public func anyWillInsert(with transaction: DBWriteTransaction) {
+        // no - op
+        owsFailDebug("shouldn't save mock thread")
+    }
+}
+
 // MARK: -
 
-private class MockIncomingMessage: TSIncomingMessage {
-    init(messageBody: ValidatedInlineMessageBody, thread: MockThread) {
+public class MockIncomingMessage: TSIncomingMessage {
+    fileprivate init(messageBody: ValidatedInlineMessageBody, thread: MockThread) {
         let builder: TSIncomingMessageBuilder = .withDefaultValues(
             thread: thread,
             authorAci: thread.contactAddress.aci!,
@@ -227,18 +240,27 @@ private class MockIncomingMessage: TSIncomingMessage {
         super.init(incomingMessageWithBuilder: builder)
     }
 
-    override var shouldBeSaved: Bool {
+    init(messageBody: ValidatedInlineMessageBody, thread: MockGroupThread, authorAci: Aci) {
+        let builder: TSIncomingMessageBuilder = .withDefaultValues(
+            thread: thread,
+            authorAci: authorAci,
+            messageBody: messageBody,
+        )
+        super.init(incomingMessageWithBuilder: builder)
+    }
+
+    override public var shouldBeSaved: Bool {
         return false
     }
 
-    override func anyWillInsert(with transaction: DBWriteTransaction) {
+    override public func anyWillInsert(with transaction: DBWriteTransaction) {
         owsFailDebug("shouldn't save mock message")
     }
 }
 
 // MARK: -
 
-private class MockOutgoingMessage: TSOutgoingMessage {
+public class MockOutgoingMessage: TSOutgoingMessage {
     init(messageBody: ValidatedInlineMessageBody, thread: TSThread, transaction: DBReadTransaction) {
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(thread: thread, messageBody: messageBody)
         super.init(
@@ -254,22 +276,22 @@ private class MockOutgoingMessage: TSOutgoingMessage {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override var shouldBeSaved: Bool {
+    override public var shouldBeSaved: Bool {
         return false
     }
 
-    override func anyWillInsert(with transaction: DBWriteTransaction) {
+    override public func anyWillInsert(with transaction: DBWriteTransaction) {
         owsFailDebug("shouldn't save mock message")
     }
 
-    override var messageState: TSOutgoingMessageState { .sent }
+    override public var messageState: TSOutgoingMessageState { .sent }
 
-    override func readRecipientAddresses() -> [SignalServiceAddress] {
+    override public func readRecipientAddresses() -> [SignalServiceAddress] {
         // makes message appear as read
         return [MockConversationView.mockAddress]
     }
 
-    override func recipientState(for recipientAddress: SignalServiceAddress) -> TSOutgoingMessageRecipientState? {
+    override public func recipientState(for recipientAddress: SignalServiceAddress) -> TSOutgoingMessageRecipientState? {
         return TSOutgoingMessageRecipientState(
             status: .read,
             statusTimestamp: Date().ows_millisecondsSince1970,

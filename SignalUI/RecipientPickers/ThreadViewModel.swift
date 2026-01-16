@@ -111,7 +111,7 @@ public class ThreadViewModel: NSObject {
         if let threadId = thread.grdbId?.int64Value {
             pinnedMessages = DependenciesBridge.shared.pinnedMessageManager.fetchPinnedMessagesForThread(threadId: threadId, tx: transaction)
         } else {
-            owsFailDebug("missing thread Id")
+            owsAssertDebug(thread.uniqueId == "MockThread" || thread.uniqueId == "MockGroupThread", "missing thread Id")
             pinnedMessages = []
         }
     }
