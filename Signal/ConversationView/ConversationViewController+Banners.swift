@@ -15,6 +15,10 @@ extension ConversationViewController {
     public func ensureBannerState() {
         AssertIsOnMainThread()
 
+        guard !isInPreviewPlatter else {
+            return
+        }
+
         var banners = [UIView]()
 
         // Logic for whether or not should a certain banner be displayed is inside of each banner creation method.
