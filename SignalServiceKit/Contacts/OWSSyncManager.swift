@@ -92,14 +92,14 @@ extension OWSSyncManager: SyncManagerProtocolObjc {
         let sealedSenderIndicators = SSKEnvironment.shared.preferencesRef.shouldShowUnidentifiedDeliveryIndicators(transaction: tx)
         let typingIndicators = SSKEnvironment.shared.typingIndicatorsRef.areTypingIndicatorsEnabled()
 
-        let configurationSyncMessage = OWSSyncConfigurationMessage(
+        let configurationSyncMessage = OutgoingConfigurationSyncMessage(
             localThread: thread,
-            readReceiptsEnabled: readReceipts,
+            areReadReceiptsEnabled: readReceipts,
             showUnidentifiedDeliveryIndicators: sealedSenderIndicators,
             showTypingIndicators: typingIndicators,
             sendLinkPreviews: linkPreviews,
             provisioningVersion: LinkingProvisioningMessage.Constants.provisioningVersion,
-            transaction: tx,
+            tx: tx,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: configurationSyncMessage,
