@@ -433,12 +433,12 @@ public class BlockingManager {
 
             let blockedGroupIds = blockedGroupStore.blockedGroupIds(tx: tx)
 
-            let message = OWSBlockedPhoneNumbersMessage(
+            let message = OutgoingBlockedSyncMessage(
                 localThread: localThread,
                 phoneNumbers: blockedRecipients.compactMap { $0.phoneNumber?.stringValue },
-                aciStrings: blockedRecipients.compactMap { $0.aci?.serviceIdString },
+                acis: blockedRecipients.compactMap { $0.aci },
                 groupIds: Array(blockedGroupIds),
-                transaction: tx,
+                tx: tx,
             )
 
             let preparedMessage = PreparedOutgoingMessage.preprepared(

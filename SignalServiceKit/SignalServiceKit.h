@@ -18,7 +18,6 @@ FOUNDATION_EXPORT const unsigned char SignalServiceKitVersionString[];
 #import <SignalServiceKit/OWSAddToProfileWhitelistOfferMessage.h>
 #import <SignalServiceKit/OWSArchivedPaymentMessage.h>
 #import <SignalServiceKit/OWSAsserts.h>
-#import <SignalServiceKit/OWSBlockedPhoneNumbersMessage.h>
 #import <SignalServiceKit/OWSDisappearingConfigurationUpdateInfoMessage.h>
 #import <SignalServiceKit/OWSDisappearingMessagesConfiguration.h>
 #import <SignalServiceKit/OWSDynamicOutgoingMessage.h>
