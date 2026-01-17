@@ -607,11 +607,11 @@ extension OWSSyncManager: SyncManagerProtocol, SyncManagerProtocolSwift {
 
     public func sendFetchLatestSubscriptionStatusSyncMessage() { sendFetchLatestSyncMessage(type: .subscriptionStatus) }
 
-    private func sendFetchLatestSyncMessage(type: OWSSyncFetchType) {
+    private func sendFetchLatestSyncMessage(type: OutgoingFetchLatestSyncMessage.FetchType) {
         Task { await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in self._sendFetchLatestSyncMessage(type: type, tx: tx) } }
     }
 
-    private func _sendFetchLatestSyncMessage(type: OWSSyncFetchType, tx: DBWriteTransaction) {
+    private func _sendFetchLatestSyncMessage(type: OutgoingFetchLatestSyncMessage.FetchType, tx: DBWriteTransaction) {
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         guard let registeredState = try? tsAccountManager.registeredState(tx: tx) else {
             owsFailDebug("Tried to send sync message before registration.")
@@ -623,7 +623,7 @@ extension OWSSyncManager: SyncManagerProtocol, SyncManagerProtocolSwift {
             transaction: tx,
         )
 
-        let fetchLatestSyncMessage = OWSSyncFetchLatestMessage(localThread: thread, fetchType: type, transaction: tx)
+        let fetchLatestSyncMessage = OutgoingFetchLatestSyncMessage(localThread: thread, fetchType: type, tx: tx)
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: fetchLatestSyncMessage,
         )
