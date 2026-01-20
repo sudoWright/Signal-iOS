@@ -1515,10 +1515,13 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
 
         fileprivate func performHeadRequest(
             downloadState: DownloadState,
+            maxDownloadSizeBytes: UInt64,
         ) async throws -> AttachmentDownloads.CdnInfo {
+            // We don't need maxDownloadSizeBytes for this request, but we include it
+            // to increase the likelihood of a shared URLSession cache hit.
             let urlSession = await self.signalService.sharedUrlSessionForCdn(
                 cdnNumber: downloadState.cdnNumber(),
-                maxResponseSize: BackupArchive.Constants.maxDownloadSizeBytes,
+                maxResponseSize: maxDownloadSizeBytes,
             )
             let urlPath = try downloadState.urlPath()
             var headers = downloadState.additionalHeaders()
@@ -1615,7 +1618,10 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                 expectedDownloadSizeBytes = UInt(size)
             case .useHeadRequest:
                 // Perform a HEAD request just to get the byte length from cdn.
-                let downloadInfo = try await performHeadRequest(downloadState: downloadState)
+                let downloadInfo = try await performHeadRequest(
+                    downloadState: downloadState,
+                    maxDownloadSizeBytes: maxDownloadSizeBytes,
+                )
                 expectedDownloadSizeBytes = downloadInfo.contentLength
             }
 
