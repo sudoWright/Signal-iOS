@@ -215,7 +215,7 @@ public class AttachmentManagerImpl: AttachmentManager {
         }
 
         let referenceParams = AttachmentReference.ConstructionParams(
-            owner: try owner.build(
+            owner: owner.build(
                 knownIdInOwner: knownIdFromProto,
                 renderingFlag: .fromProto(proto),
                 // Not downloaded so we don't know the content type.
@@ -428,7 +428,7 @@ public class AttachmentManagerImpl: AttachmentManager {
         let referenceParams: AttachmentReference.ConstructionParams
         do {
             referenceParams = AttachmentReference.ConstructionParams(
-                owner: try ownedProto.owner.build(
+                owner: ownedProto.owner.build(
                     knownIdInOwner: knownIdFromProto,
                     renderingFlag: ownedProto.renderingFlag,
                     // Not downloaded so we don't know the content type.
@@ -440,8 +440,6 @@ public class AttachmentManagerImpl: AttachmentManager {
                 sourceUnencryptedByteCount: sourceUnencryptedByteCount,
                 sourceMediaSizePixels: sourceMediaSizePixels,
             )
-        } catch {
-            return .failure(.dbInsertionError(error))
         }
 
         do {
@@ -591,7 +589,7 @@ public class AttachmentManagerImpl: AttachmentManager {
                 throw OWSAssertionError("Missing existing attachment!")
             }
 
-            let owner: AttachmentReference.Owner = try ownedDataSource.owner.build(
+            let owner: AttachmentReference.Owner = ownedDataSource.owner.build(
                 knownIdInOwner: .none,
                 renderingFlag: existingAttachmentMetadata.renderingFlag,
                 contentType: existingAttachment.streamInfo?.contentType.raw,
@@ -608,7 +606,7 @@ public class AttachmentManagerImpl: AttachmentManager {
                 tx: tx,
             )
         case .pendingAttachment(let pendingAttachment):
-            let owner: AttachmentReference.Owner = try ownedDataSource.owner.build(
+            let owner: AttachmentReference.Owner = ownedDataSource.owner.build(
                 knownIdInOwner: .none,
                 renderingFlag: pendingAttachment.renderingFlag,
                 contentType: pendingAttachment.validatedContentType.raw,
@@ -1066,7 +1064,7 @@ public class AttachmentManagerImpl: AttachmentManager {
                 thumbnailTransitTierInfo: thumbnailTransitTierInfo,
             )
             let referenceParams = AttachmentReference.ConstructionParams(
-                owner: try referenceOwner.build(
+                owner: referenceOwner.build(
                     knownIdInOwner: .none,
                     renderingFlag: originalAttachmentSource.renderingFlag,
                     contentType: nil,

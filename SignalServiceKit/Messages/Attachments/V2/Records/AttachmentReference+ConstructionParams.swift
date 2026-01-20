@@ -62,7 +62,7 @@ extension AttachmentReference {
             renderingFlag: AttachmentReference.RenderingFlag,
             contentType: AttachmentReference.ContentType?,
             caption: String? = nil,
-        ) throws -> AttachmentReference.Owner {
+        ) -> AttachmentReference.Owner {
             switch self {
             case .messageBodyAttachment(let metadata):
                 return .message(.bodyAttachment(.init(
