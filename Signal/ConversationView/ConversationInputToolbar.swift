@@ -1026,7 +1026,7 @@ public class ConversationInputToolbar: UIView, QuotedReplyPreviewDelegate {
                 hasLayoutChanged = true
             }
 
-            // Enable/disable Send button, taking potential visibility changes into accoount.
+            // Enable/disable Send button, taking potential visibility changes into account.
             if hideSendButton, sendButtonVisibilityChanges {
                 // If Send button becomes hidden do not update `isEnabled` until animation completes.
                 if let animator {
