@@ -164,7 +164,7 @@ struct ConversationHeaderBuilder {
             transaction: transaction,
         )
 
-        if BuildFlags.memberLabels, let memberLabel {
+        if BuildFlags.MemberLabel.receive, let memberLabel {
             let memberLabelLabel = builder.addMemberLabel(label: memberLabel.label, backgroundColor: memberLabel.groupNameColor)
             memberLabelLabel.numberOfLines = 0
             memberLabelLabel.textAlignment = .center

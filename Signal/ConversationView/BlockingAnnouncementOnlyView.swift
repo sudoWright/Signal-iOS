@@ -164,7 +164,7 @@ class MessageUserSubsetSheet: OWSTableSheetViewController {
                     configuration.forceDarkAppearance = self?.forceDarkMode ?? false
 
                     if
-                        BuildFlags.memberLabels,
+                        BuildFlags.MemberLabel.receive,
                         let groupThread = self?.groupThread,
                         let senderAci = address.aci,
                         let memberLabelString = groupThread.groupModel.groupMembership.memberLabel(for: senderAci),

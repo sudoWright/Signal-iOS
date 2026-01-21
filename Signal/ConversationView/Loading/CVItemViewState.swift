@@ -417,7 +417,7 @@ struct CVItemModelBuilder: CVItemBuilding {
 
                 var memberLabel: String?
                 if
-                    BuildFlags.memberLabels, let groupThread = thread as? TSGroupThread,
+                    BuildFlags.MemberLabel.receive, let groupThread = thread as? TSGroupThread,
                     let senderAci = incomingSenderAddress.aci
                 {
                     memberLabel = groupThread.groupModel.groupMembership.memberLabel(for: senderAci)

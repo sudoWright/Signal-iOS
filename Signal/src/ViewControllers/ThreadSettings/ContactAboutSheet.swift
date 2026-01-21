@@ -194,7 +194,7 @@ class ContactAboutSheet: StackSheetViewController {
             stackView.addArrangedSubview(label)
         }
 
-        if BuildFlags.memberLabels, isLocalUser {
+        if BuildFlags.MemberLabel.send, isLocalUser {
             stackView.addArrangedSubview(ProfileDetailLabel.memberLabel(memberLabel?.label))
         }
 

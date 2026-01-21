@@ -786,7 +786,7 @@ extension ConversationSettingsViewController {
                         cell.selectionStyle = .default
                     }
 
-                    if BuildFlags.memberLabels, let memberAci = memberAddress.aci {
+                    if BuildFlags.MemberLabel.receive, let memberAci = memberAddress.aci {
                         if
                             let memberLabel = groupModel.groupMembership.memberLabel(for: memberAci),
                             let groupNameColors
@@ -888,7 +888,7 @@ extension ConversationSettingsViewController {
             ),
         )
 
-        if BuildFlags.memberLabels {
+        if BuildFlags.MemberLabel.send {
             section.add(
                 OWSTableItem.disclosureItem(
                     icon: .memberLabel,
