@@ -82,11 +82,8 @@ final class SurveyDebugLogViewController: CallQualitySurveySheetViewController {
                     },
                 ),
             ],
-            footerTitle: OWSLocalizedString(
-                "CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER",
-                comment: "Footer text explaining what debug logs contain in the call quality survey",
-            ),
         )
+        section.customFooterView = createFooterView()
 
         tableViewController.setContents(OWSTableContents(sections: [section]))
 
@@ -117,6 +114,38 @@ final class SurveyDebugLogViewController: CallQualitySurveySheetViewController {
                     }
                 }
         }
+    }
+
+    private func createFooterView() -> UIView {
+        let container = UIView()
+
+        let textView = LinkingTextView { [weak self] in
+            self?.showDebugLogPreview()
+        }
+        textView.attributedText = .composed(of: [
+            OWSLocalizedString(
+                "CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER",
+                comment: "Footer text explaining what debug logs contain in the call quality survey",
+            ),
+            " ",
+            OWSLocalizedString(
+                "CALL_QUALITY_SURVEY_DEBUG_LOG_PREVIEW_LINK",
+                comment: "Link text to open a preview of debug logs in the call quality survey. Appended to CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER",
+            ).styled(with: .link(.Support.generic)),
+        ]).styled(
+            with: .font(.dynamicTypeFootnote),
+            .color(.Signal.secondaryLabel),
+        )
+        container.addSubview(textView)
+        textView.autoPinEdgesToSuperviewEdges(with: .init(top: 12, leading: 20, bottom: 0, trailing: 20))
+
+        return container
+    }
+
+    private func showDebugLogPreview() {
+        let vc = DebugLogPreviewViewController()
+        let nav = OWSNavigationController(rootViewController: vc)
+        present(nav, animated: true)
     }
 
     override func customSheetHeight() -> CGFloat? {

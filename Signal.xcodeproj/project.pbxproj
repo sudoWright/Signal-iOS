@@ -76,6 +76,7 @@
 		04A5736B2E4CF1BF0019651F /* CVPollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A5736A2E4CF1BD0019651F /* CVPollView.swift */; };
 		04A573702E4D4BD50019651F /* OWSPoll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A5736F2E4D4BD30019651F /* OWSPoll.swift */; };
 		04A573722E53A3BF0019651F /* SupportKeyValueStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A573712E53A3B40019651F /* SupportKeyValueStore.swift */; };
+		04A573762E75B00B0019651F /* DebugLogPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A573752E75B00A0019651F /* DebugLogPreviewViewController.swift */; };
 		04AA85BC2E0EFC5C0051C0A7 /* BackupEnablementReminderMegaphoneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041A5F082E05D3AC00FAED05 /* BackupEnablementReminderMegaphoneTests.swift */; };
 		04AB61C62E5E37A800405699 /* PollRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AB61C52E5E37A400405699 /* PollRecord.swift */; };
 		04AB61C82E5E399700405699 /* PollOptionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AB61C72E5E399400405699 /* PollOptionRecord.swift */; };
@@ -4128,6 +4129,7 @@
 		04A5736A2E4CF1BD0019651F /* CVPollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVPollView.swift; sourceTree = "<group>"; };
 		04A5736F2E4D4BD30019651F /* OWSPoll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OWSPoll.swift; sourceTree = "<group>"; };
 		04A573712E53A3B40019651F /* SupportKeyValueStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportKeyValueStore.swift; sourceTree = "<group>"; };
+		04A573752E75B00A0019651F /* DebugLogPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogPreviewViewController.swift; sourceTree = "<group>"; };
 		04AB61C52E5E37A400405699 /* PollRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollRecord.swift; sourceTree = "<group>"; };
 		04AB61C72E5E399400405699 /* PollOptionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollOptionRecord.swift; sourceTree = "<group>"; };
 		04AB61C92E5E448A00405699 /* PollManagerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollManagerTest.swift; sourceTree = "<group>"; };
@@ -8391,6 +8393,7 @@
 			children = (
 				32B3286424C6957B00E4F974 /* ComposeSupportEmailOperation.swift */,
 				32ECD08924BFBF9500EDDED0 /* ContactSupportViewController.swift */,
+				04A573752E75B00A0019651F /* DebugLogPreviewViewController.swift */,
 				32ECD08724BFBF8000EDDED0 /* HelpViewController.swift */,
 				04A573712E53A3B40019651F /* SupportKeyValueStore.swift */,
 			);
@@ -17933,6 +17936,7 @@
 				346C19DF25ACDF0B00061D3A /* DataSettingsTableViewController.swift in Sources */,
 				88535064240829950011D318 /* DateHeaderInteraction.swift in Sources */,
 				50A1CE3A2A00931900730C40 /* DebugLogger+MainApp.swift in Sources */,
+				04A573762E75B00B0019651F /* DebugLogPreviewViewController.swift in Sources */,
 				34067EAB2710D61A000407C3 /* DebugLogs.swift in Sources */,
 				D9AAB2682EBC0ABF0012D306 /* DebugUIBackups.swift in Sources */,
 				76F958632A09A5AE00B43E63 /* DebugUIDiskUsage.swift in Sources */,
