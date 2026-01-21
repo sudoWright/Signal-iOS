@@ -412,10 +412,9 @@ public final class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
 
     // MARK: Proto conversion
 
-    /// If bodyLength is provided (is nonnegative), drops any ranges that exceed the length.
-    @objc
-    func toProtoBodyRanges(bodyLength: Int = -1) -> [SSKProtoBodyRange] {
-        let maxBodyLength = bodyLength < 0 ? nil : bodyLength
+    /// If bodyLength is provided, drops any ranges that exceed the length.
+    func toProtoBodyRanges(bodyLength: Int? = nil) -> [SSKProtoBodyRange] {
+        let maxBodyLength = bodyLength
         var protos = [SSKProtoBodyRange]()
 
         func appendMention(_ mention: NSRangedValue<Aci>) {

@@ -349,7 +349,7 @@ public extension TSOutgoingMessage {
 
 // MARK: -
 
-public extension TSOutgoingMessage {
+extension TSOutgoingMessage {
     @objc
     static func messageStateForRecipientStates(
         _ recipientStates: [TSOutgoingMessageRecipientState],
@@ -405,7 +405,173 @@ public extension TSOutgoingMessage {
     }
 
     @objc
-    var isStorySend: Bool { isGroupStoryReply }
+    public var isStorySend: Bool { isGroupStoryReply }
+
+    @objc
+    func _dataMessageBuilder(thread: TSThread, tx: DBReadTransaction) -> SSKProtoDataMessageBuilder? {
+        let builder = SSKProtoDataMessage.builder()
+        builder.setTimestamp(self.timestamp)
+
+        var requiredProtocolVersion = SSKProtoDataMessageProtocolVersion.initial.rawValue
+
+        if self.isViewOnceMessage {
+            builder.setIsViewOnce(true)
+            requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.viewOnceVideo.rawValue)
+        }
+
+        let body = self.body
+        let trimmedBody = body?.trimToUtf8ByteCount(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes)
+        // It was historically possible to end up with a message in the database that
+        // exceeds this threshold, and therefore possible to hit this assert (by forwarding
+        // an older message). But it is good for us to know when this happens.
+        owsAssertDebug(body?.utf8.count == trimmedBody?.utf8.count)
+
+        if self.isPoll {
+            if let pollCreateProto = self.buildPollProto(tx: tx) {
+                builder.setPollCreate(pollCreateProto)
+            } else {
+                owsFailDebug("Could not build poll protobuf")
+            }
+            requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.polls.rawValue)
+        } else {
+            if let trimmedBody {
+                builder.setBody(trimmedBody)
+            }
+            if let body {
+                let bodyRanges = self.bodyRanges?.toProtoBodyRanges(bodyLength: body.utf16.count) ?? []
+                if !bodyRanges.isEmpty {
+                    builder.setBodyRanges(bodyRanges)
+                    requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.mentions.rawValue)
+                }
+            }
+        }
+
+        // Story Context
+        if let storyTimestamp, let storyAuthorAci {
+            if let storyReactionEmoji {
+                let reactionBuilder = SSKProtoDataMessageReaction.builder(emoji: storyReactionEmoji, timestamp: storyTimestamp.uint64Value)
+                if BuildFlags.serviceIdStrings {
+                    reactionBuilder.setTargetAuthorAci(storyAuthorAci.serviceIdString)
+                }
+                if BuildFlags.serviceIdBinaryConstantOverhead {
+                    reactionBuilder.setTargetAuthorAciBinary(storyAuthorAci.serviceIdBinary)
+                }
+
+                do {
+                    builder.setReaction(try reactionBuilder.build())
+                    requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.reactions.rawValue)
+                } catch {
+                    owsFailDebug("Could not build story reaction protobuf: \(error)")
+                }
+            }
+
+            let storyContextBuilder = SSKProtoDataMessageStoryContext.builder()
+            if BuildFlags.serviceIdStrings {
+                storyContextBuilder.setAuthorAci(storyAuthorAci.serviceIdString)
+            }
+            if BuildFlags.serviceIdBinaryConstantOverhead {
+                storyContextBuilder.setAuthorAciBinary(storyAuthorAci.serviceIdBinary)
+            }
+            storyContextBuilder.setSentTimestamp(storyTimestamp.uint64Value)
+
+            builder.setStoryContext(storyContextBuilder.buildInfallibly())
+        }
+
+        builder.setExpireTimer(self.expiresInSeconds)
+        if let expireTimerVersion {
+            builder.setExpireTimerVersion(expireTimerVersion.uint32Value)
+        }
+
+        // Group Messages
+        if let thread = thread as? TSGroupThread {
+            switch thread.groupModel.groupsVersion {
+            case .V1:
+                Logger.error("[GV1] Cannot build data message for V1 group!")
+                return nil
+            case .V2:
+                break
+            }
+            let result = self.addGroupsV2ToDataMessageBuilder(builder, groupThread: thread, tx: tx)
+            switch result {
+            case .error:
+                return nil
+            case .addedWithoutGroupAvatar:
+                break
+            }
+        }
+
+        // Message Attachments
+
+        // Only inserted messages should have attachments, and if they are saveable
+        // they should be inserted by now.
+        if self.shouldBeSaved {
+            if grdbId != nil {
+                do {
+                    let attachments = try self.buildProtosForBodyAttachments(tx: tx)
+                    builder.setAttachments(attachments)
+                } catch {
+                    owsFailDebug("Could not build body attachments")
+                }
+            } else {
+                owsFailDebug("Saved message uninserted at proto build time!")
+            }
+        }
+
+        // Quoted Reply
+        if let quotedMessage {
+            do {
+                let quoteProto = try self.buildQuoteProto(quote: quotedMessage, tx: tx)
+                builder.setQuote(quoteProto)
+                if !quoteProto.bodyRanges.isEmpty {
+                    requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.mentions.rawValue)
+                }
+            } catch {
+                owsFailDebug("Could not build quote protobuf: \(error)")
+            }
+        }
+
+        // Contact Share
+        if let contactShare {
+            do {
+                let contactProto = try self.buildContactShareProto(contactShare, tx: tx)
+                builder.addContact(contactProto)
+            } catch {
+                owsFailDebug("Could not build contact share protobuf: \(error)")
+            }
+        }
+
+        // Link Preview
+        if let linkPreview {
+            do {
+                let previewProto = try self.buildLinkPreviewProto(linkPreview: linkPreview, tx: tx)
+                builder.addPreview(previewProto)
+            } catch {
+                owsFailDebug("Could not build link preview protobuf: \(error)")
+            }
+        }
+
+        // Sticker
+        if let messageSticker {
+            do {
+                let stickerProto = try self.buildStickerProto(sticker: messageSticker, tx: tx)
+                builder.setSticker(stickerProto)
+            } catch {
+                owsFailDebug("Could not build sticker protobuf: \(error)")
+            }
+        }
+
+        // Gift badge
+        if let giftBadge {
+            let giftBadgeBuilder = SSKProtoDataMessageGiftBadge.builder()
+            if let redemptionCredential = giftBadge.redemptionCredential {
+                giftBadgeBuilder.setReceiptCredentialPresentation(redemptionCredential)
+            }
+            builder.setGiftBadge(giftBadgeBuilder.buildInfallibly())
+        }
+
+        builder.setRequiredProtocolVersion(UInt32(requiredProtocolVersion))
+        return builder
+    }
 
     @objc
     func _buildTranscriptSyncMessage(localThread: TSContactThread, tx: DBWriteTransaction) -> OWSOutgoingSyncMessage? {
@@ -460,8 +626,7 @@ public extension TSOutgoingMessage {
         return builder.buildInfallibly()
     }
 
-    @objc
-    func addGroupsV2ToDataMessageBuilder(
+    private func addGroupsV2ToDataMessageBuilder(
         _ builder: SSKProtoDataMessageBuilder,
         groupThread: TSGroupThread,
         tx: DBReadTransaction,
@@ -545,14 +710,10 @@ public extension TSOutgoingMessage {
             identityManager.clearShouldSharePhoneNumber(with: aci, tx: transaction)
         }
     }
-}
 
-// MARK: - Attachments
+    // MARK: - Attachments
 
-extension TSOutgoingMessage {
-
-    @objc
-    func buildProtosForBodyAttachments(tx: DBReadTransaction) throws -> [SSKProtoAttachmentPointer] {
+    private func buildProtosForBodyAttachments(tx: DBReadTransaction) throws -> [SSKProtoAttachmentPointer] {
         let attachments = sqliteRowId.map { sqliteRowId in
             return DependenciesBridge.shared.attachmentStore.fetchReferencedAttachments(
                 owners: [
@@ -578,8 +739,7 @@ extension TSOutgoingMessage {
         }
     }
 
-    @objc
-    func buildLinkPreviewProto(
+    private func buildLinkPreviewProto(
         linkPreview: OWSLinkPreview,
         tx: DBReadTransaction,
     ) throws -> SSKProtoPreview {
@@ -590,8 +750,7 @@ extension TSOutgoingMessage {
         )
     }
 
-    @objc
-    func buildContactShareProto(
+    private func buildContactShareProto(
         _ contact: OWSContact,
         tx: DBReadTransaction,
     ) throws -> SSKProtoDataMessageContact {
@@ -602,8 +761,7 @@ extension TSOutgoingMessage {
         )
     }
 
-    @objc
-    func buildStickerProto(
+    private func buildStickerProto(
         sticker: MessageSticker,
         tx: DBReadTransaction,
     ) throws -> SSKProtoDataMessageSticker {
@@ -614,8 +772,7 @@ extension TSOutgoingMessage {
         )
     }
 
-    @objc
-    func buildQuoteProto(
+    private func buildQuoteProto(
         quote: TSQuotedMessage,
         tx: DBReadTransaction,
     ) throws -> SSKProtoDataMessageQuote {
@@ -628,8 +785,7 @@ extension TSOutgoingMessage {
 
     // MARK: - Polls
 
-    @objc
-    func buildPollProto(tx: DBReadTransaction) -> SSKProtoDataMessagePollCreate? {
+    private func buildPollProto(tx: DBReadTransaction) -> SSKProtoDataMessagePollCreate? {
         do {
             return try DependenciesBridge.shared.pollMessageManager.buildProtoForSending(
                 parentMessage: self,

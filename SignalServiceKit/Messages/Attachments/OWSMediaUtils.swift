@@ -172,9 +172,3 @@ public enum OWSMediaUtils {
     /// to support legacy cases)
     public static let kMaxOversizeTextMessageReceiveSizeBytes = 128 * 1024
 }
-
-@objc
-class OWSMediaUtilsObjc: NSObject {
-    @objc
-    static let kOversizeTextMessageSizeThresholdBytes = UInt(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes)
-}
