@@ -8,8 +8,22 @@ import SignalServiceKit
 import SignalUI
 import SwiftUI
 
-class MemberLabelViewController: OWSViewController {
-    override init() {
+class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
+    private var memberLabel: String?
+    private var emoji: String?
+    private var addEmojiButton = UIButton(type: .system)
+    private var previewContainer: UIStackView?
+    private let stackView = UIStackView()
+    private let textField = UITextField()
+    private var characterCountLabel = UILabel()
+
+    private static let maxCharCount = 24
+    private static let showCharacterCountMax = 9
+
+    init(memberLabel: String? = nil) {
+        self.memberLabel = memberLabel
+        textField.text = memberLabel
+
         super.init()
 
         view.backgroundColor = UIColor.Signal.groupedBackground
@@ -28,7 +42,6 @@ class MemberLabelViewController: OWSViewController {
     }
 
     private func createViews() {
-        let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 20
 
@@ -54,21 +67,42 @@ class MemberLabelViewController: OWSViewController {
         textFieldStack.isLayoutMarginsRelativeArrangement = true
         textFieldStack.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
-        let addEmojiButton = UIButton(type: .system)
         addEmojiButton.setImage(UIImage(named: "emoji-plus"), for: .normal)
         addEmojiButton.tintColor = UIColor.Signal.secondaryLabel
         addEmojiButton.setContentHuggingPriority(.required, for: .horizontal)
         addEmojiButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        addEmojiButton.addTarget(self, action: #selector(didTapEmojiPicker), for: .touchUpInside)
 
-        let textField = UITextField()
         textField.placeholder = OWSLocalizedString(
             "MEMBER_LABEL_VIEW_PLACEHOLDER_TEXT",
             comment: "Placeholder text in text field where user can edit their member label.",
         )
         textField.font = .dynamicTypeBodyClamped
+        textField.addTarget(self, action: #selector(textDidChange(_:)), for: .editingChanged)
+        textField.delegate = self
+
+        characterCountLabel.isHidden = true
+        if let count = memberLabel?.count {
+            characterCountLabel.text = String(Self.maxCharCount - count)
+            characterCountLabel.font = .dynamicTypeBody
+            characterCountLabel.textColor = UIColor.Signal.tertiaryLabel.withAlphaComponent(0.3)
+            characterCountLabel.isHidden = Self.maxCharCount - count > Self.showCharacterCountMax
+        }
+
+        let clearButton = UIButton(type: .system)
+        clearButton.setImage(UIImage(named: "x-circle-fill-compact"), for: .normal)
+        clearButton.tintColor = UIColor.Signal.tertiaryLabel
+        clearButton.addTarget(self, action: #selector(clearButtonTapped), for: .touchUpInside)
+        clearButton.autoSetDimensions(to: .square(16))
 
         textFieldStack.addArrangedSubview(addEmojiButton)
         textFieldStack.addArrangedSubview(textField)
+        textFieldStack.addArrangedSubview(characterCountLabel)
+        textFieldStack.addArrangedSubview(clearButton)
+
+        clearButton.autoPinEdge(.trailing, to: .trailing, of: textFieldStack, withOffset: -16)
+        characterCountLabel.autoPinEdge(.trailing, to: .leading, of: clearButton, withOffset: -8)
+
         stackView.addArrangedSubview(textFieldStack)
         stackView.setCustomSpacing(34, after: textFieldStack)
 
@@ -120,7 +154,10 @@ class MemberLabelViewController: OWSViewController {
 
         var groupModelBuilder = TSGroupModelBuilder(secretParams: secretParams)
         var groupMembershipBuilder = groupModelBuilder.groupMembership.asBuilder
-        groupMembershipBuilder.setMemberLabel(label: "test123", aci: localAci)
+        if memberLabel != nil || emoji != nil {
+            let memberLabelWithEmoji = "\(emoji ?? "") \(memberLabel ?? "")"
+            groupMembershipBuilder.setMemberLabel(label: memberLabelWithEmoji, aci: localAci)
+        }
         groupModelBuilder.groupMembership = groupMembershipBuilder.build()
 
         guard let groupModel = try? groupModelBuilder.buildAsV2() else {
@@ -154,8 +191,7 @@ class MemberLabelViewController: OWSViewController {
         return renderItem
     }
 
-    func messageBubblePreviewContainer(renderItem: CVRenderItem) -> UIView? {
-
+    func messageBubblePreviewContainer(renderItem: CVRenderItem) -> UIStackView? {
         let previewTitle = UILabel()
         previewTitle.text = OWSLocalizedString(
             "MEMBER_LABEL_PREVIEW_HEADING",
@@ -178,13 +214,24 @@ class MemberLabelViewController: OWSViewController {
         cellView.autoPinEdge(toSuperviewEdge: .top, withInset: 20)
         cellView.autoPinEdge(toSuperviewEdge: .bottom, withInset: 20)
 
-        let previewContainer = UIStackView()
-        previewContainer.axis = .vertical
-        previewContainer.spacing = 8
-        previewContainer.addArrangedSubview(previewTitle)
-        previewContainer.addArrangedSubview(cellContainer)
+        previewContainer = UIStackView()
+        previewContainer?.axis = .vertical
+        previewContainer?.spacing = 8
+        previewContainer?.addArrangedSubview(previewTitle)
+        previewContainer?.addArrangedSubview(cellContainer)
 
         return previewContainer
+    }
+
+    @objc
+    private func clearButtonTapped() {
+        textField.text = ""
+        memberLabel = nil
+        emoji = nil
+        addEmojiButton.setImage(UIImage(named: "emoji-plus"), for: .normal)
+        addEmojiButton.setTitle(nil, for: .normal)
+
+        reloadMessagePreview()
     }
 
     @objc
@@ -195,6 +242,62 @@ class MemberLabelViewController: OWSViewController {
     @objc
     private func didTapCancel() {
         dismiss(animated: true)
+    }
+
+    @objc
+    private func didTapEmojiPicker() {
+        let picker = EmojiPickerSheet(message: nil, allowReactionConfiguration: false) { [weak self] emoji in
+            guard let emojiString = emoji?.rawValue else {
+                return
+            }
+            self?.emoji = emojiString
+            self?.addEmojiButton.setImage(nil, for: .normal)
+            self?.addEmojiButton.setTitle(emojiString, for: .normal)
+            self?.addEmojiButton.titleLabel?.font = .dynamicTypeTitle3Clamped
+            self?.reloadMessagePreview()
+        }
+        present(picker, animated: true)
+    }
+
+    private func reloadMessagePreview() {
+        if let previewContainer {
+            stackView.removeArrangedSubview(previewContainer)
+            previewContainer.removeFromSuperview()
+        }
+        previewContainer = nil
+        if
+            let mockRenderItem = buildMockConversationItem(),
+            let previewContainer = messageBubblePreviewContainer(renderItem: mockRenderItem)
+        {
+            stackView.addArrangedSubview(previewContainer)
+        }
+        let count = memberLabel?.count ?? 0
+        let charsRemaining = Self.maxCharCount - count
+        characterCountLabel.text = String(charsRemaining)
+        characterCountLabel.isHidden = charsRemaining > Self.showCharacterCountMax
+        characterCountLabel.textColor = charsRemaining > 5 ? UIColor.Signal.tertiaryLabel.withAlphaComponent(0.3) : UIColor.Signal.red
+    }
+
+    @objc
+    func textDidChange(_ textField: UITextField) {
+        memberLabel = textField.text == "" ? nil : textField.text?.filterStringForDisplay()
+        reloadMessagePreview()
+    }
+
+    // MARK: - UITextFieldDelegate
+
+    func textField(
+        _ textField: UITextField,
+        shouldChangeCharactersIn range: NSRange,
+        replacementString string: String,
+    ) -> Bool {
+        TextFieldHelper.textField(
+            textField,
+            shouldChangeCharactersInRange: range,
+            replacementString: string,
+            maxByteCount: 96,
+            maxGlyphCount: Self.maxCharCount,
+        )
     }
 }
 
