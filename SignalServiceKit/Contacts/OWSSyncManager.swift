@@ -221,12 +221,12 @@ extension OWSSyncManager: SyncManagerProtocol, SyncManagerProtocolSwift {
 
         let mrbk = DependenciesBridge.shared.accountKeyStore.getOrGenerateMediaRootBackupKey(tx: tx)
 
-        let syncKeysMessage = OWSSyncKeysMessage(
+        let syncKeysMessage = OutgoingKeysSyncMessage(
             localThread: thread,
-            accountEntropyPool: accountEntropyPool?.rawString,
-            masterKey: masterKey?.rawData,
-            mediaRootBackupKey: mrbk.serialize(),
-            transaction: tx,
+            accountEntropyPool: accountEntropyPool,
+            masterKey: masterKey,
+            mediaRootBackupKey: mrbk,
+            tx: tx,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: syncKeysMessage,
