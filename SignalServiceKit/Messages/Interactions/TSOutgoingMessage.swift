@@ -657,6 +657,7 @@ extension TSOutgoingMessage {
             receiptType: .delivered,
             receiptTimestamp: timestamp,
             tryToClearPhoneNumberSharing: true,
+            context: context,
             tx: tx,
         )
     }
@@ -672,6 +673,7 @@ extension TSOutgoingMessage {
             deviceId: deviceId,
             receiptType: .read,
             receiptTimestamp: timestamp,
+            context: PassthroughDeliveryReceiptContext(),
             tx: tx,
         )
     }
@@ -687,6 +689,7 @@ extension TSOutgoingMessage {
             deviceId: deviceId,
             receiptType: .viewed,
             receiptTimestamp: timestamp,
+            context: PassthroughDeliveryReceiptContext(),
             tx: tx,
         )
     }
@@ -711,6 +714,7 @@ extension TSOutgoingMessage {
         receiptType: IncomingReceiptType,
         receiptTimestamp: UInt64,
         tryToClearPhoneNumberSharing: Bool = false,
+        context: any DeliveryReceiptContext,
         tx: DBWriteTransaction,
     ) {
         owsAssertDebug(recipientAddress.isValid)
@@ -734,33 +738,37 @@ extension TSOutgoingMessage {
             recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable,
             signalServiceAddressCache: SSKEnvironment.shared.signalServiceAddressCacheRef,
         )
-        anyUpdateOutgoingMessage(transaction: tx) { message in
-            guard
-                let recipientState: TSOutgoingMessageRecipientState = {
-                    if let existingMatch = message.recipientAddressStates?[recipientAddress] {
-                        return existingMatch
-                    }
-                    if let normalizedAddress = recipientStateMerger.normalizedAddressIfNeeded(for: recipientAddress, tx: tx) {
-                        // If we get a receipt from a PNI, then normalizing PNIs -> ACIs won't fix
-                        // it, but normalizing the address from a PNI to an ACI might fix it.
-                        return message.recipientAddressStates?[normalizedAddress]
-                    } else {
-                        // If we get a receipt from an ACI, then we might have the PNI stored, and
-                        // we need to migrate it to the ACI before we'll be able to find it.
-                        recipientStateMerger.normalize(&message.recipientAddressStates, tx: tx)
-                        return message.recipientAddressStates?[recipientAddress]
-                    }
-                }()
-            else {
-                owsFailDebug("Missing recipient state for \(recipientAddress)")
-                return
-            }
+        context.addUpdate(
+            message: self,
+            transaction: tx,
+            update: { message in
+                guard
+                    let recipientState: TSOutgoingMessageRecipientState = {
+                        if let existingMatch = message.recipientAddressStates?[recipientAddress] {
+                            return existingMatch
+                        }
+                        if let normalizedAddress = recipientStateMerger.normalizedAddressIfNeeded(for: recipientAddress, tx: tx) {
+                            // If we get a receipt from a PNI, then normalizing PNIs -> ACIs won't fix
+                            // it, but normalizing the address from a PNI to an ACI might fix it.
+                            return message.recipientAddressStates?[normalizedAddress]
+                        } else {
+                            // If we get a receipt from an ACI, then we might have the PNI stored, and
+                            // we need to migrate it to the ACI before we'll be able to find it.
+                            recipientStateMerger.normalize(&message.recipientAddressStates, tx: tx)
+                            return message.recipientAddressStates?[recipientAddress]
+                        }
+                    }()
+                else {
+                    owsFailDebug("Missing recipient state for \(recipientAddress)")
+                    return
+                }
 
-            recipientState.updateStatusIfPossible(
-                receiptType.asRecipientStatus,
-                statusTimestamp: receiptTimestamp,
-            )
-        }
+                recipientState.updateStatusIfPossible(
+                    receiptType.asRecipientStatus,
+                    statusTimestamp: receiptTimestamp,
+                )
+            },
+        )
     }
 }
 
