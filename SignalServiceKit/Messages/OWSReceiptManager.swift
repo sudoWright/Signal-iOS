@@ -35,10 +35,10 @@ struct ReceiptForLinkedDevice: Codable {
         )
     }
 
-    var asLinkedDeviceViewedReceipt: OWSLinkedDeviceViewedReceipt? {
+    var asLinkedDeviceViewedReceipt: LinkedDeviceViewedReceipt? {
         guard let senderAci = senderAddress.aci else { return nil }
-        return OWSLinkedDeviceViewedReceipt(
-            senderAci: AciObjC(senderAci),
+        return LinkedDeviceViewedReceipt(
+            senderAci: senderAci,
             messageUniqueId: messageUniqueId,
             messageIdTimestamp: messageIdTimestamp,
             viewedTimestamp: timestamp,
@@ -304,10 +304,10 @@ extension OWSReceiptManager {
         if !viewedReceiptsForLinkedDevices.isEmpty {
             let viewedReceiptsToSend = viewedReceiptsForLinkedDevices.compactMap { $0.asLinkedDeviceViewedReceipt }
             if !viewedReceiptsToSend.isEmpty {
-                let message = OWSViewedReceiptsForLinkedDevicesMessage(
+                let message = OutgoingViewedReceiptsSyncMessage(
                     localThread: thread,
                     viewedReceipts: viewedReceiptsToSend,
-                    transaction: transaction,
+                    tx: transaction,
                 )
                 let preparedMessage = PreparedOutgoingMessage.preprepared(transientMessageWithoutAttachments: message)
                 messageSenderJobQueue.add(message: preparedMessage, transaction: transaction)
