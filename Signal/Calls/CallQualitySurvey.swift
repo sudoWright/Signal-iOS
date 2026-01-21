@@ -55,14 +55,17 @@ class CallQualitySurveyManager {
 
     private let callSummary: CallSummary
     private let callType: CallQualitySurvey.CallType
+    private let threadUniqueId: String?
 
     init(
         callSummary: CallSummary,
         callType: CallQualitySurvey.CallType,
+        threadUniqueId: String?,
         deps: Deps,
     ) {
         self.callSummary = callSummary
         self.callType = callType
+        self.threadUniqueId = threadUniqueId
         self.deps = deps
     }
 
@@ -71,6 +74,19 @@ class CallQualitySurveyManager {
         guard deps.db.read(block: shouldShowSurvey(tx:)) else { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            let vc = UIApplication.shared.frontmostViewControllerIgnoringAlerts
+            let conversationSplitVC = (vc as? ConversationSplitViewController)
+                ?? (vc?.splitViewController as? ConversationSplitViewController)
+            let currentlyVisibleConversationThreadId = conversationSplitVC?.selectedThread?.uniqueId
+
+            // Don't present a survey for one chat's call when a different chat is visible to avoid confusion
+            if
+                currentlyVisibleConversationThreadId != nil,
+                currentlyVisibleConversationThreadId != self.threadUniqueId
+            {
+                return
+            }
+
             UIApplication.shared.frontmostViewController?.present(
                 CallQualitySurveyNavigationController(callQualitySurveyManager: self),
                 animated: true,

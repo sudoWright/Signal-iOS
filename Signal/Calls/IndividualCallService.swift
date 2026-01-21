@@ -466,6 +466,7 @@ final class IndividualCallService: CallServiceStateObserver {
                 case .video: .individualVideo
                 }
             }(),
+            threadUniqueId: call.individualCall.thread.uniqueId,
             deps: .init(
                 db: DependenciesBridge.shared.db,
                 accountManager: tsAccountManager,

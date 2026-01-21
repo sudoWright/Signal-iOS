@@ -229,6 +229,12 @@ class GroupCall: SignalRingRTC.GroupCallDelegate {
                 case .callLink: .link
                 }
             }(),
+            threadUniqueId: {
+                switch concreteType {
+                case .groupThread(let groupThread): groupThread.threadUniqueId
+                case .callLink: nil
+                }
+            }(),
             deps: .init(
                 db: DependenciesBridge.shared.db,
                 accountManager: DependenciesBridge.shared.tsAccountManager,
