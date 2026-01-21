@@ -8,6 +8,14 @@ import GRDB
 import LibSignalClient
 
 public class MessageProcessor {
+
+    private enum Constants {
+        // We want a value that is just high enough to yield perf benefits.
+        static let incomingMessageBatchLimit = 16
+
+        static let incomingReceiptBatchLimit = 32
+    }
+
     public static let messageProcessorDidDrainQueue = Notification.Name("messageProcessorDidDrainQueue")
 
     private var hasPendingEnvelopes: Bool {
@@ -183,14 +191,15 @@ public class MessageProcessor {
             return false
         }
 
-        // We want a value that is just high enough to yield perf benefits.
-        let kIncomingMessageBatchSize = 16
         // If the app is in the background, use batch size of 1.
         // This reduces the risk of us never being able to drain any
         // messages from the queue. We should fine tune this number
         // to yield the best perf we can get.
-        let batchSize = CurrentAppContext().isInBackground() ? 1 : kIncomingMessageBatchSize
-        let batch = pendingEnvelopes.nextBatch(batchSize: batchSize)
+        let batchLimitUpperBound = CurrentAppContext().isInBackground() ? 1 : max(
+            Constants.incomingMessageBatchLimit,
+            Constants.incomingReceiptBatchLimit,
+        )
+        let batch = pendingEnvelopes.nextBatch(batchSize: batchLimitUpperBound)
         let batchEnvelopes = batch.batchEnvelopes
         let pendingEnvelopesCount = batch.pendingEnvelopesCount
 
@@ -205,6 +214,10 @@ public class MessageProcessor {
         var startTime: CFTimeInterval = 0
 
         var processedEnvelopesCount = 0
+
+        var messageCount = 0
+        var receiptCount = 0
+
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             // Start the timer once we acquire a write transaction.
             startTime = CACurrentMediaTime()
@@ -218,21 +231,30 @@ public class MessageProcessor {
             let localDeviceId = DependenciesBridge.shared.tsAccountManager.storedDeviceId(tx: tx)
 
             var remainingEnvelopes = batchEnvelopes[...]
-            while !remainingEnvelopes.isEmpty {
+            while
+                !remainingEnvelopes.isEmpty,
+                messageCount < Constants.incomingMessageBatchLimit,
+                receiptCount < Constants.incomingReceiptBatchLimit
+            {
                 guard SSKEnvironment.shared.messagePipelineSupervisorRef.isMessageProcessingPermitted else {
                     break
                 }
                 autoreleasepool {
                     // If we build a request, we must handle it to ensure it's not lost if we
                     // stop processing envelopes.
-                    let combinedRequest = buildNextCombinedRequest(
+                    let relatedRequests = buildNextCombinedRequest(
                         envelopes: &remainingEnvelopes,
                         localIdentifiers: localIdentifiers,
                         localDeviceId: localDeviceId,
                         tx: tx,
                     )
+                    if relatedRequests.first?.deliveryReceiptMessageTimestamps != nil {
+                        receiptCount += relatedRequests.count
+                    } else {
+                        messageCount += relatedRequests.count
+                    }
                     handle(
-                        combinedRequest: combinedRequest,
+                        relatedRequests: relatedRequests,
                         localIdentifiers: localIdentifiers,
                         transaction: tx,
                     )
@@ -265,8 +287,8 @@ public class MessageProcessor {
         localIdentifiers: LocalIdentifiers,
         localDeviceId: LocalDeviceId,
         tx: DBWriteTransaction,
-    ) -> RelatedProcessingRequests {
-        let result = RelatedProcessingRequests()
+    ) -> [ProcessingRequest] {
+        var results = [ProcessingRequest]()
         while let envelope = envelopes.first {
             envelopes.removeFirst()
             let request = processingRequest(
@@ -275,21 +297,21 @@ public class MessageProcessor {
                 localDeviceId: localDeviceId,
                 tx: tx,
             )
-            result.add(request)
+            results.append(request)
             if request.deliveryReceiptMessageTimestamps == nil {
                 // If we hit a non-delivery receipt envelope, handle it immediately to avoid
                 // keeping potentially large decrypted envelopes in memory.
                 break
             }
         }
-        return result
+        return results
     }
 
-    private func handle(combinedRequest: RelatedProcessingRequests, localIdentifiers: LocalIdentifiers, transaction: DBWriteTransaction) {
+    private func handle(relatedRequests: [ProcessingRequest], localIdentifiers: LocalIdentifiers, transaction: DBWriteTransaction) {
         // Efficiently handle delivery receipts for the same message by fetching the sent message only
         // once and only using one updateWith... to update the message with new recipient state.
         BatchingDeliveryReceiptContext.withDeferredUpdates(transaction: transaction) { context in
-            for request in combinedRequest.processingRequests {
+            for request in relatedRequests {
                 handleProcessingRequest(request, context: context, localIdentifiers: localIdentifiers, tx: transaction)
             }
         }
@@ -374,14 +396,6 @@ private struct ProcessingRequest {
     init(_ receivedEnvelope: ReceivedEnvelope, state: State) {
         self.receivedEnvelope = receivedEnvelope
         self.state = state
-    }
-}
-
-private class RelatedProcessingRequests {
-    private(set) var processingRequests = [ProcessingRequest]()
-
-    func add(_ processingRequest: ProcessingRequest) {
-        processingRequests.append(processingRequest)
     }
 }
 
