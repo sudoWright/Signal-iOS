@@ -192,7 +192,7 @@ private extension ConversationViewController {
     }
 
     func leaveAndSoftDeleteThread(
-        messageRequestResponseType: OWSSyncMessageRequestResponseType,
+        messageRequestResponseType: OutgoingMessageRequestResponseSyncMessage.ResponseType,
     ) {
         AssertIsOnMainThread()
 

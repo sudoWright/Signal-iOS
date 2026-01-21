@@ -74,11 +74,11 @@ public class OWSMockSyncManager: SyncManagerProtocol {
         Logger.info("")
     }
 
-    public func sendMessageRequestResponseSyncMessage(thread: TSThread, responseType: OWSSyncMessageRequestResponseType) {
+    public func sendMessageRequestResponseSyncMessage(thread: TSThread, responseType: OutgoingMessageRequestResponseSyncMessage.ResponseType) {
         Logger.info("")
     }
 
-    public func sendMessageRequestResponseSyncMessage(thread: TSThread, responseType: OWSSyncMessageRequestResponseType, transaction: DBWriteTransaction) {
+    public func sendMessageRequestResponseSyncMessage(thread: TSThread, responseType: OutgoingMessageRequestResponseSyncMessage.ResponseType, transaction: DBWriteTransaction) {
         Logger.info("")
     }
 

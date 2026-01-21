@@ -366,7 +366,7 @@ extension OWSSyncManager: SyncManagerProtocol, SyncManagerProtocolSwift {
         }
     }
 
-    public func sendMessageRequestResponseSyncMessage(thread: TSThread, responseType: OWSSyncMessageRequestResponseType) {
+    public func sendMessageRequestResponseSyncMessage(thread: TSThread, responseType: OutgoingMessageRequestResponseSyncMessage.ResponseType) {
         Logger.info("")
 
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
@@ -382,7 +382,7 @@ extension OWSSyncManager: SyncManagerProtocol, SyncManagerProtocolSwift {
 
     public func sendMessageRequestResponseSyncMessage(
         thread: TSThread,
-        responseType: OWSSyncMessageRequestResponseType,
+        responseType: OutgoingMessageRequestResponseSyncMessage.ResponseType,
         transaction: DBWriteTransaction,
     ) {
         Logger.info("")
@@ -398,11 +398,11 @@ extension OWSSyncManager: SyncManagerProtocol, SyncManagerProtocolSwift {
             transaction: transaction,
         )
 
-        let syncMessageRequestResponse = OWSSyncMessageRequestResponseMessage(
+        let syncMessageRequestResponse = OutgoingMessageRequestResponseSyncMessage(
             localThread: localThread,
             messageRequestThread: thread,
             responseType: responseType,
-            transaction: transaction,
+            tx: transaction,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: syncMessageRequestResponse,
