@@ -134,12 +134,12 @@ public class ViewOnceMessages: NSObject {
         }
         let readTimestamp: UInt64 = nowMs()
 
-        let syncMessage = OWSViewOnceMessageReadSyncMessage(
+        let syncMessage = OutgoingViewOnceOpenSyncMessage(
             localThread: thread,
-            senderAci: AciObjC(senderAci),
+            senderAci: senderAci,
             message: message,
             readTimestamp: readTimestamp,
-            transaction: transaction,
+            tx: transaction,
         )
         // this is the sync that we viewed; it doesn't have the attachment on it.
         let preparedMessage = PreparedOutgoingMessage.preprepared(

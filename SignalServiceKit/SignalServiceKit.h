@@ -41,7 +41,6 @@ FOUNDATION_EXPORT const unsigned char SignalServiceKitVersionString[];
 #import <SignalServiceKit/OWSVerificationState.h>
 #import <SignalServiceKit/OWSVerificationStateChangeMessage.h>
 #import <SignalServiceKit/OWSVerificationStateSyncMessage.h>
-#import <SignalServiceKit/OWSViewOnceMessageReadSyncMessage.h>
 #import <SignalServiceKit/OutgoingPaymentSyncMessage.h>
 #import <SignalServiceKit/SSKAccessors+SDS.h>
 #import <SignalServiceKit/StickerInfo.h>
