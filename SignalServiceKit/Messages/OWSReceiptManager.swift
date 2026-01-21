@@ -25,10 +25,10 @@ struct ReceiptForLinkedDevice: Codable {
         self.timestamp = timestamp
     }
 
-    var asLinkedDeviceReadReceipt: OWSLinkedDeviceReadReceipt? {
+    var asLinkedDeviceReadReceipt: LinkedDeviceReadReceipt? {
         guard let senderAci = senderAddress.aci else { return nil }
-        return OWSLinkedDeviceReadReceipt(
-            senderAci: AciObjC(senderAci),
+        return LinkedDeviceReadReceipt(
+            senderAci: senderAci,
             messageUniqueId: messageUniqueId,
             messageIdTimestamp: messageIdTimestamp,
             readTimestamp: timestamp,
@@ -290,10 +290,10 @@ extension OWSReceiptManager {
         if !readReceiptsForLinkedDevices.isEmpty {
             let readReceiptsToSend = readReceiptsForLinkedDevices.compactMap { $0.asLinkedDeviceReadReceipt }
             if !readReceiptsToSend.isEmpty {
-                let message = OWSReadReceiptsForLinkedDevicesMessage(
+                let message = OutgoingReadReceiptsSyncMessage(
                     localThread: thread,
                     readReceipts: readReceiptsToSend,
-                    transaction: transaction,
+                    tx: transaction,
                 )
                 let preparedMessage = PreparedOutgoingMessage.preprepared(transientMessageWithoutAttachments: message)
                 messageSenderJobQueue.add(message: preparedMessage, transaction: transaction)
@@ -671,7 +671,7 @@ extension OWSReceiptManager {
             repeat {
                 batchQuotaRemaining = maxBatchSize
                 SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                    var receiptsForMessage: [OWSLinkedDeviceReadReceipt] = []
+                    var receiptsForMessage: [LinkedDeviceReadReceipt] = []
                     var cursor = interactionFinder.fetchMessagesWithUnreadReactions(
                         beforeSortId: sortId,
                         transaction: transaction,
@@ -682,8 +682,8 @@ extension OWSReceiptManager {
                             message.markUnreadReactionsAsRead(transaction: transaction)
 
                             if let localAci {
-                                let receipt = OWSLinkedDeviceReadReceipt(
-                                    senderAci: AciObjC(localAci),
+                                let receipt = LinkedDeviceReadReceipt(
+                                    senderAci: localAci,
                                     messageUniqueId: message.uniqueId,
                                     messageIdTimestamp: message.timestamp,
                                     readTimestamp: readTimestamp,
@@ -704,10 +704,10 @@ extension OWSReceiptManager {
                             owsFailDebug("Couldn't create localThread.")
                             return
                         }
-                        let message = OWSReadReceiptsForLinkedDevicesMessage(
+                        let message = OutgoingReadReceiptsSyncMessage(
                             localThread: localThread,
                             readReceipts: receiptsForMessage,
-                            transaction: transaction,
+                            tx: transaction,
                         )
                         let preparedMessage = PreparedOutgoingMessage.preprepared(
                             transientMessageWithoutAttachments: message,
