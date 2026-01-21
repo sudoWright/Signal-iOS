@@ -730,7 +730,7 @@ extension OWSSyncManager: SyncManagerProtocol, SyncManagerProtocolSwift {
             transaction: transaction,
         )
 
-        let syncRequestMessage = OWSSyncRequestMessage(localThread: thread, requestType: requestType.rawValue, transaction: transaction)
+        let syncRequestMessage = OutgoingRequestSyncMessage(localThread: thread, requestType: requestType, tx: transaction)
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: syncRequestMessage,
         )
