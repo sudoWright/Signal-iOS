@@ -102,13 +102,10 @@ extension TSOutgoingMessage {
             predicate(state)
         }.map { $0.key }
     }
-}
 
-// MARK: - Update recipients
+    // MARK: - Update recipients
 
-public extension TSOutgoingMessage {
-    @objc
-    func updateWithRecipientAddressStates(
+    public func updateWithRecipientAddressStates(
         _ recipientAddressStates: [SignalServiceAddress: TSOutgoingMessageRecipientState]?,
         tx: DBWriteTransaction,
     ) {
@@ -250,7 +247,7 @@ public extension TSOutgoingMessage {
     ///
     /// This should be called on app launch.
     @objc
-    func updateWithAllSendingRecipientsMarkedAsFailed(
+    public func updateWithAllSendingRecipientsMarkedAsFailed(
         error: (any Error)? = nil,
         transaction tx: DBWriteTransaction,
     ) {
@@ -314,42 +311,10 @@ public extension TSOutgoingMessage {
     /// Called when a message successfully sends.
     /// Subclasses that need to know when a message send succeeds can override this.
     @objc
-    func updateWithSendSuccess(tx: DBWriteTransaction) { }
-}
+    public func updateWithSendSuccess(tx: DBWriteTransaction) { }
 
-#if TESTABLE_BUILD
-public extension TSOutgoingMessage {
-    func updateWithFakeMessageState(
-        _ messageState: TSOutgoingMessageState,
-        tx: DBWriteTransaction,
-    ) {
-        anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
-            guard let recipientAddressStates = outgoingMessage.recipientAddressStates else {
-                return
-            }
+    // MARK: -
 
-            for recipientState in recipientAddressStates.values {
-                switch messageState {
-                case .sending:
-                    recipientState.updateStatusIfPossible(.sending)
-                case .failed:
-                    recipientState.updateStatusIfPossible(.failed)
-                case .sent:
-                    recipientState.updateStatusIfPossible(.sent)
-                case .pending:
-                    recipientState.updateStatusIfPossible(.pending)
-                case .sent_OBSOLETE, .delivered_OBSOLETE:
-                    break
-                }
-            }
-        }
-    }
-}
-#endif
-
-// MARK: -
-
-extension TSOutgoingMessage {
     @objc
     static func messageStateForRecipientStates(
         _ recipientStates: [TSOutgoingMessageRecipientState],
@@ -383,7 +348,6 @@ extension TSOutgoingMessage {
         return .sent
     }
 
-    @objc
     static func isEligibleToStartExpireTimer(recipientStates: [TSOutgoingMessageRecipientState]) -> Bool {
         let messageState = Self.messageStateForRecipientStates(recipientStates)
         return isEligibleToStartExpireTimer(messageState: messageState)
@@ -795,11 +759,9 @@ extension TSOutgoingMessage {
             return nil
         }
     }
-}
 
-// MARK: - Receipts
+    // MARK: - Receipts
 
-extension TSOutgoingMessage {
     public func update(
         withDeliveredRecipient recipientAddress: SignalServiceAddress,
         deviceId: DeviceId,
@@ -926,11 +888,8 @@ extension TSOutgoingMessage {
             },
         )
     }
-}
 
-// MARK: - Sender Key + Message Send Log
-
-extension TSOutgoingMessage {
+    // MARK: - Sender Key + Message Send Log
 
     /// A collection of message unique IDs related to the outgoing message
     ///
