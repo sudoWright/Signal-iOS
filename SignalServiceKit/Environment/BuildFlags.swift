@@ -81,7 +81,7 @@ public enum BuildFlags {
     public static let serviceIdStrings = TSConstants.isUsingProductionService
 
     public enum PinnedMessages {
-        public static let send = build <= .internal
+        public static let send = true
         public static let receive = true
     }
 
