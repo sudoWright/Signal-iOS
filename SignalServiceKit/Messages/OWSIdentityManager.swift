@@ -691,15 +691,15 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         let address = message.verificationForRecipientAddress
         let contactThread = TSContactThread.getOrCreateThread(contactAddress: address)
 
-        // DURABLE CLEANUP - we could replace the custom durability logic in this class
-        // with a durable JobQueue.
+        // DURABLE CLEANUP - we could replace the custom durability logic in this
+        // class with a durable JobQueue.
         let nullMessagePromise = db.write { tx in
-            // Send null message to appear as though we're sending a normal message to cover the sync message sent
-            // subsequently
-            let nullMessage = OWSOutgoingNullMessage(
+            // Send null message to appear as though we're sending a normal message to
+            // cover the sync message sent subsequently
+            let nullMessage = OutgoingNullMessage(
                 contactThread: contactThread,
                 verificationStateSyncMessage: message,
-                transaction: tx,
+                tx: tx,
             )
             let preparedMessage = PreparedOutgoingMessage.preprepared(
                 transientMessageWithoutAttachments: nullMessage,

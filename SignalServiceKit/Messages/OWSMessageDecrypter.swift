@@ -75,7 +75,7 @@ public class OWSMessageDecrypter {
                 let messageSenderJobQueue = SSKEnvironment.shared.messageSenderJobQueueRef
 
                 await db.awaitableWrite { transaction in
-                    let nullMessage = OWSOutgoingNullMessage(contactThread: contactThread, transaction: transaction)
+                    let nullMessage = OutgoingNullMessage(contactThread: contactThread, tx: transaction)
                     let preparedMessage = PreparedOutgoingMessage.preprepared(
                         transientMessageWithoutAttachments: nullMessage,
                     )
