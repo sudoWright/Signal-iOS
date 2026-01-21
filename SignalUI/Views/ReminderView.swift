@@ -127,8 +127,6 @@ open class ReminderView: UIView {
             layoutMargins.bottom = 14
         }
 
-        self.backgroundColor = Theme.backgroundColor
-
         switch style {
         case .warning:
             backgroundView.backgroundColor = Self.warningBackgroundColor()

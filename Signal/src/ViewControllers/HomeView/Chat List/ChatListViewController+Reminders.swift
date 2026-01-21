@@ -33,6 +33,7 @@ public class CLVReminderViews {
         reminderStackView.spacing = 0
         reminderViewCell.selectionStyle = .none
         reminderViewCell.contentView.addSubview(reminderStackView)
+        reminderViewCell.backgroundColor = .clear
         reminderStackView.autoPinEdgesToSuperviewEdges()
 
         let deregisteredText: String
