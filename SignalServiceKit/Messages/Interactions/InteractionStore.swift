@@ -36,9 +36,9 @@ public protocol InteractionStore {
 
     func fetchCursor(
         minRowIdExclusive: Int64?,
-        maxRowIdInclusive: Int64?,
+        maxRowIdInclusive: Int64,
         tx: DBReadTransaction,
-    ) throws -> AnyCursor<TSInteraction>
+    ) -> AnyCursor<InteractionRecord>
 
     func insertedMessageHasRenderableContent(
         message: TSMessage,
@@ -149,21 +149,20 @@ public class InteractionStoreImpl: InteractionStore {
 
     public func fetchCursor(
         minRowIdExclusive: Int64?,
-        maxRowIdInclusive: Int64?,
+        maxRowIdInclusive: Int64,
         tx: DBReadTransaction,
-    ) throws -> AnyCursor<TSInteraction> {
+    ) -> AnyCursor<InteractionRecord> {
         let idColumn = Column(InteractionRecord.CodingKeys.id)
         var query = InteractionRecord
             .order(idColumn.asc)
         if let minRowIdExclusive {
             query = query.filter(idColumn > minRowIdExclusive)
         }
-        if let maxRowIdInclusive {
-            query = query.filter(idColumn <= maxRowIdInclusive)
+        query = query.filter(idColumn <= maxRowIdInclusive)
+        return failIfThrows {
+            let cursor = try query.fetchCursor(tx.database)
+            return AnyCursor(cursor)
         }
-        let cursor = try query.fetchCursor(tx.database)
-            .map(TSInteraction.fromRecord(_:))
-        return AnyCursor(cursor)
     }
 
     public func insertedMessageHasRenderableContent(
@@ -344,16 +343,16 @@ open class MockInteractionStore: InteractionStore {
 
     open func fetchCursor(
         minRowIdExclusive: Int64?,
-        maxRowIdInclusive: Int64?,
+        maxRowIdInclusive: Int64,
         tx: DBReadTransaction,
-    ) throws -> AnyCursor<TSInteraction> {
+    ) -> AnyCursor<InteractionRecord> {
         let filtered = insertedInteractions.lazy
             .filter { interaction in
                 guard let rowId = interaction.sqliteRowId else { return false }
                 if let minRowIdExclusive, rowId <= minRowIdExclusive {
                     return false
                 }
-                if let maxRowIdInclusive, rowId > maxRowIdInclusive {
+                if rowId > maxRowIdInclusive {
                     return false
                 }
                 return true
@@ -361,17 +360,18 @@ open class MockInteractionStore: InteractionStore {
             .sorted(by: { lhs, rhs in
                 return lhs.sqliteRowId! < rhs.sqliteRowId!
             })
+            .map { $0.asRecord() as! InteractionRecord }
 
         class Iterator: IteratorProtocol {
             var index = 0
-            var array: [TSInteraction]
+            var array: [InteractionRecord]
 
-            init(index: Int = 0, array: [TSInteraction]) {
+            init(index: Int = 0, array: [InteractionRecord]) {
                 self.index = index
                 self.array = array
             }
 
-            func next() -> TSInteraction? {
+            func next() -> InteractionRecord? {
                 guard index < array.count else {
                     return nil
                 }
@@ -379,7 +379,7 @@ open class MockInteractionStore: InteractionStore {
                 return array[index]
             }
 
-            typealias Element = TSInteraction
+            typealias Element = InteractionRecord
         }
 
         return AnyCursor(iterator: Iterator(array: filtered))

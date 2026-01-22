@@ -101,6 +101,7 @@ public enum TimeGatedBatch {
     public static func processAll<E: Error, TxContext, DoneResult>(
         db: DB,
         yieldTxAfter maximumDuration: TimeInterval = 0.5,
+        delayTwixtTx: TimeInterval = 0,
         errorTxCompletion: GRDB.Database.TransactionCompletion = .commit,
         buildTxContext: (DBWriteTransaction) throws(E) -> TxContext,
         processBatch: (DBWriteTransaction, inout TxContext) throws(E) -> ProcessBatchResult<DoneResult>,
@@ -109,6 +110,7 @@ public enum TimeGatedBatch {
         return try await _processAll(
             db: db,
             yieldTxAfter: maximumDuration,
+            delayTwixtTx: delayTwixtTx,
             errorTxCompletion: errorTxCompletion,
             buildTxContext: buildTxContext,
             processBatch: processBatch,
@@ -122,12 +124,14 @@ public enum TimeGatedBatch {
     public static func processAll<E: Error, DoneResult>(
         db: DB,
         yieldTxAfter maximumDuration: TimeInterval = 0.5,
+        delayTwixtTx: TimeInterval = 0,
         errorTxCompletion: GRDB.Database.TransactionCompletion = .commit,
         processBatch: (DBWriteTransaction) throws(E) -> ProcessBatchResult<DoneResult>,
     ) async throws(E) -> DoneResult {
         return try await _processAll(
             db: db,
             yieldTxAfter: maximumDuration,
+            delayTwixtTx: delayTwixtTx,
             errorTxCompletion: errorTxCompletion,
             buildTxContext: { _ throws(E) in DummyTxContext() },
             processBatch: { tx, _ throws(E) in try processBatch(tx) },
@@ -139,6 +143,7 @@ public enum TimeGatedBatch {
     private static func _processAll<E: Error, TxContext, DoneResult>(
         db: DB,
         yieldTxAfter maximumDuration: TimeInterval,
+        delayTwixtTx: TimeInterval,
         errorTxCompletion: GRDB.Database.TransactionCompletion,
         buildTxContext: (DBWriteTransaction) throws(E) -> TxContext,
         processBatch: (DBWriteTransaction, inout TxContext) throws(E) -> ProcessBatchResult<DoneResult>,
@@ -164,7 +169,7 @@ public enum TimeGatedBatch {
 
             switch batchResult {
             case .more:
-                continue
+                try? await Task.sleep(nanoseconds: delayTwixtTx.clampedNanoseconds)
             case .done(let result):
                 return result
             }
