@@ -71,7 +71,6 @@ class BackupExportJobImpl: BackupExportJob {
     private let backupAttachmentDownloadQueueStatusManager: BackupAttachmentDownloadQueueStatusManager
     private let backupAttachmentUploadProgress: BackupAttachmentUploadProgress
     private let backupAttachmentUploadQueueStatusManager: BackupAttachmentUploadQueueStatusManager
-    private let backupKeyService: BackupKeyService
     private let backupSettingsStore: BackupSettingsStore
     private let db: DB
     private let logger: PrefixedLogger
@@ -86,7 +85,6 @@ class BackupExportJobImpl: BackupExportJob {
         backupAttachmentDownloadQueueStatusManager: BackupAttachmentDownloadQueueStatusManager,
         backupAttachmentUploadProgress: BackupAttachmentUploadProgress,
         backupAttachmentUploadQueueStatusManager: BackupAttachmentUploadQueueStatusManager,
-        backupKeyService: BackupKeyService,
         backupSettingsStore: BackupSettingsStore,
         db: DB,
         messageProcessor: MessageProcessor,
@@ -99,7 +97,6 @@ class BackupExportJobImpl: BackupExportJob {
         self.backupAttachmentDownloadQueueStatusManager = backupAttachmentDownloadQueueStatusManager
         self.backupAttachmentUploadProgress = backupAttachmentUploadProgress
         self.backupAttachmentUploadQueueStatusManager = backupAttachmentUploadQueueStatusManager
-        self.backupKeyService = backupKeyService
         self.backupSettingsStore = backupSettingsStore
         self.db = db
         self.logger = PrefixedLogger(prefix: "[Backups][ExportJob]")

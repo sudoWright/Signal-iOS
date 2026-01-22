@@ -1611,7 +1611,6 @@ extension AppSetup.GlobalsContinuation {
             backupAttachmentDownloadQueueStatusManager: backupAttachmentDownloadQueueStatusManager,
             backupAttachmentUploadProgress: backupAttachmentUploadProgress,
             backupAttachmentUploadQueueStatusManager: backupAttachmentUploadQueueStatusManager,
-            backupKeyService: backupKeyService,
             backupSettingsStore: backupSettingsStore,
             db: db,
             messageProcessor: messageProcessor,
