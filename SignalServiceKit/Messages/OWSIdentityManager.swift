@@ -602,7 +602,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         // database write transactions. If we do end up with thousands of keys,
         // using a separate transaction avoids long blocks.
         for key in allKeys {
-            let syncMessage = db.write { tx -> OWSVerificationStateSyncMessage? in
+            let syncMessage = db.write { tx -> OutgoingVerificationStateSyncMessage? in
                 guard let syncMessage = buildVerificationStateSyncMessage(for: key, localThread: thread, tx: tx) else {
                     queuedVerificationStateSyncMessagesKeyValueStore.removeValue(forKey: key, transaction: tx)
                     return nil
@@ -620,7 +620,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         for key: String,
         localThread: TSContactThread,
         tx: DBReadTransaction,
-    ) -> OWSVerificationStateSyncMessage? {
+    ) -> OutgoingVerificationStateSyncMessage? {
         let value: Any? = queuedVerificationStateSyncMessagesKeyValueStore.getObject(
             key,
             ofClasses: [NSNumber.self, NSString.self, SignalServiceAddress.self],
@@ -678,16 +678,16 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
             return nil
         }
 
-        return OWSVerificationStateSyncMessage(
+        return OutgoingVerificationStateSyncMessage(
             localThread: localThread,
             verificationState: recipientIdentity.verificationState,
             identityKey: identityKey.serialize(),
             verificationForRecipientAddress: recipient.address,
-            transaction: tx,
+            tx: tx,
         )
     }
 
-    private func sendVerificationStateSyncMessage(for recipientUniqueId: RecipientUniqueId, message: OWSVerificationStateSyncMessage) {
+    private func sendVerificationStateSyncMessage(for recipientUniqueId: RecipientUniqueId, message: OutgoingVerificationStateSyncMessage) {
         let address = message.verificationForRecipientAddress
         let contactThread = TSContactThread.getOrCreateThread(contactAddress: address)
 
@@ -1058,19 +1058,11 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
 
 class OWSIdentityManagerObjCBridge: NSObject {
     @objc
-    static let identityKeyLength = UInt(OWSIdentityManagerImpl.Constants.identityKeyLength)
-
-    @objc
     static func identityKey(forAddress address: SignalServiceAddress) -> Data? {
         return SSKEnvironment.shared.databaseStorageRef.read { tx in
             let identityManager = DependenciesBridge.shared.identityManager
             return identityManager.identityKey(for: address, tx: tx)
         }
-    }
-
-    @objc
-    static func saveIdentityKey(_ identityKey: Data, forServiceId serviceId: ServiceIdObjC, transaction tx: DBWriteTransaction) {
-        DependenciesBridge.shared.identityManager.saveIdentityKey(identityKey, for: serviceId.wrappedValue, tx: tx)
     }
 }
 

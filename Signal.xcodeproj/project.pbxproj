@@ -778,6 +778,7 @@
 		50BCD5402F21447B0032BF02 /* OutgoingViewedReceiptsSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BCD53F2F21447B0032BF02 /* OutgoingViewedReceiptsSyncMessage.swift */; };
 		50BCD5522F2182430032BF02 /* OutgoingNullMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BCD5512F2182430032BF02 /* OutgoingNullMessage.swift */; };
 		50BCD5542F21941E0032BF02 /* OutgoingViewOnceOpenSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BCD5532F21941E0032BF02 /* OutgoingViewOnceOpenSyncMessage.swift */; };
+		50BCD5562F219A730032BF02 /* OutgoingVerificationStateSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BCD5552F219A730032BF02 /* OutgoingVerificationStateSyncMessage.swift */; };
 		50BD86AF2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BD86AE2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift */; };
 		50BDC3682C88B7FA002294D0 /* AudioWaveformSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BDC3672C88B7FA002294D0 /* AudioWaveformSampler.swift */; };
 		50BDC36A2C88C2C8002294D0 /* AudioWaveformSamplerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BDC3692C88C2C8002294D0 /* AudioWaveformSamplerTest.swift */; };
@@ -3731,9 +3732,7 @@
 		F9C5CCF8289453B300548EEE /* ContactsInputStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5CA15289453B100548EEE /* ContactsInputStream.swift */; };
 		F9C5CCFB289453B300548EEE /* ProvisioningSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5CA18289453B100548EEE /* ProvisioningSocket.swift */; };
 		F9C5CCFD289453B300548EEE /* OWSDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5CA1A289453B100548EEE /* OWSDevice.swift */; };
-		F9C5CCFE289453B300548EEE /* OWSVerificationStateSyncMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5CA1B289453B100548EEE /* OWSVerificationStateSyncMessage.m */; };
 		F9C5CD08289453B300548EEE /* ProvisioningCipher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5CA25289453B100548EEE /* ProvisioningCipher.swift */; };
-		F9C5CD0A289453B300548EEE /* OWSVerificationStateSyncMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5CA27289453B100548EEE /* OWSVerificationStateSyncMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CD13289453B300548EEE /* SDSError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5CA32289453B100548EEE /* SDSError.swift */; };
 		F9C5CD15289453B300548EEE /* SDSModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5CA34289453B100548EEE /* SDSModel.swift */; };
 		F9C5CD17289453B300548EEE /* ThreadFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5CA37289453B100548EEE /* ThreadFinder.swift */; };
@@ -4947,6 +4946,7 @@
 		50BCD53F2F21447B0032BF02 /* OutgoingViewedReceiptsSyncMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingViewedReceiptsSyncMessage.swift; sourceTree = "<group>"; };
 		50BCD5512F2182430032BF02 /* OutgoingNullMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingNullMessage.swift; sourceTree = "<group>"; };
 		50BCD5532F21941E0032BF02 /* OutgoingViewOnceOpenSyncMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingViewOnceOpenSyncMessage.swift; sourceTree = "<group>"; };
+		50BCD5552F219A730032BF02 /* OutgoingVerificationStateSyncMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingVerificationStateSyncMessage.swift; sourceTree = "<group>"; };
 		50BD86AE2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendMessagePromptBuilder.swift; sourceTree = "<group>"; };
 		50BDC3672C88B7FA002294D0 /* AudioWaveformSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformSampler.swift; sourceTree = "<group>"; };
 		50BDC3692C88C2C8002294D0 /* AudioWaveformSamplerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformSamplerTest.swift; sourceTree = "<group>"; };
@@ -7942,9 +7942,7 @@
 		F9C5CA15289453B100548EEE /* ContactsInputStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactsInputStream.swift; sourceTree = "<group>"; };
 		F9C5CA18289453B100548EEE /* ProvisioningSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProvisioningSocket.swift; sourceTree = "<group>"; };
 		F9C5CA1A289453B100548EEE /* OWSDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OWSDevice.swift; sourceTree = "<group>"; };
-		F9C5CA1B289453B100548EEE /* OWSVerificationStateSyncMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OWSVerificationStateSyncMessage.m; sourceTree = "<group>"; };
 		F9C5CA25289453B100548EEE /* ProvisioningCipher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProvisioningCipher.swift; sourceTree = "<group>"; };
-		F9C5CA27289453B100548EEE /* OWSVerificationStateSyncMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OWSVerificationStateSyncMessage.h; sourceTree = "<group>"; };
 		F9C5CA32289453B100548EEE /* SDSError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDSError.swift; sourceTree = "<group>"; };
 		F9C5CA34289453B100548EEE /* SDSModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDSModel.swift; sourceTree = "<group>"; };
 		F9C5CA37289453B100548EEE /* ThreadFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadFinder.swift; sourceTree = "<group>"; };
@@ -13256,10 +13254,9 @@
 				50C55EB02F1ACCD700BA8309 /* OutgoingBlockedSyncMessage.swift */,
 				D9AA7D6D2D11F0750014137C /* OutgoingDeviceNameChangeSyncMessage.swift */,
 				507988E02F20ABCD007285B5 /* OutgoingReadReceiptsSyncMessage.swift */,
+				50BCD5552F219A730032BF02 /* OutgoingVerificationStateSyncMessage.swift */,
 				50BCD53F2F21447B0032BF02 /* OutgoingViewedReceiptsSyncMessage.swift */,
 				50BCD5532F21941E0032BF02 /* OutgoingViewOnceOpenSyncMessage.swift */,
-				F9C5CA27289453B100548EEE /* OWSVerificationStateSyncMessage.h */,
-				F9C5CA1B289453B100548EEE /* OWSVerificationStateSyncMessage.m */,
 				500CC1EA2F15D1E5001A86F7 /* StickerPackSyncMessage.swift */,
 			);
 			path = SyncMessages;
@@ -15344,7 +15341,6 @@
 				F9C5CC42289453B300548EEE /* OWSUnknownProtocolVersionMessage.h in Headers */,
 				F9C5CE68289453B400548EEE /* OWSVerificationState.h in Headers */,
 				F9C5CBFA289453B300548EEE /* OWSVerificationStateChangeMessage.h in Headers */,
-				F9C5CD0A289453B300548EEE /* OWSVerificationStateSyncMessage.h in Headers */,
 				F9262C46289462F600063502 /* SignalServiceKit-Prefix.pch in Headers */,
 				F9C5C8A7289451B900548EEE /* SignalServiceKit.h in Headers */,
 				F9C5CD2C289453B300548EEE /* SSKAccessors+SDS.h in Headers */,
@@ -19103,6 +19099,7 @@
 				F9C5CC5A289453B300548EEE /* OutgoingStoryMessage.swift in Sources */,
 				884E4C4828AF2F2A007A338C /* OutgoingStorySentMessageTranscript.swift in Sources */,
 				042223BA2EDF30BA00158556 /* OutgoingUnpinMessage.swift in Sources */,
+				50BCD5562F219A730032BF02 /* OutgoingVerificationStateSyncMessage.swift in Sources */,
 				50BCD5402F21447B0032BF02 /* OutgoingViewedReceiptsSyncMessage.swift in Sources */,
 				50BCD5542F21941E0032BF02 /* OutgoingViewOnceOpenSyncMessage.swift in Sources */,
 				C1E307402BA3B342009F015B /* OutputStreamable.swift in Sources */,
@@ -19217,7 +19214,6 @@
 				F9C5CDD0289453B400548EEE /* OWSUserProfile.swift in Sources */,
 				F9C5CBCD289453B300548EEE /* OWSVerificationStateChangeMessage+SDS.swift in Sources */,
 				F9C5CBDE289453B300548EEE /* OWSVerificationStateChangeMessage.m in Sources */,
-				F9C5CCFE289453B300548EEE /* OWSVerificationStateSyncMessage.m in Sources */,
 				509085BE2C49C29400409B85 /* PaddingBucket.swift in Sources */,
 				668B5BFC2C7E46D30018CF36 /* PaletteChatColor+Constants.swift in Sources */,
 				F9C5CDCD289453B400548EEE /* ParamParser.swift in Sources */,

@@ -8,9 +8,9 @@ import Foundation
 @objc(OWSOutgoingNullMessage)
 final class OutgoingNullMessage: TSOutgoingMessage {
 
-    let verificationStateSyncMessage: OWSVerificationStateSyncMessage?
+    let verificationStateSyncMessage: OutgoingVerificationStateSyncMessage?
 
-    init(contactThread: TSContactThread, verificationStateSyncMessage: OWSVerificationStateSyncMessage? = nil, tx: DBReadTransaction) {
+    init(contactThread: TSContactThread, verificationStateSyncMessage: OutgoingVerificationStateSyncMessage? = nil, tx: DBReadTransaction) {
         self.verificationStateSyncMessage = verificationStateSyncMessage
         let messageBuilder = TSOutgoingMessageBuilder.outgoingMessageBuilder(thread: contactThread)
         super.init(
@@ -32,7 +32,7 @@ final class OutgoingNullMessage: TSOutgoingMessage {
     }
 
     required init?(coder: NSCoder) {
-        self.verificationStateSyncMessage = coder.decodeObject(of: OWSVerificationStateSyncMessage.self, forKey: "verificationStateSyncMessage")
+        self.verificationStateSyncMessage = coder.decodeObject(of: OutgoingVerificationStateSyncMessage.self, forKey: "verificationStateSyncMessage")
         super.init(coder: coder)
     }
 
@@ -54,7 +54,7 @@ final class OutgoingNullMessage: TSOutgoingMessage {
         let nullMessageBuilder = SSKProtoNullMessage.builder()
 
         if let verificationStateSyncMessage {
-            var contentLength = verificationStateSyncMessage.unpaddedVerifiedLength
+            var contentLength = verificationStateSyncMessage.unpaddedVerifiedLength()
 
             owsAssertDebug(verificationStateSyncMessage.paddingBytesLength > 0)
 
@@ -70,7 +70,7 @@ final class OutgoingNullMessage: TSOutgoingMessage {
 
             owsAssertDebug(contentLength > 0)
 
-            nullMessageBuilder.setPadding(Randomness.generateRandomBytes(UInt(contentLength)))
+            nullMessageBuilder.setPadding(Randomness.generateRandomBytes(contentLength))
         }
 
         let nullMessage = nullMessageBuilder.buildInfallibly()

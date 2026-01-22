@@ -241,9 +241,8 @@ public final class OWSRecipientIdentity: NSObject, SDSCodableModel, Decodable {
         }
     }
 
-    @objc
-    public class func buildVerifiedProto(
-        destinationAci: AciObjC,
+    class func buildVerifiedProto(
+        destinationAci: Aci,
         identityKey: Data,
         verificationState: OWSVerificationState,
         paddingBytesLength: UInt,
@@ -255,10 +254,10 @@ public final class OWSRecipientIdentity: NSObject, SDSCodableModel, Decodable {
 
         let verifiedBuilder = SSKProtoVerified.builder()
         if BuildFlags.serviceIdStrings {
-            verifiedBuilder.setDestinationAci(destinationAci.wrappedAciValue.serviceIdString)
+            verifiedBuilder.setDestinationAci(destinationAci.serviceIdString)
         }
         if BuildFlags.serviceIdBinaryConstantOverhead {
-            verifiedBuilder.setDestinationAciBinary(destinationAci.wrappedAciValue.serviceIdBinary)
+            verifiedBuilder.setDestinationAciBinary(destinationAci.serviceIdBinary)
         }
         verifiedBuilder.setIdentityKey(identityKey)
         verifiedBuilder.setState(verificationState.protoState)
