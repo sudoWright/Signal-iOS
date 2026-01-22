@@ -96,12 +96,9 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         updateExpirationReminderView()
         updatePaymentReminderView()
         updateUsernameReminderView()
+        updateDownloadProgressView()
         updateTableViewPaddingIfNeeded()
         observeNotifications()
-        DependenciesBridge.shared.db.read { tx in
-            self.viewState.backupDownloadProgressViewState.refetchDBState(tx: tx)
-        }
-        self.viewState.backupDownloadProgressView.update(viewState: self.viewState.backupDownloadProgressViewState)
     }
 
     private var viewHasAppeared = false

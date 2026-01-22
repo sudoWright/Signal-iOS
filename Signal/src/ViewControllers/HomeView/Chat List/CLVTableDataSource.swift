@@ -549,7 +549,7 @@ extension CLVTableDataSource: UITableViewDataSource {
                 return 0
             }
             return CLVBackupDownloadProgressView.measureHeight(
-                viewState: viewState.backupDownloadProgressViewState,
+                state: viewState.backupDownloadProgressView.state,
                 width: tableView.bounds.width,
             )
         case .pinned, .unpinned:

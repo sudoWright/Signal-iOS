@@ -151,21 +151,6 @@ extension ChatListViewController {
             name: .hasConsumedMediaTierCapacityStatusDidChange,
             object: nil,
         )
-
-        viewState.backupDownloadProgressViewState.downloadQueueStatus =
-            DependenciesBridge.shared.backupAttachmentDownloadQueueStatusReporter.currentStatus(for: .fullsize)
-        Task { @MainActor in
-            self.viewState.backupDownloadProgressViewState.downloadProgressObserver = await DependenciesBridge.shared
-                .backupAttachmentDownloadProgress
-                .addObserver { [weak self] progress in
-                    DispatchQueue.main.asyncIfNecessary {
-                        guard let self else { return }
-                        self.viewState.backupDownloadProgressViewState.downloadProgress = progress
-                        self.viewState.backupDownloadProgressView.update(viewState: self.viewState.backupDownloadProgressViewState)
-                    }
-                }
-        }
-
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(showFYISheetIfNecessary),
@@ -360,16 +345,12 @@ extension ChatListViewController {
 
     @objc
     private func backupAttachmentDownloadQueueStatusDidChange(_ notification: Notification) {
-        self.viewState.backupDownloadProgressViewState.downloadQueueStatus =
-            DependenciesBridge.shared.backupAttachmentDownloadQueueStatusReporter.currentStatus(for: .fullsize)
-        self.viewState.backupDownloadProgressView.update(viewState: self.viewState.backupDownloadProgressViewState)
+        viewState.backupDownloadProgressView.reloadStateAndUpdate()
     }
 
     @objc
     private func backupPlanDidChange(_ notification: Notification) {
-        let db = DependenciesBridge.shared.db
-        db.read { viewState.backupDownloadProgressViewState.refetchDBState(tx: $0) }
-        viewState.backupDownloadProgressView.update(viewState: viewState.backupDownloadProgressViewState)
+        viewState.backupDownloadProgressView.reloadStateAndUpdate()
     }
 
     @objc

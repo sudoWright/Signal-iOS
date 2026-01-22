@@ -112,8 +112,6 @@ class CLVViewState {
         }
     }
 
-    let backupDownloadProgressViewState = CLVBackupDownloadProgressView.State()
-
     // MARK: - Initializer
 
     @MainActor
