@@ -383,12 +383,11 @@ extension TSOutgoingMessage {
             requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.viewOnceVideo.rawValue)
         }
 
-        let body = self.body
-        let trimmedBody = body?.trimToUtf8ByteCount(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes)
+        let trimmedBody = self.body?.trimToUtf8ByteCount(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes)
         // It was historically possible to end up with a message in the database that
         // exceeds this threshold, and therefore possible to hit this assert (by forwarding
         // an older message). But it is good for us to know when this happens.
-        owsAssertDebug(body?.utf8.count == trimmedBody?.utf8.count)
+        owsAssertDebug(self.body?.utf8.count == trimmedBody?.utf8.count)
 
         if self.isPoll {
             if let pollCreateProto = self.buildPollProto(tx: tx) {
@@ -400,9 +399,7 @@ extension TSOutgoingMessage {
         } else {
             if let trimmedBody {
                 builder.setBody(trimmedBody)
-            }
-            if let body {
-                let bodyRanges = self.bodyRanges?.toProtoBodyRanges(bodyLength: body.utf16.count) ?? []
+                let bodyRanges = self.bodyRanges?.toProtoBodyRanges(bodyLength: trimmedBody.utf16.count) ?? []
                 if !bodyRanges.isEmpty {
                     builder.setBodyRanges(bodyRanges)
                     requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.mentions.rawValue)
