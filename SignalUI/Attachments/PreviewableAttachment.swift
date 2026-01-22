@@ -120,7 +120,7 @@ public struct PreviewableAttachment {
             dataSource: dataSource,
             dataUTI: dataUTI,
             validUTISet: SignalAttachment.videoUTISet,
-            maxFileSize: OWSMediaUtils.kMaxFileSizeVideo,
+            maxFileSize: OutgoingAttachmentLimits.currentLimits().maxPlaintextVideoBytes,
         )
     }
 
@@ -206,7 +206,7 @@ public struct PreviewableAttachment {
             dataSource: dataSource,
             dataUTI: dataUTI,
             validUTISet: SignalAttachment.audioUTISet,
-            maxFileSize: OWSMediaUtils.kMaxFileSizeAudio,
+            maxFileSize: OutgoingAttachmentLimits.currentLimits().maxPlaintextAudioBytes,
         )
     }
 
@@ -221,7 +221,7 @@ public struct PreviewableAttachment {
             dataSource: dataSource,
             dataUTI: dataUTI,
             validUTISet: nil,
-            maxFileSize: OWSMediaUtils.kMaxFileSizeGeneric,
+            maxFileSize: OutgoingAttachmentLimits.currentLimits().maxPlaintextBytes,
         )
     }
 

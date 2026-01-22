@@ -196,7 +196,8 @@ class GifPickerCell: UICollectionViewCell {
             activityIndicator.stopAnimating()
         }
 
-        if asset.assetDescription.fileExtension == "mp4", let video = LoopingVideo(decryptedLocalFileUrl: URL(fileURLWithPath: asset.filePath)) {
+        if asset.assetDescription.fileExtension == "mp4" {
+            let video = LoopingVideo(decryptedLocalFileUrl: URL(fileURLWithPath: asset.filePath))
             mp4View.video = video
             mp4View.isHidden = false
         } else if (try? DataImageSource.forPath(asset.filePath))?.ows_isValidImage ?? false, let image = SDAnimatedImage(contentsOfFile: asset.filePath) {

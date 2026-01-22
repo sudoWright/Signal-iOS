@@ -45,7 +45,7 @@ class PhotoCaptureViewController: OWSViewController, OWSNavigationChildControlle
     private lazy var qrCodeSampleBufferScanner = QRCodeSampleBufferScanner(delegate: self)
     private lazy var cameraCaptureSession = CameraCaptureSession(
         delegate: self,
-        maxPlaintextVideoBytes: RemoteConfig.current.attachmentMaxPlaintextVideoBytes,
+        maxPlaintextVideoBytes: OutgoingAttachmentLimits.currentLimits().maxPlaintextVideoBytes,
         qrCodeSampleBufferScanner: qrCodeSampleBufferScanner,
     )
 

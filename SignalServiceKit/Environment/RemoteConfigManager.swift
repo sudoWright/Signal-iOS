@@ -224,16 +224,14 @@ public class RemoteConfig {
     }
 
     public var attachmentMaxEncryptedReceiveBytes: UInt64 {
-        // TODO: Use the Remote Config value and new fallback value.
-        return self.attachmentMaxEncryptedBytes
-    }
-
-    public var attachmentMaxPlaintextVideoBytes: UInt64 {
-        if BuildFlags.useNewAttachmentLimits {
-            return PaddingBucket.forEncryptedSizeLimit(self.attachmentMaxEncryptedBytes).plaintextSize
-        } else {
-            return OWSMediaUtils.kMaxFileSizeVideo
+        guard BuildFlags.useNewAttachmentLimits else {
+            return self.attachmentMaxEncryptedBytes
         }
+        let maxEncryptedBytes = self.attachmentMaxEncryptedBytes
+        return getUInt64Value(
+            forFlag: .attachmentMaxEncryptedReceiveBytes,
+            defaultValue: maxEncryptedBytes + maxEncryptedBytes / 4,
+        )
     }
 
     public var backupListMediaDefaultRefreshInterval: TimeInterval {
@@ -577,6 +575,7 @@ private enum IsEnabledFlag: String, FlagType {
 private enum ValueFlag: String, FlagType {
     case applePayDisabledRegions = "global.donations.apayDisabledRegions"
     case attachmentMaxEncryptedBytes = "global.attachments.maxBytes"
+    case attachmentMaxEncryptedReceiveBytes = "global.attachments.maxReceiveBytes"
     case automaticSessionResetAttemptInterval = "ios.automaticSessionResetAttemptInterval"
     case backgroundRefreshInterval = "ios.backgroundRefreshInterval"
     case callQualitySurveyPPM = "ios.callQualitySurveyPPM"
@@ -612,6 +611,7 @@ private enum ValueFlag: String, FlagType {
         switch self {
         case .applePayDisabledRegions: true
         case .attachmentMaxEncryptedBytes: false
+        case .attachmentMaxEncryptedReceiveBytes: false
         case .automaticSessionResetAttemptInterval: true
         case .backgroundRefreshInterval: true
         case .callQualitySurveyPPM: true

@@ -752,6 +752,7 @@
 		509085C02C49C2A500409B85 /* PaddingBucketTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509085BF2C49C2A500409B85 /* PaddingBucketTest.swift */; };
 		50925DEA2DA86E3A00DAB484 /* GroupMessageProcessorJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50925DE92DA86E3A00DAB484 /* GroupMessageProcessorJob.swift */; };
 		50925DEC2DA87AEF00DAB484 /* GroupMessageProcessorJobTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50925DEB2DA87AEF00DAB484 /* GroupMessageProcessorJobTest.swift */; };
+		5094D5052EE3A6780041F402 /* AttachmentLimits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5094D5042EE3A6780041F402 /* AttachmentLimits.swift */; };
 		509527FA2E26F02B00A03829 /* ConnectionLockTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509527F92E26F02B00A03829 /* ConnectionLockTest.swift */; };
 		509A8DC22E25817E0024BF14 /* ConnectionLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509A8DC12E25817E0024BF14 /* ConnectionLock.swift */; };
 		509BBF7A28CA556700F4D8A0 /* Data+SSKTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509BBF7928CA556700F4D8A0 /* Data+SSKTest.swift */; };
@@ -4912,6 +4913,7 @@
 		509085BF2C49C2A500409B85 /* PaddingBucketTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingBucketTest.swift; sourceTree = "<group>"; };
 		50925DE92DA86E3A00DAB484 /* GroupMessageProcessorJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupMessageProcessorJob.swift; sourceTree = "<group>"; };
 		50925DEB2DA87AEF00DAB484 /* GroupMessageProcessorJobTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupMessageProcessorJobTest.swift; sourceTree = "<group>"; };
+		5094D5042EE3A6780041F402 /* AttachmentLimits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentLimits.swift; sourceTree = "<group>"; };
 		509527F92E26F02B00A03829 /* ConnectionLockTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionLockTest.swift; sourceTree = "<group>"; };
 		5096BE642AF3514800668F9F /* ContactSyncAttachmentBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSyncAttachmentBuilder.swift; sourceTree = "<group>"; };
 		5096BE682AF37A9900668F9F /* ContactOutputStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactOutputStream.swift; sourceTree = "<group>"; };
@@ -10797,6 +10799,7 @@
 		7255A4C32B98D5A800E95368 /* Attachments */ = {
 			isa = PBXGroup;
 			children = (
+				5094D5042EE3A6780041F402 /* AttachmentLimits.swift */,
 				509085BD2C49C29400409B85 /* PaddingBucket.swift */,
 				509085BF2C49C2A500409B85 /* PaddingBucketTest.swift */,
 			);
@@ -18476,6 +18479,7 @@
 				66D7B9402B9A67B00005C98B /* AttachmentDownloadPriority.swift in Sources */,
 				664E8D942BD86AFB00C4968A /* AttachmentDownloadState.swift in Sources */,
 				66278A4C2C1CDDD9006123E9 /* AttachmentDownloadStoreImpl.swift in Sources */,
+				5094D5052EE3A6780041F402 /* AttachmentLimits.swift in Sources */,
 				66D7B92D2B98DAAD0005C98B /* AttachmentManager+Proto.swift in Sources */,
 				66D7B8FF2B9287F00005C98B /* AttachmentManager.swift in Sources */,
 				66D7B9012B92889E0005C98B /* AttachmentManagerImpl.swift in Sources */,

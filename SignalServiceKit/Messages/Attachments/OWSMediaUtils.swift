@@ -116,13 +116,6 @@ public enum OWSMediaUtils {
         }
     }
 
-    public static func validateVideoSize(atPath path: String) throws {
-        let fileSize = try OWSFileSystem.fileSize(ofPath: path)
-        guard fileSize <= kMaxFileSizeVideo else {
-            throw OWSGenericError("video file is too large")
-        }
-    }
-
     public static func validateVideoAsset(atPath path: String) throws {
         let asset = AVURLAsset(url: URL(fileURLWithPath: path), options: nil)
         try validateVideoAsset(asset)
@@ -154,9 +147,6 @@ public enum OWSMediaUtils {
     public static let kMaxFileSizeImage: UInt64 = 8 * 1024 * 1024
     // Cloudflare limits uploads to 100 MB. To avoid hitting those limits,
     // we use limits that are 5% lower for the unencrypted content.
-    public static let kMaxFileSizeVideo: UInt64 = 95_000_000
-    public static let kMaxFileSizeAudio: UInt64 = 95_000_000
-    public static let kMaxFileSizeGeneric: UInt64 = 95_000_000
     public static let kMaxAttachmentUploadSizeBytes: UInt64 = 100_000_000
 
     public static let kMaxVideoDimensions: CGFloat = 4096 // 4k video width

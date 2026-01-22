@@ -751,6 +751,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
 
             let downloadMetadata: DownloadMetadata
             let downloadSizeSource: DownloadQueue.DownloadSizeSource
+            let maxDownloadSizeBytes: UInt64
             switch record.sourceType {
             case .transitTier:
                 // We only download from the latest transit tier info.
@@ -772,6 +773,15 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                         unencryptedSize: UInt64(safeCast: $0),
                     ) ?? UInt64(UInt32.max)))
                 }) ?? .useHeadRequest
+                let attachmentLimits = IncomingAttachmentLimits.currentLimits()
+                switch Attachment.ContentTypeRaw(mimeType: attachment.mimeType) {
+                case .video:
+                    maxDownloadSizeBytes = attachmentLimits.maxEncryptedVideoBytes
+                case .image, .animatedImage:
+                    maxDownloadSizeBytes = attachmentLimits.maxEncryptedImageBytes
+                case .audio, .file, .invalid:
+                    maxDownloadSizeBytes = attachmentLimits.maxEncryptedBytes
+                }
             case .mediaTierFullsize:
                 let cdnNumber = attachment.mediaTierInfo?.cdnNumber ?? remoteConfigManager.currentConfig().mediaTierFallbackCdnNumber
                 guard
@@ -798,6 +808,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                 downloadSizeSource = .estimatedSizeBytes(UInt(Cryptography.estimatedMediaTierCDNSize(
                     unencryptedSize: UInt64(safeCast: mediaTierInfo.unencryptedByteCount),
                 ) ?? UInt64(UInt32.max)))
+                maxDownloadSizeBytes = RemoteConfig.current.attachmentMaxEncryptedReceiveBytes
             case .mediaTierThumbnail:
                 let cdnNumber = attachment.thumbnailMediaTierInfo?.cdnNumber ?? remoteConfigManager.currentConfig().mediaTierFallbackCdnNumber
                 guard
@@ -836,13 +847,14 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                 downloadSizeSource = .estimatedSizeBytes(UInt(Cryptography.estimatedMediaTierCDNSize(
                     unencryptedSize: UInt64(safeCast: AttachmentThumbnailQuality.backupThumbnailMaxSizeBytes),
                 ) ?? UInt64(UInt32.max)))
+                maxDownloadSizeBytes = RemoteConfig.current.attachmentMaxEncryptedReceiveBytes
             }
 
             let downloadedFileUrl: URL
             do {
                 downloadedFileUrl = try await downloadQueue.enqueueDownload(
                     downloadState: .init(type: .attachment(downloadMetadata, id: attachment.id)),
-                    maxDownloadSizeBytes: RemoteConfig.current.attachmentMaxEncryptedReceiveBytes,
+                    maxDownloadSizeBytes: maxDownloadSizeBytes,
                     expectedDownloadSize: downloadSizeSource,
                     progress: nil,
                 )
@@ -1882,7 +1894,6 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
                         guard let plaintextLength else { return nil }
                         return UInt64(safeCast: plaintextLength)
                     }()
-
                     return try await attachmentValidator.validateBackupMediaFileContents(
                         fileUrl: encryptedFileUrl,
                         outerDecryptionData: DecryptionMetadata(key: outerEncryptionMetadata.attachmentKey()),

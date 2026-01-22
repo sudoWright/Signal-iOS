@@ -10,7 +10,6 @@ public protocol UploadMetadata {
     var encryptedDataLength: UInt32 { get }
 
     static var maxUploadSizeBytes: UInt64 { get }
-    static var maxPlaintextSizeBytes: UInt64 { get }
 }
 
 /// Includes extra info like digest for validation.

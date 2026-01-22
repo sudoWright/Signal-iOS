@@ -11,7 +11,7 @@ public import SignalServiceKit
 public class LoopingVideo: NSObject {
     fileprivate var asset: AVAsset
 
-    public convenience init?(_ attachment: PreviewableAttachment) {
+    public convenience init(_ attachment: PreviewableAttachment) {
         self.init(decryptedLocalFileUrl: attachment.rawValue.dataSource.fileUrl)
     }
 
@@ -22,13 +22,7 @@ public class LoopingVideo: NSObject {
         self.init(asset: asset)
     }
 
-    public convenience init?(decryptedLocalFileUrl url: URL) {
-        do {
-            try OWSMediaUtils.validateVideoExtension(ofPath: url.path)
-            try OWSMediaUtils.validateVideoSize(atPath: url.path)
-        } catch {
-            return nil
-        }
+    public convenience init(decryptedLocalFileUrl url: URL) {
         self.init(asset: AVAsset(url: url))
     }
 
