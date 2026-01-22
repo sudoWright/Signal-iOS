@@ -75,7 +75,7 @@ private class SessionResetJobRunner: JobRunner {
             if !self.hasArchivedAllSessions {
                 self.archiveAllSessions(for: contactThread, tx: tx)
             }
-            let endSessionMessage = EndSessionMessage(thread: contactThread, transaction: tx)
+            let endSessionMessage = OutgoingEndSessionMessage(thread: contactThread, tx: tx)
             let preparedMessage = PreparedOutgoingMessage.preprepared(
                 transientMessageWithoutAttachments: endSessionMessage,
             )
@@ -85,7 +85,6 @@ private class SessionResetJobRunner: JobRunner {
 
         try await endSessionMessagePromise.awaitable()
 
-        Logger.info("successfully sent EndSessionMessage.")
         try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
             let contactThread = try self.fetchThread(jobRecord: jobRecord, tx: tx)
             // Archive the just-created session since the recipient should delete their
