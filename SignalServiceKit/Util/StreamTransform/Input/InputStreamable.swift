@@ -17,8 +17,11 @@ public protocol InputStreamable: Streamable {
 
 extension InputStream: InputStreamable {
     public func read(maxLength len: Int) throws -> Data {
-        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: len)
-        let bytesRead = self.read(buffer, maxLength: len)
-        return Data(bytes: buffer, count: bytesRead)
+        if len == 0 {
+            return Data()
+        }
+        var buffer = Data(count: len)
+        let bytesRead = buffer.withUnsafeMutableBytes { self.read($0.baseAddress!, maxLength: len) }
+        return buffer.prefix(bytesRead)
     }
 }
