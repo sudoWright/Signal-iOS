@@ -75,7 +75,6 @@ class BackupExportJobImpl: BackupExportJob {
     private let backupSettingsStore: BackupSettingsStore
     private let db: DB
     private let logger: PrefixedLogger
-    private let messagePipelineSupervisor: MessagePipelineSupervisor
     private let messageProcessor: MessageProcessor
     private let reachabilityManager: SSKReachabilityManager
     private let tsAccountManager: TSAccountManager
@@ -90,7 +89,6 @@ class BackupExportJobImpl: BackupExportJob {
         backupKeyService: BackupKeyService,
         backupSettingsStore: BackupSettingsStore,
         db: DB,
-        messagePipelineSupervisor: MessagePipelineSupervisor,
         messageProcessor: MessageProcessor,
         reachabilityManager: SSKReachabilityManager,
         tsAccountManager: TSAccountManager,
@@ -105,7 +103,6 @@ class BackupExportJobImpl: BackupExportJob {
         self.backupSettingsStore = backupSettingsStore
         self.db = db
         self.logger = PrefixedLogger(prefix: "[Backups][ExportJob]")
-        self.messagePipelineSupervisor = messagePipelineSupervisor
         self.messageProcessor = messageProcessor
         self.reachabilityManager = reachabilityManager
         self.tsAccountManager = tsAccountManager

@@ -1614,7 +1614,6 @@ extension AppSetup.GlobalsContinuation {
             backupKeyService: backupKeyService,
             backupSettingsStore: backupSettingsStore,
             db: db,
-            messagePipelineSupervisor: messagePipelineSupervisor,
             messageProcessor: messageProcessor,
             reachabilityManager: reachabilityManager,
             tsAccountManager: tsAccountManager,
