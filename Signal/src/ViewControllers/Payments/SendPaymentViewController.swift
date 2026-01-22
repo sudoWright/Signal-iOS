@@ -326,7 +326,7 @@ public class SendPaymentViewController: OWSViewController {
             else {
                 return
             }
-            let message = OWSPaymentActivationRequestMessage(thread: thread, transaction: transaction)
+            let message = OutgoingPaymentActivationRequestMessage(thread: thread, tx: transaction)
             // The request message isn't inserted or rendered in chat; thats done with an info message.
             let preparedMessage = PreparedOutgoingMessage.preprepared(
                 transientMessageWithoutAttachments: message,
