@@ -419,7 +419,9 @@ public class OWSMessageDecrypter {
                 sendReactiveProfileKeyIfNecessary(to: sourceAci, tx: transaction)
             case .preKey:
                 if DependenciesBridge.shared.tsAccountManager.registrationState(tx: transaction).isRegistered {
-                    DependenciesBridge.shared.preKeyManager.checkPreKeysIfNecessary(tx: transaction)
+                    Task {
+                        try? await DependenciesBridge.shared.preKeyManager.checkPreKeysIfNecessary()
+                    }
                 }
                 let message = try PreKeySignalMessage(bytes: encryptedData)
                 plaintext = try signalDecryptPreKey(
@@ -607,7 +609,9 @@ public class OWSMessageDecrypter {
             decryptResult.messageType == .prekey,
             DependenciesBridge.shared.tsAccountManager.registrationState(tx: transaction).isRegistered
         {
-            DependenciesBridge.shared.preKeyManager.checkPreKeysIfNecessary(tx: transaction)
+            Task {
+                try? await DependenciesBridge.shared.preKeyManager.checkPreKeysIfNecessary()
+            }
         }
 
         let envelopeBuilder = validatedEnvelope.envelope.asBuilder()

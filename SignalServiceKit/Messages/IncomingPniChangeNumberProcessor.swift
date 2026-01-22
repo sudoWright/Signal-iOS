@@ -87,7 +87,11 @@ public class IncomingPniChangeNumberProcessorImpl: IncomingPniChangeNumberProces
         // We need to refresh our one-time pre-keys, and should also refresh
         // our signed pre-key so we use the one generated on the primary for as
         // little time as possible.
-        preKeyManager.refreshOneTimePreKeys(forIdentity: .pni, alsoRefreshSignedPreKey: true)
+        tx.addSyncCompletion { [preKeyManager] in
+            Task {
+                try? await preKeyManager.refreshOneTimePreKeys(forIdentity: .pni, alsoRefreshSignedPreKey: true)
+            }
+        }
     }
 
     private func deserializeIncomingPniChangePhoneNumber(

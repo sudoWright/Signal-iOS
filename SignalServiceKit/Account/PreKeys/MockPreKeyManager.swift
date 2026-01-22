@@ -11,51 +11,47 @@ import LibSignalClient
 class MockPreKeyManager: PreKeyManager {
     func isAppLockedDueToPreKeyUpdateFailures(tx: SignalServiceKit.DBReadTransaction) -> Bool { false }
     func refreshOneTimePreKeysCheckDidSucceed() { }
-    func checkPreKeysIfNecessary(tx: SignalServiceKit.DBReadTransaction) { }
+    func checkPreKeysIfNecessary() async throws { }
     func rotatePreKeysOnUpgradeIfNecessary(for identity: OWSIdentity) async throws { }
     var attemptedRefreshes: [(OWSIdentity, Bool)] = []
 
-    func createPreKeysForRegistration() -> Task<RegistrationPreKeyUploadBundles, Error> {
+    func createPreKeysForRegistration() async -> RegistrationPreKeyUploadBundles {
         let identityKeyPair = ECKeyPair.generateKeyPair()
-        return Task {
-            .init(
-                aci: .init(
-                    identity: .aci,
-                    identityKeyPair: identityKeyPair,
-                    signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
-                    lastResortPreKey: generateLastResortKyberPreKey(signedBy: identityKeyPair.keyPair.privateKey),
-                ),
-                pni: .init(
-                    identity: .pni,
-                    identityKeyPair: identityKeyPair,
-                    signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
-                    lastResortPreKey: generateLastResortKyberPreKey(signedBy: identityKeyPair.keyPair.privateKey),
-                ),
-            )
-        }
+        return .init(
+            aci: .init(
+                identity: .aci,
+                identityKeyPair: identityKeyPair,
+                signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
+                lastResortPreKey: generateLastResortKyberPreKey(signedBy: identityKeyPair.keyPair.privateKey),
+            ),
+            pni: .init(
+                identity: .pni,
+                identityKeyPair: identityKeyPair,
+                signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
+                lastResortPreKey: generateLastResortKyberPreKey(signedBy: identityKeyPair.keyPair.privateKey),
+            ),
+        )
     }
 
     func createPreKeysForProvisioning(
         aciIdentityKeyPair: ECKeyPair,
         pniIdentityKeyPair: ECKeyPair,
-    ) -> Task<RegistrationPreKeyUploadBundles, Error> {
+    ) async -> RegistrationPreKeyUploadBundles {
         let identityKeyPair = ECKeyPair.generateKeyPair()
-        return Task {
-            .init(
-                aci: .init(
-                    identity: .aci,
-                    identityKeyPair: identityKeyPair,
-                    signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
-                    lastResortPreKey: generateLastResortKyberPreKey(signedBy: identityKeyPair.keyPair.privateKey),
-                ),
-                pni: .init(
-                    identity: .pni,
-                    identityKeyPair: identityKeyPair,
-                    signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
-                    lastResortPreKey: generateLastResortKyberPreKey(signedBy: identityKeyPair.keyPair.privateKey),
-                ),
-            )
-        }
+        return .init(
+            aci: .init(
+                identity: .aci,
+                identityKeyPair: identityKeyPair,
+                signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
+                lastResortPreKey: generateLastResortKyberPreKey(signedBy: identityKeyPair.keyPair.privateKey),
+            ),
+            pni: .init(
+                identity: .pni,
+                identityKeyPair: identityKeyPair,
+                signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
+                lastResortPreKey: generateLastResortKyberPreKey(signedBy: identityKeyPair.keyPair.privateKey),
+            ),
+        )
     }
 
     var didFinalizeRegistrationPrekeys = false
@@ -63,17 +59,16 @@ class MockPreKeyManager: PreKeyManager {
     func finalizeRegistrationPreKeys(
         _ bundles: RegistrationPreKeyUploadBundles,
         uploadDidSucceed: Bool,
-    ) -> Task<Void, Error> {
+    ) async {
         didFinalizeRegistrationPrekeys = true
-        return Task {}
     }
 
-    func rotateOneTimePreKeysForRegistration(auth: ChatServiceAuth) -> Task<Void, Error> {
-        return Task {}
+    func rotateOneTimePreKeysForRegistration(auth: ChatServiceAuth) async throws {
     }
 
-    func rotateSignedPreKeysIfNeeded() -> Task<Void, Error> { Task {} }
-    func refreshOneTimePreKeys(forIdentity identity: OWSIdentity, alsoRefreshSignedPreKey shouldRefreshSignedPreKey: Bool) {
+    func rotateSignedPreKeysIfNeeded() async throws {}
+
+    func refreshOneTimePreKeys(forIdentity identity: OWSIdentity, alsoRefreshSignedPreKey shouldRefreshSignedPreKey: Bool) async throws {
         attemptedRefreshes.append((identity, shouldRefreshSignedPreKey))
     }
 

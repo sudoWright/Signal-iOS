@@ -168,34 +168,34 @@ public class _RegistrationCoordinator_PreKeyManagerMock: PreKeyManager {
     }
 
     public func isAppLockedDueToPreKeyUpdateFailures(tx: DBReadTransaction) -> Bool { fatalError() }
-    public func checkPreKeysIfNecessary(tx: DBReadTransaction) { fatalError() }
+    public func checkPreKeysIfNecessary() async throws { fatalError() }
     public func rotatePreKeysOnUpgradeIfNecessary(for identity: OWSIdentity) async throws { fatalError() }
-    public func createPreKeysForProvisioning(aciIdentityKeyPair: ECKeyPair, pniIdentityKeyPair: ECKeyPair) -> Task<RegistrationPreKeyUploadBundles, any Error> { fatalError() }
-    public func rotateSignedPreKeysIfNeeded() -> Task<Void, any Error> { fatalError() }
-    public func refreshOneTimePreKeys(forIdentity identity: OWSIdentity, alsoRefreshSignedPreKey shouldRefreshSignedPreKey: Bool) { fatalError() }
+    public func createPreKeysForProvisioning(aciIdentityKeyPair: ECKeyPair, pniIdentityKeyPair: ECKeyPair) async -> RegistrationPreKeyUploadBundles { fatalError() }
+    public func rotateSignedPreKeysIfNeeded() async throws { fatalError() }
+    public func refreshOneTimePreKeys(forIdentity identity: OWSIdentity, alsoRefreshSignedPreKey shouldRefreshSignedPreKey: Bool) async throws { fatalError() }
 
-    public typealias CreatePreKeysMock = () -> Task<RegistrationPreKeyUploadBundles, any Error>
+    public typealias CreatePreKeysMock = () -> Task<RegistrationPreKeyUploadBundles, Never>
     private var createPreKeysMocks = [CreatePreKeysMock]()
     public func addCreatePreKeysMock(_ mock: @escaping CreatePreKeysMock) { createPreKeysMocks.append(mock) }
-    public func createPreKeysForRegistration() -> Task<RegistrationPreKeyUploadBundles, any Error> {
+    public func createPreKeysForRegistration() async -> RegistrationPreKeyUploadBundles {
         run.addObservedStep(.createPreKeys)
-        return createPreKeysMocks.removeFirst()()
+        return await createPreKeysMocks.removeFirst()().value
     }
 
-    public typealias FinalizePreKeysMock = (Bool) -> Task<Void, any Error>
+    public typealias FinalizePreKeysMock = (Bool) -> Task<Void, Never>
     private var finalizePreKeysMocks = [FinalizePreKeysMock]()
     public func addFinalizePreKeyMock(_ mock: @escaping FinalizePreKeysMock) { finalizePreKeysMocks.append(mock) }
-    public func finalizeRegistrationPreKeys(_ bundles: RegistrationPreKeyUploadBundles, uploadDidSucceed: Bool) -> Task<Void, any Error> {
+    public func finalizeRegistrationPreKeys(_ bundles: RegistrationPreKeyUploadBundles, uploadDidSucceed: Bool) async {
         run.addObservedStep(.finalizePreKeys)
-        return finalizePreKeysMocks.removeFirst()(uploadDidSucceed)
+        await finalizePreKeysMocks.removeFirst()(uploadDidSucceed).value
     }
 
     public typealias RotateOneTimePreKeysMock = (ChatServiceAuth) -> Task<Void, any Error>
     private var rotateOneTimePreKeysMocks = [RotateOneTimePreKeysMock]()
     public func addRotateOneTimePreKeyMock(_ mock: @escaping RotateOneTimePreKeysMock) { rotateOneTimePreKeysMocks.append(mock) }
-    public func rotateOneTimePreKeysForRegistration(auth: ChatServiceAuth) -> Task<Void, any Error> {
+    public func rotateOneTimePreKeysForRegistration(auth: ChatServiceAuth) async throws {
         run.addObservedStep(.rotateOneTimePreKeys)
-        return rotateOneTimePreKeysMocks.removeFirst()(auth)
+        return try await rotateOneTimePreKeysMocks.removeFirst()(auth).value
     }
 
     public func setIsChangingNumber(_ isChangingNumber: Bool) {

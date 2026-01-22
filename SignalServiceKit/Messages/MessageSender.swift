@@ -442,7 +442,7 @@ public class MessageSender {
                         // If this succeeds, or if we hit an error, allow another attempt.
                         self.pendingPreKeyRotation.set(nil)
                     }
-                    try await self.preKeyManager.rotateSignedPreKeysIfNeeded().value
+                    try await self.preKeyManager.rotateSignedPreKeysIfNeeded()
                 }
             }
             return nil

@@ -238,23 +238,10 @@ class ProvisioningCoordinatorImpl: ProvisioningCoordinator {
         pni: Pni,
         phoneNumber: E164,
     ) async throws(CompleteProvisioningError) -> CompleteProvisioningStepResult {
-        let prekeyBundles: RegistrationPreKeyUploadBundles
-        do {
-            // This should be the last failable thing we do before making the verification
-            // request, because if the verification request fails we need to clean up prekey
-            // state created by this method.
-            // If we did add new (failable) method calls between this and the verification
-            // request invocation, we would have to make sure we similarly clean up prekey
-            // state if there are failures.
-            prekeyBundles = try await self.preKeyManager
-                .createPreKeysForProvisioning(
-                    aciIdentityKeyPair: provisionMessage.aciIdentityKeyPair.asECKeyPair,
-                    pniIdentityKeyPair: provisionMessage.pniIdentityKeyPair.asECKeyPair,
-                )
-                .value
-        } catch {
-            throw .genericError(error)
-        }
+        let prekeyBundles = await self.preKeyManager.createPreKeysForProvisioning(
+            aciIdentityKeyPair: provisionMessage.aciIdentityKeyPair.asECKeyPair,
+            pniIdentityKeyPair: provisionMessage.pniIdentityKeyPair.asECKeyPair,
+        )
 
         return try await completeProvisioning_createRegistrationIds(
             provisionMessage: provisionMessage,
@@ -264,10 +251,10 @@ class ProvisioningCoordinatorImpl: ProvisioningCoordinator {
             phoneNumber: phoneNumber,
             prekeyBundles: prekeyBundles,
         ).withUndoOnFailureStep {
-            try await self.preKeyManager.finalizeRegistrationPreKeys(
+            await self.preKeyManager.finalizeRegistrationPreKeys(
                 prekeyBundles,
                 uploadDidSucceed: false,
-            ).value
+            )
         }
     }
 
@@ -434,12 +421,10 @@ class ProvisioningCoordinatorImpl: ProvisioningCoordinator {
         authedDevice: AuthedDevice.Explicit,
     ) async throws(CompleteProvisioningError) -> CompleteProvisioningStepResult {
         do {
-            try await self.preKeyManager
+            await self.preKeyManager
                 .finalizeRegistrationPreKeys(prekeyBundles, uploadDidSucceed: true)
-                .value
             try await self.preKeyManager
                 .rotateOneTimePreKeysForRegistration(auth: authedDevice.authedAccount.chatServiceAuth)
-                .value
         } catch {
             throw .genericError(error)
         }

@@ -1337,9 +1337,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction()
 
         if registeredState != nil {
-            DependenciesBridge.shared.db.read { tx in
+            Task {
                 // Always check prekeys after app launches, and sometimes check on app activation.
-                DependenciesBridge.shared.preKeyManager.checkPreKeysIfNecessary(tx: tx)
+                try? await DependenciesBridge.shared.preKeyManager.checkPreKeysIfNecessary()
             }
         }
 

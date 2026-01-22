@@ -205,13 +205,12 @@ class ChangePhoneNumberPniManagerImpl: ChangePhoneNumberPniManager {
         // Followup tasks
 
         tx.addSyncCompletion { [preKeyManager] in
-            // Since we rotated the identity key, we need new one-time pre-keys.
-            // However, no need to update the signed pre-key, which we also just
-            // rotated.
-            preKeyManager.refreshOneTimePreKeys(
-                forIdentity: .pni,
-                alsoRefreshSignedPreKey: refreshSignedPreKey,
-            )
+            Task {
+                try? await preKeyManager.refreshOneTimePreKeys(
+                    forIdentity: .pni,
+                    alsoRefreshSignedPreKey: refreshSignedPreKey,
+                )
+            }
         }
     }
 }

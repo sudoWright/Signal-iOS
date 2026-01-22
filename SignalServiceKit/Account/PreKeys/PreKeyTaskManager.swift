@@ -79,7 +79,6 @@ struct PreKeyTaskManager {
     /// ALWAYS changes the targeted keys (regardless of current key state)
     func createForRegistration() async -> RegistrationPreKeyUploadBundles {
         logger.info("Create for registration")
-
         let (aciBundle, pniBundle) = await db.awaitableWrite { tx in
             let aciBundle = self.generateKeysForRegistration(identity: .aci, tx: tx)
             let pniBundle = self.generateKeysForRegistration(identity: .pni, tx: tx)
@@ -98,7 +97,6 @@ struct PreKeyTaskManager {
         pniIdentityKeyPair: ECKeyPair,
     ) async -> RegistrationPreKeyUploadBundles {
         logger.info("Create for provisioning")
-
         let (aciBundle, pniBundle) = await db.awaitableWrite { tx in
             let aciBundle = self.generateKeysForProvisioning(
                 identity: .aci,

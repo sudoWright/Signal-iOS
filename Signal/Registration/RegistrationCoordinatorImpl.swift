@@ -3483,7 +3483,7 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
             // But we should still upload one-time prekeys, as that is not part
             // of account creation.
             do {
-                try await deps.preKeyManager.rotateOneTimePreKeysForRegistration(auth: accountIdentity.chatServiceAuth).value
+                try await deps.preKeyManager.rotateOneTimePreKeysForRegistration(auth: accountIdentity.chatServiceAuth)
                 self.db.write { tx in
                     self.updatePersistedState(tx) {
                         // No harm marking both down as done even though
@@ -4494,12 +4494,7 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
             persistRegistrationMessage(registrationMessage)
         }
 
-        let prekeyBundles: RegistrationPreKeyUploadBundles
-        do {
-            prekeyBundles = try await deps.preKeyManager.createPreKeysForRegistration().value
-        } catch {
-            return .showErrorSheet(.genericError)
-        }
+        let prekeyBundles = await deps.preKeyManager.createPreKeysForRegistration()
 
         let shouldSkipDeviceTransfer = self.shouldSkipDeviceTransfer()
         let signalService = self.deps.signalService
@@ -4523,15 +4518,10 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
             .genericError,
             .deviceTransferPossible: false
         }
-        do {
-            try await deps.preKeyManager.finalizeRegistrationPreKeys(
-                prekeyBundles,
-                uploadDidSucceed: isPrekeyUploadSuccess,
-            ).value
-        } catch {
-            // Finalizing is best effort.
-            Logger.error("Unable to finalize prekeys, ignoring and continuing")
-        }
+        await deps.preKeyManager.finalizeRegistrationPreKeys(
+            prekeyBundles,
+            uploadDidSucceed: isPrekeyUploadSuccess,
+        )
         return await responseHandler(accountResponse)
     }
 

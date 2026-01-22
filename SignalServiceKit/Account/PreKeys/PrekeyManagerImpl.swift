@@ -37,7 +37,7 @@ public class PreKeyManagerImpl: PreKeyManager {
     /// Some of our pre-key operations depend on the service state, e.g. we need to check our one-time-prekey count
     /// before we decide to upload new ones. This potentially entails multiple async operations, all of which should
     /// complete before starting any other pre-key operation. That's why they must run in serial.
-    private static let taskQueue = SerialTaskQueue()
+    private let taskQueue = ConcurrentTaskQueue(concurrentLimit: 1)
 
     private let db: any DB
     private let identityManager: OWSIdentityManager
@@ -115,15 +115,13 @@ public class PreKeyManagerImpl: PreKeyManager {
         lastOneTimePreKeyCheckTimestamp = Date()
     }
 
-    public func checkPreKeysIfNecessary(tx: DBReadTransaction) {
-        checkPreKeys(shouldThrottle: true, tx: tx)
+    public func checkPreKeysIfNecessary() async throws {
+        try await checkPreKeys(shouldThrottle: true)
     }
 
-    fileprivate func checkPreKeys(shouldThrottle: Bool, tx: DBReadTransaction) {
-        guard
-            CurrentAppContext().isMainAppAndActive
-        else {
-            return
+    fileprivate func checkPreKeys(shouldThrottle: Bool) async throws {
+        guard CurrentAppContext().isMainAppAndActive else {
+            throw OWSGenericError("must be the main app")
         }
 
         let shouldCheckOneTimePreKeys = {
@@ -145,24 +143,22 @@ public class PreKeyManagerImpl: PreKeyManager {
             logger.warn("Skipping PNI pre key check due to change number.")
         }
 
-        _ = self._checkPreKeys(
+        try await self._checkPreKeys(
             shouldCheckOneTimePreKeys: shouldCheckOneTimePreKeys,
             shouldCheckPniPreKeys: !shouldSkipPniPreKeyCheck,
-            tx: tx,
         )
     }
 
     private func _checkPreKeys(
         shouldCheckOneTimePreKeys: Bool,
         shouldCheckPniPreKeys: Bool,
-        tx: DBReadTransaction,
-    ) -> Task<Void, any Error> {
+    ) async throws {
         var targets: PreKeyTargets = [.signedPreKey, .lastResortPqPreKey]
         if shouldCheckOneTimePreKeys {
             targets.insert(target: .oneTimePreKey)
             targets.insert(target: .oneTimePqPreKey)
         }
-        return Self.taskQueue.enqueue { [self, chatConnectionManager, taskManager, targets] in
+        try await taskQueue.run {
             try await chatConnectionManager.waitForIdentifiedConnectionToOpen()
             try Task.checkCancellation()
             try await taskManager.refresh(identity: .aci, targets: targets, auth: .implicit())
@@ -177,83 +173,53 @@ public class PreKeyManagerImpl: PreKeyManager {
         }
     }
 
-    public func createPreKeysForRegistration() -> Task<RegistrationPreKeyUploadBundles, Error> {
+    public func createPreKeysForRegistration() async -> RegistrationPreKeyUploadBundles {
         logger.info("Create registration prekeys")
-        /// Note that we do not report a `refreshOneTimePreKeysCheckDidSucceed`
-        /// because this operation does not generate one time prekeys, so we
-        /// shouldn't mark the routine refresh as having been "checked".
-        return Self.taskQueue.enqueueCancellingPrevious { [taskManager] in
-            try Task.checkCancellation()
-            return await taskManager.createForRegistration()
-        }
+        return await taskManager.createForRegistration()
     }
 
     public func createPreKeysForProvisioning(
         aciIdentityKeyPair: ECKeyPair,
         pniIdentityKeyPair: ECKeyPair,
-    ) -> Task<RegistrationPreKeyUploadBundles, Error> {
+    ) async -> RegistrationPreKeyUploadBundles {
         logger.info("Create provisioning prekeys")
-        /// Note that we do not report a `refreshOneTimePreKeysCheckDidSucceed`
-        /// because this operation does not generate one time prekeys, so we
-        /// shouldn't mark the routine refresh as having been "checked".
-        return Self.taskQueue.enqueueCancellingPrevious { [taskManager] in
-            try Task.checkCancellation()
-            return await taskManager.createForProvisioning(
-                aciIdentityKeyPair: aciIdentityKeyPair,
-                pniIdentityKeyPair: pniIdentityKeyPair,
-            )
-        }
+        return await taskManager.createForProvisioning(
+            aciIdentityKeyPair: aciIdentityKeyPair,
+            pniIdentityKeyPair: pniIdentityKeyPair,
+        )
     }
 
     public func finalizeRegistrationPreKeys(
         _ bundles: RegistrationPreKeyUploadBundles,
         uploadDidSucceed: Bool,
-    ) -> Task<Void, Error> {
+    ) async {
         logger.info("Finalize registration prekeys")
-        return Self.taskQueue.enqueue { [taskManager] in
-            try Task.checkCancellation()
-            await taskManager.persistAfterRegistration(
-                bundles: bundles,
-                uploadDidSucceed: uploadDidSucceed,
-            )
-        }
+        await taskManager.persistAfterRegistration(
+            bundles: bundles,
+            uploadDidSucceed: uploadDidSucceed,
+        )
     }
 
-    public func rotateOneTimePreKeysForRegistration(auth: ChatServiceAuth) -> Task<Void, Error> {
+    public func rotateOneTimePreKeysForRegistration(auth: ChatServiceAuth) async throws {
         logger.info("Rotate one-time prekeys for registration")
 
-        return Self.taskQueue.enqueue { [weak self, taskManager] in
+        return try await taskQueue.run {
             try Task.checkCancellation()
             try await taskManager.createOneTimePreKeys(identity: .aci, auth: auth)
             try Task.checkCancellation()
             try await taskManager.createOneTimePreKeys(identity: .pni, auth: auth)
-            self?.refreshOneTimePreKeysCheckDidSucceed()
+            self.refreshOneTimePreKeysCheckDidSucceed()
         }
     }
 
-    public func rotateSignedPreKeysIfNeeded() -> Task<Void, Error> {
+    public func rotateSignedPreKeysIfNeeded() async throws {
         logger.info("Rotating signed prekeys if needed")
-
-        return db.read { tx in
-            return _checkPreKeys(shouldCheckOneTimePreKeys: false, shouldCheckPniPreKeys: true, tx: tx)
-        }
+        try await _checkPreKeys(shouldCheckOneTimePreKeys: false, shouldCheckPniPreKeys: true)
     }
 
     /// Refresh one-time pre-keys for the given identity, and optionally refresh
     /// the signed pre-key.
     public func refreshOneTimePreKeys(
-        forIdentity identity: OWSIdentity,
-        alsoRefreshSignedPreKey shouldRefreshSignedPreKey: Bool,
-    ) {
-        Task {
-            try? await self._refreshOneTimePreKeys(
-                forIdentity: identity,
-                alsoRefreshSignedPreKey: shouldRefreshSignedPreKey,
-            )
-        }
-    }
-
-    private func _refreshOneTimePreKeys(
         forIdentity identity: OWSIdentity,
         alsoRefreshSignedPreKey shouldRefreshSignedPreKey: Bool,
     ) async throws {
@@ -265,11 +231,11 @@ public class PreKeyManagerImpl: PreKeyManager {
         var targets: PreKeyTargets = [.oneTimePreKey, .oneTimePqPreKey]
         if shouldRefreshSignedPreKey {
             targets.insert(.signedPreKey)
-            targets.insert(target: .lastResortPqPreKey)
+            targets.insert(.lastResortPqPreKey)
         }
         try await waitUntilNotChangingNumberIfNeeded(targets: targets)
 
-        let task = Self.taskQueue.enqueue { [taskManager, targets] in
+        try await taskQueue.run {
             try Task.checkCancellation()
             try await taskManager.refresh(
                 identity: identity,
@@ -278,7 +244,6 @@ public class PreKeyManagerImpl: PreKeyManager {
                 auth: .implicit(),
             )
         }
-        try await task.value
     }
 
     /// If we don't have a PNI identity key, we should not run PNI operations.
@@ -310,7 +275,7 @@ public class PreKeyManagerImpl: PreKeyManager {
             }
             do {
                 try await chatConnectionManager.waitForIdentifiedConnectionToOpen()
-                try await _refreshOneTimePreKeys(forIdentity: identity, alsoRefreshSignedPreKey: true)
+                try await refreshOneTimePreKeys(forIdentity: identity, alsoRefreshSignedPreKey: true)
             } catch {
                 logger.warn("Couldn't rotate pre keys: \(error)")
                 throw error
@@ -366,8 +331,8 @@ public class PreKeyManagerImpl: PreKeyManager {
 #if TESTABLE_BUILD
 
 public extension PreKeyManagerImpl {
-    func checkPreKeysImmediately(tx: DBReadTransaction) {
-        checkPreKeys(shouldThrottle: false, tx: tx)
+    func checkPreKeysImmediately() async throws {
+        try await checkPreKeys(shouldThrottle: false)
     }
 }
 
