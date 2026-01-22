@@ -16,6 +16,7 @@ pod 'LibSignalClient', git: 'https://github.com/signalapp/libsignal.git', tag: '
 # pod 'LibSignalClient', path: '../libsignal', testspecs: ["Tests"]
 
 ENV['RINGRTC_PREBUILD_CHECKSUM'] = '582c64f2b256bd87c1ad6cb3de4bb954feefeef4d3162b65f62a8256200c5105'
+# ENV['RINGRTC_USE_FILE_BASED_CAMERA'] = '1'
 pod 'SignalRingRTC', git: 'https://github.com/signalapp/ringrtc', tag: 'v2.62.0', inhibit_warnings: true
 # pod 'SignalRingRTC', path: '../ringrtc', testspecs: ["Tests"]
 
