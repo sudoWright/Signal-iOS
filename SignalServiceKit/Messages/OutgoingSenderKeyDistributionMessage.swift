@@ -72,6 +72,8 @@ final class OutgoingSenderKeyDistributionMessage: TSOutgoingMessage {
 
     override var shouldBeSaved: Bool { false }
 
+    override var shouldRecordSendLog: Bool { false }
+
     override var isUrgent: Bool { false }
 
     override var isStorySend: Bool { self.isSentOnBehalfOfStoryMessage }
