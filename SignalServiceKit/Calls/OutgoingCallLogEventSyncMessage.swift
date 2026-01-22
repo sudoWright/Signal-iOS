@@ -8,7 +8,7 @@
 ///
 /// - SeeAlso ``IncomingCallLogEventSyncMessageManager``
 @objc(OutgoingCallLogEventSyncMessage)
-public class OutgoingCallLogEventSyncMessage: OWSOutgoingSyncMessage {
+public class OutgoingCallLogEventSyncMessage: OutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -47,12 +47,12 @@ public class OutgoingCallLogEventSyncMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.callLogEvent = callLogEvent
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override public var isUrgent: Bool { false }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let callLogEventBuilder = SSKProtoSyncMessageCallLogEvent.builder()
 
         callLogEventBuilder.setTimestamp(callLogEvent.timestamp)

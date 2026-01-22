@@ -7,7 +7,7 @@ import Foundation
 public import SignalRingRTC
 
 @objc(OutgoingCallLinkUpdateMessage)
-public class OutgoingCallLinkUpdateMessage: OWSOutgoingSyncMessage {
+public class OutgoingCallLinkUpdateMessage: OutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -54,12 +54,12 @@ public class OutgoingCallLinkUpdateMessage: OWSOutgoingSyncMessage {
     ) {
         self.rootKey = rootKey.bytes
         self.adminPasskey = adminPasskey
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override public var isUrgent: Bool { false }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let callLinkUpdateBuilder = SSKProtoSyncMessageCallLinkUpdate.builder()
         callLinkUpdateBuilder.setType(.update)
         callLinkUpdateBuilder.setRootKey(self.rootKey)

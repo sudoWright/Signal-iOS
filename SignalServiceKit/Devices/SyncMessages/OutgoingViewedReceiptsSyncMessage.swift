@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 
 @objc(OWSViewedReceiptsForLinkedDevicesMessage)
-final class OutgoingViewedReceiptsSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingViewedReceiptsSyncMessage: OutgoingSyncMessage {
 
     let viewedReceipts: [LinkedDeviceViewedReceipt]
 
@@ -17,7 +17,7 @@ final class OutgoingViewedReceiptsSyncMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.viewedReceipts = viewedReceipts
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override class var supportsSecureCoding: Bool { true }
@@ -51,7 +51,7 @@ final class OutgoingViewedReceiptsSyncMessage: OWSOutgoingSyncMessage {
 
     override var isUrgent: Bool { false }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let syncMessageBuilder = SSKProtoSyncMessage.builder()
         for viewedReceipt in self.viewedReceipts {
             let viewedProtoBuilder = SSKProtoSyncMessageViewed.builder(timestamp: viewedReceipt.messageIdTimestamp)

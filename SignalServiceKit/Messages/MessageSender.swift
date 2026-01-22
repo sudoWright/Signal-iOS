@@ -17,7 +17,7 @@ private extension TSOutgoingMessage {
         self is OutgoingResendRequest
     }
 
-    var isSyncMessage: Bool { self is OWSOutgoingSyncMessage }
+    var isSyncMessage: Bool { self is OutgoingSyncMessage }
 
     var canSendToLocalAddress: Bool {
         return isSyncMessage ||

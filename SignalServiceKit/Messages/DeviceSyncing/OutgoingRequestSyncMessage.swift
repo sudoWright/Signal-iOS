@@ -4,7 +4,7 @@
 //
 
 @objc(OWSSyncRequestMessage)
-final class OutgoingRequestSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingRequestSyncMessage: OutgoingSyncMessage {
     let requestType: SSKProtoSyncMessageRequestType
 
     init(
@@ -13,7 +13,7 @@ final class OutgoingRequestSyncMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.requestType = requestType
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override class var supportsSecureCoding: Bool { true }
@@ -48,7 +48,7 @@ final class OutgoingRequestSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let requestBuilder = SSKProtoSyncMessageRequest.builder()
 
         switch self.requestType {

@@ -4,7 +4,6 @@
 //
 
 #import "TSOutgoingMessage.h"
-#import "OWSOutgoingSyncMessage.h"
 #import "TSContactThread.h"
 #import "TSGroupThread.h"
 #import "TSQuotedMessage.h"

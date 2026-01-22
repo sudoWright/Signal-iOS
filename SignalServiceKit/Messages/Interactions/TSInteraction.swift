@@ -167,7 +167,7 @@ extension TSInteraction {
     public func shouldAppearInInbox(
         groupUpdateItemsBuilder: (TSInfoMessage) -> [TSInfoMessage.PersistableGroupUpdateItem]?,
     ) -> Bool {
-        if !shouldBeSaved || isDynamicInteraction || self is OWSOutgoingSyncMessage {
+        if !shouldBeSaved || isDynamicInteraction || self is OutgoingSyncMessage {
             owsFailDebug("Unexpected interaction type: \(type(of: self))")
             return false
         }

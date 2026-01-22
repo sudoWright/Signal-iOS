@@ -128,7 +128,7 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
     override public func buildTranscriptSyncMessage(
         localThread: TSContactThread,
         transaction: DBWriteTransaction,
-    ) -> OWSOutgoingSyncMessage? {
+    ) -> OutgoingSyncMessage? {
         guard let storyMessage = StoryMessage.anyFetch(uniqueId: storyMessageId, transaction: transaction) else {
             owsFailDebug("Missing story message")
             return nil

@@ -6,7 +6,7 @@
 import Foundation
 
 @objc(OWSVerificationStateSyncMessage)
-final class OutgoingVerificationStateSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingVerificationStateSyncMessage: OutgoingSyncMessage {
 
     // This is a clunky name, but we want to differentiate it from
     // `recipientIdentifier` inherited from `TSOutgoingMessage`
@@ -40,7 +40,7 @@ final class OutgoingVerificationStateSyncMessage: OWSOutgoingSyncMessage {
         // subtract it from the total length.
         self.paddingBytesLength = UInt.random(in: 1...512)
 
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override class var supportsSecureCoding: Bool { true }
@@ -98,7 +98,7 @@ final class OutgoingVerificationStateSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         // We add the same amount of padding in the VerificationStateSync message and it's corresponding NullMessage so that
         // the sync message is indistinguishable from an outgoing Sent transcript corresponding to the NullMessage. We pad
         // the NullMessage so as to obscure it's content. The sync message (like all sync messages) will be *additionally*

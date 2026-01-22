@@ -6,7 +6,7 @@
 import Foundation
 
 @objc(OutgoingPaymentSyncMessage)
-public final class OutgoingPaymentSyncMessage: OWSOutgoingSyncMessage {
+public final class OutgoingPaymentSyncMessage: OutgoingSyncMessage {
 
     let mobileCoin: OutgoingPaymentMobileCoin
 
@@ -16,7 +16,7 @@ public final class OutgoingPaymentSyncMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.mobileCoin = mobileCoin
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override public class var supportsSecureCoding: Bool { true }
@@ -48,7 +48,7 @@ public final class OutgoingPaymentSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         do {
             let amountPicoMob = mobileCoin.amountPicoMob
             let feePicoMob = mobileCoin.feePicoMob

@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 
 @objc(OWSReadReceiptsForLinkedDevicesMessage)
-final class OutgoingReadReceiptsSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingReadReceiptsSyncMessage: OutgoingSyncMessage {
 
     let readReceipts: [LinkedDeviceReadReceipt]
 
@@ -17,7 +17,7 @@ final class OutgoingReadReceiptsSyncMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.readReceipts = readReceipts
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override class var supportsSecureCoding: Bool { true }
@@ -49,7 +49,7 @@ final class OutgoingReadReceiptsSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let syncMessageBuilder = SSKProtoSyncMessage.builder()
         for readReceipt in self.readReceipts {
             let readProtoBuilder = SSKProtoSyncMessageRead.builder(timestamp: readReceipt.messageIdTimestamp)

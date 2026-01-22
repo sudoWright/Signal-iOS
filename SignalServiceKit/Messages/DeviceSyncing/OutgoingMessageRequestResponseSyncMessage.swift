@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 
 @objc(OWSSyncMessageRequestResponseMessage)
-public final class OutgoingMessageRequestResponseSyncMessage: OWSOutgoingSyncMessage {
+public final class OutgoingMessageRequestResponseSyncMessage: OutgoingSyncMessage {
 
     public enum ResponseType: UInt64 {
         case accept = 0
@@ -115,10 +115,10 @@ public final class OutgoingMessageRequestResponseSyncMessage: OWSOutgoingSyncMes
             owsFailDebug("can't response to thread type")
         }
         self.responseType = responseType
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let messageRequestResponseBuilder = SSKProtoSyncMessageMessageRequestResponse.builder()
         messageRequestResponseBuilder.setType(self.responseType.asProtoResponseType)
 
@@ -135,7 +135,7 @@ public final class OutgoingMessageRequestResponseSyncMessage: OWSOutgoingSyncMes
             // Fallback behavior. Messages of this version are no longer created.
             // Eventually, all enqueued messages of this type should be resolved
             // (either because they have been sent or because they ran out of retries).
-            let thread = self.thread(tx: transaction)
+            let thread = self.thread(tx: tx)
             guard let thread else {
                 owsFailDebug("Missing thread for message request response")
                 return nil

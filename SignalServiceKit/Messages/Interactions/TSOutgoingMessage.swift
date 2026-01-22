@@ -538,7 +538,7 @@ extension TSOutgoingMessage {
     }
 
     @objc
-    func _buildTranscriptSyncMessage(localThread: TSContactThread, tx: DBWriteTransaction) -> OWSOutgoingSyncMessage? {
+    func _buildTranscriptSyncMessage(localThread: TSContactThread, tx: DBWriteTransaction) -> OutgoingSyncMessage? {
         owsAssertDebug(self.shouldSyncTranscript())
 
         guard let messageThread = self.thread(tx: tx) else {

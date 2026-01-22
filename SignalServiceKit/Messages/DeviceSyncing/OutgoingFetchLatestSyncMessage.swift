@@ -6,7 +6,7 @@
 import Foundation
 
 @objc(OWSSyncFetchLatestMessage)
-final class OutgoingFetchLatestSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingFetchLatestSyncMessage: OutgoingSyncMessage {
 
     enum FetchType: UInt {
         case localProfile = 1
@@ -22,7 +22,7 @@ final class OutgoingFetchLatestSyncMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.fetchType = fetchType
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override class var supportsSecureCoding: Bool { true }
@@ -65,7 +65,7 @@ final class OutgoingFetchLatestSyncMessage: OWSOutgoingSyncMessage {
         }
     }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let fetchLatestBuilder = SSKProtoSyncMessageFetchLatest.builder()
         fetchLatestBuilder.setType(self.fetchTypeAsProtoFetchType)
 

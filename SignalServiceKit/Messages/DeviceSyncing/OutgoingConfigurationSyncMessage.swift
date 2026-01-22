@@ -6,7 +6,7 @@
 import Foundation
 
 @objc(OWSSyncConfigurationMessage)
-final class OutgoingConfigurationSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingConfigurationSyncMessage: OutgoingSyncMessage {
 
     private let areReadReceiptsEnabled: Bool
     private let showUnidentifiedDeliveryIndicators: Bool
@@ -28,7 +28,7 @@ final class OutgoingConfigurationSyncMessage: OWSOutgoingSyncMessage {
         self.showTypingIndicators = showTypingIndicators
         self.sendLinkPreviews = sendLinkPreviews
         self.provisioningVersion = provisioningVersion
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override class var supportsSecureCoding: Bool { true }
@@ -73,7 +73,7 @@ final class OutgoingConfigurationSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let configurationBuilder = SSKProtoSyncMessageConfiguration.builder()
         configurationBuilder.setReadReceipts(self.areReadReceiptsEnabled)
         configurationBuilder.setUnidentifiedDeliveryIndicators(self.showUnidentifiedDeliveryIndicators)

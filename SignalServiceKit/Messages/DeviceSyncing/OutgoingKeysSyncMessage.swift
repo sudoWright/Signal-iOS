@@ -6,7 +6,7 @@
 import Foundation
 
 @objc(OWSSyncKeysMessage)
-final class OutgoingKeysSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingKeysSyncMessage: OutgoingSyncMessage {
 
     let accountEntropyPool: String?
     let masterKey: Data?
@@ -22,7 +22,7 @@ final class OutgoingKeysSyncMessage: OWSOutgoingSyncMessage {
         self.accountEntropyPool = accountEntropyPool?.rawString
         self.masterKey = masterKey?.rawData
         self.mediaRootBackupKey = mediaRootBackupKey?.serialize()
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override class var supportsSecureCoding: Bool { true }
@@ -65,7 +65,7 @@ final class OutgoingKeysSyncMessage: OWSOutgoingSyncMessage {
         return true
     }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let keysBuilder = SSKProtoSyncMessageKeys.builder()
         if let accountEntropyPool {
             keysBuilder.setAccountEntropyPool(accountEntropyPool)

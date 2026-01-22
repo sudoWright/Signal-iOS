@@ -6,7 +6,7 @@
 /// Informs other platforms that a linked device's name has changed, and they
 /// should refresh their list of linked devices.
 @objc(OutgoingDeviceNameChangeSyncMessage)
-public class OutgoingDeviceNameChangeSyncMessage: OWSOutgoingSyncMessage {
+public class OutgoingDeviceNameChangeSyncMessage: OutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -44,12 +44,12 @@ public class OutgoingDeviceNameChangeSyncMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.deviceId = deviceId
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override public var isUrgent: Bool { false }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let deviceNameChangeBuilder = SSKProtoSyncMessageDeviceNameChange.builder()
         deviceNameChangeBuilder.setDeviceID(deviceId)
 

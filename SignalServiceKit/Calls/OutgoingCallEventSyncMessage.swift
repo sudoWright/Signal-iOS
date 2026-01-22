@@ -103,7 +103,7 @@ class OutgoingCallEvent: NSObject, NSSecureCoding {
 ///
 /// - SeeAlso ``IncomingCallEventSyncMessageManager``
 @objc(OutgoingCallEventSyncMessage)
-public class OutgoingCallEventSyncMessage: OWSOutgoingSyncMessage {
+public class OutgoingCallEventSyncMessage: OutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -142,12 +142,12 @@ public class OutgoingCallEventSyncMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.callEvent = event
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override public var isUrgent: Bool { false }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let callEventBuilder = SSKProtoSyncMessageCallEvent.builder()
         callEventBuilder.setCallID(callEvent.callId)
         callEventBuilder.setType(callEvent.callType.protoValue)

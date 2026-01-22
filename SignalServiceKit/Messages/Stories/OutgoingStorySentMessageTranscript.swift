@@ -6,7 +6,7 @@
 import Foundation
 public import LibSignalClient
 
-public class OutgoingStorySentMessageTranscript: OWSOutgoingSyncMessage {
+public class OutgoingStorySentMessageTranscript: OutgoingSyncMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -59,14 +59,14 @@ public class OutgoingStorySentMessageTranscript: OWSOutgoingSyncMessage {
         self.storyEncodedRecipientStates = Self.encodeRecipientStates(recipientStates)
         self.storyMessageUniqueId = nil
         self.isRecipientUpdate = true
-        super.init(timestamp: timestamp, localThread: localThread, transaction: transaction)
+        super.init(timestamp: timestamp, localThread: localThread, tx: transaction)
     }
 
     public init(localThread: TSContactThread, storyMessage: StoryMessage, transaction: DBReadTransaction) {
         self.storyEncodedRecipientStates = nil
         self.storyMessageUniqueId = storyMessage.uniqueId
         self.isRecipientUpdate = false
-        super.init(timestamp: storyMessage.timestamp, localThread: localThread, transaction: transaction)
+        super.init(timestamp: storyMessage.timestamp, localThread: localThread, tx: transaction)
     }
 
     private static func encodeRecipientStates(_ recipientStates: [ServiceId: StoryRecipientState]) -> Data? {
@@ -90,14 +90,14 @@ public class OutgoingStorySentMessageTranscript: OWSOutgoingSyncMessage {
         return StoryMessage.anyFetch(uniqueId: storyMessageUniqueId, transaction: transaction)
     }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let sentBuilder = SSKProtoSyncMessageSent.builder()
         sentBuilder.setTimestamp(timestamp)
         sentBuilder.setIsRecipientUpdate(isRecipientUpdate)
 
-        if let storyMessage = storyMessage(transaction: transaction) {
+        if let storyMessage = storyMessage(transaction: tx) {
             if !isRecipientUpdate {
-                guard let storyMessageProto = storyMessageProto(for: storyMessage, transaction: transaction) else {
+                guard let storyMessageProto = storyMessageProto(for: storyMessage, transaction: tx) else {
                     owsFailDebug("Failed to build sync proto for story message with timestamp \(storyMessage.timestamp)")
                     return nil
                 }

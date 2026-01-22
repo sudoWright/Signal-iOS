@@ -45,7 +45,7 @@ final class PniDistributionSyncMessage {
         let syncMessageBuilder = SSKProtoSyncMessage.builder()
         syncMessageBuilder.setPniChangeNumber(changeNumberBuilder.buildInfallibly())
 
-        let syncMessageProto = try OWSOutgoingSyncMessage.buildSyncMessageProto(for: syncMessageBuilder)
+        let syncMessageProto = try OutgoingSyncMessage.buildSyncMessageProto(forMessageBuilder: syncMessageBuilder)
 
         let contentProto = SSKProtoContent.builder()
         contentProto.setSyncMessage(syncMessageProto)

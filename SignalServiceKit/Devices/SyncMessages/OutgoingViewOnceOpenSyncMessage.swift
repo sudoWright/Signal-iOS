@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 
 @objc(OWSViewOnceMessageReadSyncMessage)
-final class OutgoingViewOnceOpenSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingViewOnceOpenSyncMessage: OutgoingSyncMessage {
 
     let senderAddress: SignalServiceAddress
     let messageIdTimestamp: UInt64
@@ -26,7 +26,7 @@ final class OutgoingViewOnceOpenSyncMessage: OWSOutgoingSyncMessage {
         self.messageUniqueId = message.uniqueId
         self.messageIdTimestamp = message.timestamp
         self.readTimestamp = readTimestamp
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override class var supportsSecureCoding: Bool { true }
@@ -82,7 +82,7 @@ final class OutgoingViewOnceOpenSyncMessage: OWSOutgoingSyncMessage {
 
     override var isUrgent: Bool { false }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let syncMessageBuilder = SSKProtoSyncMessage.builder()
 
         let readProtoBuilder = SSKProtoSyncMessageViewOnceOpen.builder(timestamp: self.messageIdTimestamp)

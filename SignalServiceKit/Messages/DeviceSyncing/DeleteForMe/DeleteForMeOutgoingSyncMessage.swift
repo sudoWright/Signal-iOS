@@ -10,7 +10,7 @@ import LibSignalClient
 ///
 /// - SeeAlso ``DeleteForMeOutgoingSyncMessageManager``
 @objc(DeleteForMeOutgoingSyncMessage)
-class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
+final class DeleteForMeOutgoingSyncMessage: OutgoingSyncMessage {
     override class var supportsSecureCoding: Bool { true }
 
     required init?(coder: NSCoder) {
@@ -111,12 +111,12 @@ class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
             return nil
         }
 
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override var isUrgent: Bool { false }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let contents: Contents
         do {
             contents = try JSONDecoder().decode(Contents.self, from: self.contents)

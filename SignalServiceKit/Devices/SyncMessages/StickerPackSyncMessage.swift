@@ -11,7 +11,7 @@ enum StickerPackOperationType: UInt {
 }
 
 @objc(OWSStickerPackSyncMessage)
-final class StickerPackSyncMessage: OWSOutgoingSyncMessage {
+final class StickerPackSyncMessage: OutgoingSyncMessage {
     private let packs: [StickerPackInfo]
     private let operationType: StickerPackOperationType
 
@@ -61,10 +61,10 @@ final class StickerPackSyncMessage: OWSOutgoingSyncMessage {
     ) {
         self.packs = packs
         self.operationType = operationType
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let operationType: SSKProtoSyncMessageStickerPackOperationType
         switch self.operationType {
         case .install:

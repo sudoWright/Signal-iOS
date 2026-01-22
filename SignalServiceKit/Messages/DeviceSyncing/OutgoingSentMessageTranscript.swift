@@ -8,7 +8,7 @@ import Foundation
 /// Notifies your other registered devices (if you have any) that you've
 /// sent a message. This way the message you just sent can appear on all
 /// your devices.
-class OutgoingSentMessageTranscript: OWSOutgoingSyncMessage {
+class OutgoingSentMessageTranscript: OutgoingSyncMessage {
     let message: TSOutgoingMessage
     let messageThread: TSThread
     let isRecipientUpdate: Bool
@@ -30,7 +30,7 @@ class OutgoingSentMessageTranscript: OWSOutgoingSyncMessage {
         self.sentRecipientAddress = (messageThread as? TSContactThread)?.contactAddress
 
         // The sync message's timestamp must match the original outgoing message's timestamp.
-        super.init(timestamp: message.timestamp, localThread: localThread, transaction: tx)
+        super.init(timestamp: message.timestamp, localThread: localThread, tx: tx)
     }
 
     override func encode(with coder: NSCoder) {
@@ -64,7 +64,7 @@ class OutgoingSentMessageTranscript: OWSOutgoingSyncMessage {
 
     override var isUrgent: Bool { false }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let sentBuilder = SSKProtoSyncMessageSent.builder()
         sentBuilder.setTimestamp(self.timestamp)
         if let phoneNumber = self.sentRecipientAddress?.phoneNumber {
@@ -80,11 +80,11 @@ class OutgoingSentMessageTranscript: OWSOutgoingSyncMessage {
         }
         sentBuilder.setIsRecipientUpdate(self.isRecipientUpdate)
 
-        guard prepareDataSyncMessageContent(with: sentBuilder, tx: transaction) else {
+        guard prepareDataSyncMessageContent(with: sentBuilder, tx: tx) else {
             return nil
         }
 
-        prepareUnidentifiedStatusSyncMessageContent(with: sentBuilder, tx: transaction)
+        prepareUnidentifiedStatusSyncMessageContent(with: sentBuilder, tx: tx)
 
         do {
             let syncMessageBuilder = SSKProtoSyncMessage.builder()

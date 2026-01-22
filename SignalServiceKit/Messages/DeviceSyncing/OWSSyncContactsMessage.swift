@@ -5,7 +5,7 @@
 
 import Foundation
 
-public final class OWSSyncContactsMessage: OWSOutgoingSyncMessage {
+public final class OWSSyncContactsMessage: OutgoingSyncMessage {
 
     private let uploadedAttachment: Upload.Result<Upload.LocalUploadMetadata>
 
@@ -15,7 +15,7 @@ public final class OWSSyncContactsMessage: OWSOutgoingSyncMessage {
         tx: DBReadTransaction,
     ) {
         self.uploadedAttachment = uploadedAttachment
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override public func encode(with coder: NSCoder) {
@@ -29,7 +29,7 @@ public final class OWSSyncContactsMessage: OWSOutgoingSyncMessage {
 
     override public var isUrgent: Bool { false }
 
-    override public func syncMessageBuilder(transaction tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
 
         let attachmentBuilder = SSKProtoAttachmentPointer.builder()
 

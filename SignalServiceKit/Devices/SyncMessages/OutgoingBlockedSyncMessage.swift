@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 
 @objc(OWSBlockedPhoneNumbersMessage)
-final class OutgoingBlockedSyncMessage: OWSOutgoingSyncMessage {
+final class OutgoingBlockedSyncMessage: OutgoingSyncMessage {
 
     let phoneNumbers: [String]
     let acis: [Aci]
@@ -58,10 +58,10 @@ final class OutgoingBlockedSyncMessage: OWSOutgoingSyncMessage {
         self.phoneNumbers = phoneNumbers
         self.acis = acis
         self.groupIds = groupIds
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
-    override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let blockedBuilder = SSKProtoSyncMessageBlocked.builder()
         blockedBuilder.setNumbers(self.phoneNumbers)
         if BuildFlags.serviceIdStrings {
