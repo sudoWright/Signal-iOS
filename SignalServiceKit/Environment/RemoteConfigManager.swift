@@ -401,7 +401,7 @@ public class RemoteConfig {
 
     private static func countryCodeBucketValue(csvString: String, localIdentifiers: LocalIdentifiers) -> String? {
         let phoneNumberUtil = SSKEnvironment.shared.phoneNumberUtilRef
-        let callingCode = phoneNumberUtil.parseE164(localIdentifiers.phoneNumber)?.getCallingCode()
+        let callingCode = phoneNumberUtil.localCallingCode(localIdentifiers: localIdentifiers)
         return countryCodeValue(csvString: csvString, callingCode: callingCode)
     }
 

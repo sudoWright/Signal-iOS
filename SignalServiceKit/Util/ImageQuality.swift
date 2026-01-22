@@ -61,13 +61,6 @@ public enum ImageQualityLevel: UInt, Comparable {
         return remoteConfig.standardMediaQualityLevel(callingCode: callingCode) ?? .two
     }
 
-    public static func defaultCallingCode(
-        phoneNumberUtil: PhoneNumberUtil = SSKEnvironment.shared.phoneNumberUtilRef,
-        localIdentifiers: LocalIdentifiers? = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction,
-    ) -> Int? {
-        return localIdentifiers.flatMap({ phoneNumberUtil.parseE164($0.phoneNumber) })?.getCallingCode()
-    }
-
     public var startingTier: ImageQualityTier {
         switch self {
         case .one: return .four

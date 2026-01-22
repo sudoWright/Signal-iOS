@@ -108,9 +108,7 @@ public class PhoneNumberUtil: NSObject {
             i -= 1
         }
     }
-}
 
-extension PhoneNumberUtil {
     /// Returns calling codes for libPhoneNumber-unsupported country codes.
     ///
     /// These are country codes that NSLocale.isoCountryCodes contains but
@@ -243,6 +241,10 @@ extension PhoneNumberUtil {
         }
 
         return Locale.current.localizedString(forRegionCode: countryCode)?.nilIfEmpty ?? unknownValue
+    }
+
+    public func localCallingCode(localIdentifiers: LocalIdentifiers) -> Int? {
+        return parseE164(localIdentifiers.phoneNumber)?.getCallingCode()
     }
 
     private func _parsePhoneNumber(filteredValue: String, countryCode: String = defaultCountryCode()) -> PhoneNumber? {

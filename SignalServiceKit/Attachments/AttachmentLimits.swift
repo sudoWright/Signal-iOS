@@ -40,7 +40,9 @@ public struct OutgoingAttachmentLimits {
 
     public static func currentLimits(
         remoteConfig: RemoteConfig = .current,
-        callingCode: Int? = ImageQualityLevel.defaultCallingCode(),
+        callingCode: Int? = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction.flatMap({
+            return SSKEnvironment.shared.phoneNumberUtilRef.localCallingCode(localIdentifiers: $0)
+        }),
     ) -> Self {
         return Self(remoteConfig: remoteConfig, callingCode: callingCode)
     }
