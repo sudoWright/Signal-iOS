@@ -133,10 +133,6 @@ public enum Upload {
         /// Metadata related to the SVRB nonce used for forward secrecy that should be persisted
         /// after upload success.
         let nonceMetadata: BackupExportPurpose.NonceMetadata?
-
-        /// We don't enforce a size limit locally for backups; we let the server
-        /// enforce the limit and fail the upload if we surpass it.
-        public static var maxUploadSizeBytes: UInt64 { .max }
     }
 
     public struct LocalUploadMetadata: AttachmentUploadMetadata, Codable {
@@ -165,10 +161,6 @@ public enum Upload {
         public let fileUrl: URL
         /// The length of the file.
         public let encryptedDataLength: UInt32
-
-        /// We don't enforce a size limit locally for backups; we let the server
-        /// enforce the limit and fail the upload if we surpass it.
-        public static var maxUploadSizeBytes: UInt64 { .max }
     }
 
     public struct ReusedUploadMetadata: AttachmentUploadMetadata {
@@ -189,8 +181,6 @@ public enum Upload {
         public let encryptedDataLength: UInt32
 
         public var isReusedTransitTierUpload: Bool { true }
-
-        public static var maxUploadSizeBytes: UInt64 { OWSMediaUtils.kMaxAttachmentUploadSizeBytes }
     }
 
     public struct Result<Metadata: UploadMetadata> {

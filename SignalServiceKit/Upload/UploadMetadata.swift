@@ -8,8 +8,6 @@ import Foundation
 /// Applies to attachment uploads, backup proto uploads, etc.
 public protocol UploadMetadata {
     var encryptedDataLength: UInt32 { get }
-
-    static var maxUploadSizeBytes: UInt64 { get }
 }
 
 /// Includes extra info like digest for validation.
