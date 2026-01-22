@@ -95,20 +95,6 @@ public enum BuildFlags {
 
 // MARK: -
 
-@objc
-public class BuildFlagsObjC: NSObject {
-    @objc
-    public static let serviceIdBinaryConstantOverhead = BuildFlags.serviceIdBinaryConstantOverhead
-
-    @objc
-    public static let serviceIdBinaryVariableOverhead = BuildFlags.serviceIdBinaryVariableOverhead
-
-    @objc
-    public static let serviceIdStrings = BuildFlags.serviceIdStrings
-}
-
-// MARK: -
-
 extension BuildFlags {
     public static var buildVariantString: String? {
         // Leaving this internal only for now. If we ever move this to
