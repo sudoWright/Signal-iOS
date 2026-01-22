@@ -5,14 +5,50 @@
 
 import Foundation
 
-@objc
-public extension OutgoingPaymentSyncMessage {
+@objc(OutgoingPaymentSyncMessage)
+public final class OutgoingPaymentSyncMessage: OWSOutgoingSyncMessage {
 
-    @objc(syncMessageBuilderWithMobileCoin:transaction:)
-    func syncMessageBuilder(
+    let mobileCoin: OutgoingPaymentMobileCoin
+
+    public init(
+        localThread: TSContactThread,
         mobileCoin: OutgoingPaymentMobileCoin,
-        transaction: DBReadTransaction,
-    ) -> SSKProtoSyncMessageBuilder? {
+        tx: DBReadTransaction,
+    ) {
+        self.mobileCoin = mobileCoin
+        super.init(localThread: localThread, transaction: tx)
+    }
+
+    override public class var supportsSecureCoding: Bool { true }
+
+    override public func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(self.mobileCoin, forKey: "mobileCoin")
+    }
+
+    public required init?(coder: NSCoder) {
+        guard let mobileCoin = coder.decodeObject(of: OutgoingPaymentMobileCoin.self, forKey: "mobileCoin") else {
+            return nil
+        }
+        self.mobileCoin = mobileCoin
+        super.init(coder: coder)
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(self.mobileCoin)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.mobileCoin == object.mobileCoin else { return false }
+        return true
+    }
+
+    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         do {
             let amountPicoMob = mobileCoin.amountPicoMob
             let feePicoMob = mobileCoin.feePicoMob
@@ -37,7 +73,7 @@ public extension OutgoingPaymentSyncMessage {
 
             let outgoingPaymentBuilder = SSKProtoSyncMessageOutgoingPayment.builder()
             if let recipientAci = mobileCoin.recipientAci {
-                outgoingPaymentBuilder.setRecipientServiceID(recipientAci.wrappedAciValue.serviceIdString)
+                outgoingPaymentBuilder.setRecipientServiceID(recipientAci.serviceIdString)
             }
             outgoingPaymentBuilder.setMobileCoin(try mobileCoinBuilder.build())
             if let memoMessage = mobileCoin.memoMessage {
@@ -52,4 +88,6 @@ public extension OutgoingPaymentSyncMessage {
             return nil
         }
     }
+
+    override public var isUrgent: Bool { false }
 }

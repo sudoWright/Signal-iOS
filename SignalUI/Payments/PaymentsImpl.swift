@@ -1052,7 +1052,7 @@ public extension PaymentsImpl {
             return nil
         }
         let mobileCoin = OutgoingPaymentMobileCoin(
-            recipientAci: recipientAci.map { AciObjC($0) },
+            recipientAci: recipientAci,
             recipientAddress: recipientAddress,
             amountPicoMob: paymentAmount.picoMob,
             feePicoMob: feeAmount.picoMob,
@@ -1067,7 +1067,7 @@ public extension PaymentsImpl {
         let message = OutgoingPaymentSyncMessage(
             localThread: thread,
             mobileCoin: mobileCoin,
-            transaction: transaction,
+            tx: transaction,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
             transientMessageWithoutAttachments: message,

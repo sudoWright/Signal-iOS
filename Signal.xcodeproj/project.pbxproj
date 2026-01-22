@@ -779,6 +779,7 @@
 		50BCD5522F2182430032BF02 /* OutgoingNullMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BCD5512F2182430032BF02 /* OutgoingNullMessage.swift */; };
 		50BCD5542F21941E0032BF02 /* OutgoingViewOnceOpenSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BCD5532F21941E0032BF02 /* OutgoingViewOnceOpenSyncMessage.swift */; };
 		50BCD5562F219A730032BF02 /* OutgoingVerificationStateSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BCD5552F219A730032BF02 /* OutgoingVerificationStateSyncMessage.swift */; };
+		50BCD5582F21A1060032BF02 /* OutgoingPaymentMobileCoin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BCD5572F21A1060032BF02 /* OutgoingPaymentMobileCoin.swift */; };
 		50BD86AF2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BD86AE2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift */; };
 		50BDC3682C88B7FA002294D0 /* AudioWaveformSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BDC3672C88B7FA002294D0 /* AudioWaveformSampler.swift */; };
 		50BDC36A2C88C2C8002294D0 /* AudioWaveformSamplerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BDC3692C88C2C8002294D0 /* AudioWaveformSamplerTest.swift */; };
@@ -3539,8 +3540,6 @@
 		F9C5CBB4289453B300548EEE /* OutgoingPaymentSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8BF289453B100548EEE /* OutgoingPaymentSyncMessage.swift */; };
 		F9C5CBB7289453B300548EEE /* OWSOutgoingSyncMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8C2289453B100548EEE /* OWSOutgoingSyncMessage.m */; };
 		F9C5CBB8289453B300548EEE /* OWSSyncContactsMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8C3289453B100548EEE /* OWSSyncContactsMessage.swift */; };
-		F9C5CBB9289453B300548EEE /* OutgoingPaymentSyncMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8C4289453B100548EEE /* OutgoingPaymentSyncMessage.m */; };
-		F9C5CBC6289453B300548EEE /* OutgoingPaymentSyncMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C8D1289453B100548EEE /* OutgoingPaymentSyncMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CBC7289453B300548EEE /* OWSOutgoingSyncMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C8D2289453B100548EEE /* OWSOutgoingSyncMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CBC8289453B300548EEE /* TSCall.h in Headers */ = {isa = PBXBuildFile; fileRef = F9C5C8D3289453B100548EEE /* TSCall.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9C5CBC9289453B300548EEE /* MessageBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C5C8D4289453B100548EEE /* MessageBody.swift */; };
@@ -4947,6 +4946,7 @@
 		50BCD5512F2182430032BF02 /* OutgoingNullMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingNullMessage.swift; sourceTree = "<group>"; };
 		50BCD5532F21941E0032BF02 /* OutgoingViewOnceOpenSyncMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingViewOnceOpenSyncMessage.swift; sourceTree = "<group>"; };
 		50BCD5552F219A730032BF02 /* OutgoingVerificationStateSyncMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingVerificationStateSyncMessage.swift; sourceTree = "<group>"; };
+		50BCD5572F21A1060032BF02 /* OutgoingPaymentMobileCoin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingPaymentMobileCoin.swift; sourceTree = "<group>"; };
 		50BD86AE2A3CFF89005B6AC1 /* ResendMessagePromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendMessagePromptBuilder.swift; sourceTree = "<group>"; };
 		50BDC3672C88B7FA002294D0 /* AudioWaveformSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformSampler.swift; sourceTree = "<group>"; };
 		50BDC3692C88C2C8002294D0 /* AudioWaveformSamplerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioWaveformSamplerTest.swift; sourceTree = "<group>"; };
@@ -7749,8 +7749,6 @@
 		F9C5C8BF289453B100548EEE /* OutgoingPaymentSyncMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutgoingPaymentSyncMessage.swift; sourceTree = "<group>"; };
 		F9C5C8C2289453B100548EEE /* OWSOutgoingSyncMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OWSOutgoingSyncMessage.m; sourceTree = "<group>"; };
 		F9C5C8C3289453B100548EEE /* OWSSyncContactsMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OWSSyncContactsMessage.swift; sourceTree = "<group>"; };
-		F9C5C8C4289453B100548EEE /* OutgoingPaymentSyncMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutgoingPaymentSyncMessage.m; sourceTree = "<group>"; };
-		F9C5C8D1289453B100548EEE /* OutgoingPaymentSyncMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutgoingPaymentSyncMessage.h; sourceTree = "<group>"; };
 		F9C5C8D2289453B100548EEE /* OWSOutgoingSyncMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OWSOutgoingSyncMessage.h; sourceTree = "<group>"; };
 		F9C5C8D3289453B100548EEE /* TSCall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSCall.h; sourceTree = "<group>"; };
 		F9C5C8D4289453B100548EEE /* MessageBody.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageBody.swift; sourceTree = "<group>"; };
@@ -14436,8 +14434,7 @@
 				50C55EB72F1B0EFC00BA8309 /* OutgoingFetchLatestSyncMessage.swift */,
 				50C55EB92F1B129000BA8309 /* OutgoingKeysSyncMessage.swift */,
 				5049246E2F209DA8006469B3 /* OutgoingMessageRequestResponseSyncMessage.swift */,
-				F9C5C8D1289453B100548EEE /* OutgoingPaymentSyncMessage.h */,
-				F9C5C8C4289453B100548EEE /* OutgoingPaymentSyncMessage.m */,
+				50BCD5572F21A1060032BF02 /* OutgoingPaymentMobileCoin.swift */,
 				F9C5C8BF289453B100548EEE /* OutgoingPaymentSyncMessage.swift */,
 				D93CE1232A5C84F600D916B7 /* OutgoingRequestSyncMessage.swift */,
 				C16B8B742B8940D40030BA24 /* OutgoingSentMessageTranscript.swift */,
@@ -15314,7 +15311,6 @@
 				F9C5CD77289453B300548EEE /* BaseModel.h in Headers */,
 				668A00E02C2B5ECF007B8808 /* DebuggerUtils.h in Headers */,
 				F9C5CC0A289453B300548EEE /* InstalledSticker.h in Headers */,
-				F9C5CBC6289453B300548EEE /* OutgoingPaymentSyncMessage.h in Headers */,
 				F9C5CC1E289453B300548EEE /* OWSAddToContactsOfferMessage.h in Headers */,
 				F9C5CC84289453B300548EEE /* OWSAddToProfileWhitelistOfferMessage.h in Headers */,
 				C190F8F72C1B48BE00D1EAC9 /* OWSArchivedPaymentMessage.h in Headers */,
@@ -19085,7 +19081,7 @@
 				50C55EBA2F1B129000BA8309 /* OutgoingKeysSyncMessage.swift in Sources */,
 				5049246F2F209DA8006469B3 /* OutgoingMessageRequestResponseSyncMessage.swift in Sources */,
 				50BCD5522F2182430032BF02 /* OutgoingNullMessage.swift in Sources */,
-				F9C5CBB9289453B300548EEE /* OutgoingPaymentSyncMessage.m in Sources */,
+				50BCD5582F21A1060032BF02 /* OutgoingPaymentMobileCoin.swift in Sources */,
 				F9C5CBB4289453B300548EEE /* OutgoingPaymentSyncMessage.swift in Sources */,
 				048D58382EDDD57E00F26237 /* OutgoingPinMessage.swift in Sources */,
 				04A531342E85D6E20006AC40 /* OutgoingPollTerminate.swift in Sources */,
