@@ -482,7 +482,7 @@ public class GroupsV2Impl: GroupsV2 {
             return serviceIds.map { serviceId in
                 let address = SignalServiceAddress(serviceId)
                 let contactThread = TSContactThread.getOrCreateThread(withContactAddress: address, transaction: tx)
-                let message = OWSStaticOutgoingMessage(thread: contactThread, timestamp: timestamp, plaintextData: plaintextData, transaction: tx)
+                let message = OutgoingStaticMessage(thread: contactThread, timestamp: timestamp, plaintextData: plaintextData, tx: tx)
                 let preparedMessage = PreparedOutgoingMessage.preprepared(
                     transientMessageWithoutAttachments: message,
                 )
