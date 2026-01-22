@@ -217,7 +217,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             .forEach { thread in
                 // Only send out payments activated messages from the originating device.
                 if originatedLocally {
-                    let message = OWSPaymentActivationRequestFinishedMessage(thread: thread, transaction: transaction)
+                    let message = OutgoingPaymentActivationRequestFinishedMessage(thread: thread, tx: transaction)
                     let preparedMessage = PreparedOutgoingMessage.preprepared(
                         transientMessageWithoutAttachments: message,
                     )
@@ -371,7 +371,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             Self.loadPaymentsState(transaction: transaction).isEnabled
         {
             if DependenciesBridge.shared.tsAccountManager.registrationState(tx: transaction).isPrimaryDevice ?? false {
-                let message = OWSPaymentActivationRequestFinishedMessage(thread: thread, transaction: transaction)
+                let message = OutgoingPaymentActivationRequestFinishedMessage(thread: thread, tx: transaction)
                 let preparedMessage = PreparedOutgoingMessage.preprepared(
                     transientMessageWithoutAttachments: message,
                 )

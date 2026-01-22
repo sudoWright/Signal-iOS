@@ -9,7 +9,7 @@ public import LibSignalClient
 
 /// A record of incomplete payments activation requests.
 /// When we activate payments, we use these to find the senders that requested we
-/// activate, so we can send them a ``OWSPaymentActivationRequestFinishedMessage``,
+/// activate, so we can send them an ``OutgoingPaymentActivationRequestFinishedMessage``,
 /// then we delete these models.
 public struct TSPaymentsActivationRequestModel: Codable, FetchableRecord, PersistableRecord {
     public static let databaseTableName: String = "TSPaymentsActivationRequestModel"
