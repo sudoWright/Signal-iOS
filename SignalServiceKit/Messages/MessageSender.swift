@@ -702,7 +702,7 @@ public class MessageSender {
             }
 
             let canSendToThread: Bool = {
-                if message is OWSOutgoingReactionMessage {
+                if message is OutgoingReactionMessage {
                     return thread.canSendReactionToThread
                 }
                 let isChatMessage = (
@@ -1099,7 +1099,7 @@ public class MessageSender {
         {
             return true
         }
-        if message is OWSOutgoingReactionMessage {
+        if message is OutgoingReactionMessage {
             return true
         }
         if

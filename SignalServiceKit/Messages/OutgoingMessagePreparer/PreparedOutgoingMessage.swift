@@ -226,7 +226,7 @@ public class PreparedOutgoingMessage {
             // We don't donate story message intents.
             return nil
         case .transient(let message):
-            if message is OWSOutgoingReactionMessage {
+            if message is OutgoingReactionMessage {
                 return message
             } else {
                 return nil

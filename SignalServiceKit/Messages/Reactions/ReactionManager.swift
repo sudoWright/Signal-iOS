@@ -57,7 +57,7 @@ public class ReactionManager: NSObject {
         emoji: String,
         isRemoving: Bool,
         tx: DBWriteTransaction,
-    ) throws -> OWSOutgoingReactionMessage {
+    ) throws -> OutgoingReactionMessage {
         assert(emoji.isSingleEmoji)
 
         guard let message = TSMessage.anyFetchMessage(uniqueId: messageUniqueId, transaction: tx) else {
@@ -72,41 +72,46 @@ public class ReactionManager: NSObject {
             throw OWSAssertionError("missing local address")
         }
 
+        let timestamp = MessageTimestampGenerator.sharedInstance.generateTimestamp()
+
+        let previousReaction = message.reaction(for: localAci, tx: tx)
+
+        let createdReaction: OWSReaction?
+        if isRemoving {
+            message.removeReaction(for: localAci, tx: tx)
+            createdReaction = nil
+        } else {
+            createdReaction = message.recordReaction(
+                for: localAci,
+                emoji: emoji,
+                sentAtTimestamp: timestamp,
+                receivedAtTimestamp: timestamp,
+                tx: tx,
+            )?.newValue
+
+            // Always immediately mark outgoing reactions as read.
+            createdReaction?.markAsRead(transaction: tx)
+        }
+
         let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
         let dmConfig = dmConfigurationStore.fetchOrBuildDefault(for: .thread(thread), tx: tx)
 
-        let outgoingMessage = OWSOutgoingReactionMessage(
-            thread: thread,
-            message: message,
+        return OutgoingReactionMessage(
+            timestamp: timestamp,
             emoji: emoji,
             isRemoving: isRemoving,
+            inThread: thread,
+            onMessage: message,
+            newReaction: createdReaction,
+            oldReaction: previousReaction,
             // Though we generally don't parse the expiration timer from reaction
             // messages, older desktop instances will read it from the "unsupported"
             // message resulting in the timer clearing. So we populate it to ensure
             // that does not happen.
             expiresInSeconds: dmConfig.durationSeconds,
-            expireTimerVersion: NSNumber(value: dmConfig.timerVersion),
-            transaction: tx,
+            expireTimerVersion: dmConfig.timerVersion,
+            tx: tx,
         )
-
-        outgoingMessage.previousReaction = message.reaction(for: localAci, tx: tx)
-
-        if isRemoving {
-            message.removeReaction(for: localAci, tx: tx)
-        } else {
-            outgoingMessage.createdReaction = message.recordReaction(
-                for: localAci,
-                emoji: emoji,
-                sentAtTimestamp: outgoingMessage.timestamp,
-                receivedAtTimestamp: outgoingMessage.timestamp,
-                tx: tx,
-            )?.newValue
-
-            // Always immediately mark outgoing reactions as read.
-            outgoingMessage.createdReaction?.markAsRead(transaction: tx)
-        }
-
-        return outgoingMessage
     }
 
     @objc(OWSReactionProcessingResult)
