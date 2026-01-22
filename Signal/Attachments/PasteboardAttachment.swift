@@ -94,7 +94,7 @@ enum PasteboardAttachment {
     /// Returns an attachment from the pasteboard, or nil if no attachment
     /// can be found.
     @MainActor
-    static func loadPreviewableAttachments() async throws -> [PreviewableAttachment]? {
+    static func loadPreviewableAttachments(attachmentLimits: OutgoingAttachmentLimits) async throws -> [PreviewableAttachment]? {
         guard
             UIPasteboard.general.numberOfItems >= 1,
             let pasteboardUTITypes = UIPasteboard.general.types(forItemSet: nil)
@@ -107,6 +107,7 @@ enum PasteboardAttachment {
             let attachment = try await loadPreviewableAttachment(
                 atIndex: IndexSet(integer: index),
                 pasteboardUTIs: utiSet,
+                attachmentLimits: attachmentLimits,
                 retrySinglePixelImages: true,
             )
 
@@ -138,7 +139,12 @@ enum PasteboardAttachment {
     }
 
     @MainActor
-    private static func loadPreviewableAttachment(atIndex index: IndexSet, pasteboardUTIs: [String], retrySinglePixelImages: Bool) async throws -> PreviewableAttachment? {
+    private static func loadPreviewableAttachment(
+        atIndex index: IndexSet,
+        pasteboardUTIs: [String],
+        attachmentLimits: OutgoingAttachmentLimits,
+        retrySinglePixelImages: Bool,
+    ) async throws -> PreviewableAttachment? {
         var pasteboardUTISet = Set<String>(filterDynamicUTITypes(pasteboardUTIs))
         guard pasteboardUTISet.count > 0 else {
             return nil
@@ -163,7 +169,12 @@ enum PasteboardAttachment {
                 // pasteboard after a brief delay (once, then give up).
                 if retrySinglePixelImages, (try? dataSource.imageSource())?.imageMetadata()?.pixelSize == CGSize(square: 1) {
                     try? await Task.sleep(nanoseconds: NSEC_PER_MSEC * 50)
-                    return try await loadPreviewableAttachment(atIndex: index, pasteboardUTIs: pasteboardUTIs, retrySinglePixelImages: false)
+                    return try await loadPreviewableAttachment(
+                        atIndex: index,
+                        pasteboardUTIs: pasteboardUTIs,
+                        attachmentLimits: attachmentLimits,
+                        retrySinglePixelImages: false,
+                    )
                 }
 
                 return try PreviewableAttachment.imageAttachment(dataSource: dataSource, dataUTI: dataUTI, canBeBorderless: true)
@@ -176,7 +187,7 @@ enum PasteboardAttachment {
                 }
 
                 // [15M] TODO: Don't ignore errors for pasteboard videos.
-                return try? await PreviewableAttachment.compressVideoAsMp4(dataSource: dataSource)
+                return try? await PreviewableAttachment.compressVideoAsMp4(dataSource: dataSource, attachmentLimits: attachmentLimits)
             }
         }
         for dataUTI in SignalAttachment.audioUTISet {
@@ -184,7 +195,7 @@ enum PasteboardAttachment {
                 guard let dataSource = buildDataSource(atIndex: index, dataUTI: dataUTI) else {
                     return nil
                 }
-                return try PreviewableAttachment.audioAttachment(dataSource: dataSource, dataUTI: dataUTI)
+                return try PreviewableAttachment.audioAttachment(dataSource: dataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
             }
         }
 
@@ -192,7 +203,7 @@ enum PasteboardAttachment {
         guard let dataSource = buildDataSource(atIndex: index, dataUTI: dataUTI) else {
             return nil
         }
-        return try PreviewableAttachment.genericAttachment(dataSource: dataSource, dataUTI: dataUTI)
+        return try PreviewableAttachment.genericAttachment(dataSource: dataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
     }
 
     static func loadPreviewableStickerAttachment() throws -> PreviewableAttachment? {

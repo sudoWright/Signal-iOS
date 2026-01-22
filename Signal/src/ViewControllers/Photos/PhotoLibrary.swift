@@ -136,14 +136,14 @@ class PhotoAlbumContents {
         }
     }
 
-    func outgoingAttachment(for asset: PHAsset) async throws -> PreviewableAttachment {
+    func outgoingAttachment(for asset: PHAsset, attachmentLimits: OutgoingAttachmentLimits) async throws -> PreviewableAttachment {
         switch asset.mediaType {
         case .image:
             let (dataSource, dataUTI) = try await requestImageDataSource(for: asset)
             return try PreviewableAttachment.imageAttachment(dataSource: dataSource, dataUTI: dataUTI)
         case .video:
             let video = try await requestVideoDataSource(for: asset)
-            return try await PreviewableAttachment.compressVideoAsMp4(asset: video, baseFilename: nil)
+            return try await PreviewableAttachment.compressVideoAsMp4(asset: video, baseFilename: nil, attachmentLimits: attachmentLimits)
         case .unknown, .audio:
             fallthrough
         @unknown default:

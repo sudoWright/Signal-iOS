@@ -161,6 +161,8 @@ extension UsernameLinkScanQRCodeViewController: PHPickerViewControllerDelegate {
             return
         }
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         Task { @MainActor in
             async let dismiss: Void = { @MainActor () async -> Void in
                 await withCheckedContinuation { continuation in
@@ -171,7 +173,10 @@ extension UsernameLinkScanQRCodeViewController: PHPickerViewControllerDelegate {
             }()
 
             do {
-                let attachment = try await TypedItemProvider.buildVisualMediaAttachment(forItemProvider: selectedItem.itemProvider)
+                let attachment = try await TypedItemProvider.buildVisualMediaAttachment(
+                    forItemProvider: selectedItem.itemProvider,
+                    attachmentLimits: attachmentLimits,
+                )
                 guard
                     let image = attachment.rawValue.image(),
                     let ciImage = CIImage(image: image)

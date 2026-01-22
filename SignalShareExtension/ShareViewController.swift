@@ -151,9 +151,12 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate, SA
         let chatConnectionManager = DependenciesBridge.shared.chatConnectionManager
         self.connectionTokens.append(chatConnectionManager.requestUnidentifiedConnection())
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         let conversationPicker: SharingThreadPickerViewController
         conversationPicker = SharingThreadPickerViewController(
             areAttachmentStoriesCompatPrecheck: typedItemProviders.allSatisfy { $0.isStoriesCompatible },
+            attachmentLimits: attachmentLimits,
             shareViewDelegate: self,
         )
 
@@ -202,6 +205,7 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate, SA
             }()
             typedItems = try await buildAndValidateAttachments(
                 for: typedItemProviders,
+                attachmentLimits: attachmentLimits,
                 setProgress: { loadViewControllerForProgress?.progress = $0 },
             )
         } catch {
@@ -382,6 +386,7 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate, SA
 
     private func buildAndValidateAttachments(
         for typedItemProviders: [TypedItemProvider],
+        attachmentLimits: OutgoingAttachmentLimits,
         setProgress: @MainActor (Progress) -> Void,
     ) async throws -> [TypedItem] {
         let progress = Progress(totalUnitCount: Int64(typedItemProviders.count))
@@ -394,7 +399,7 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate, SA
 
         setProgress(progress)
 
-        let typedItems = try await self.buildAttachments(for: itemsAndProgresses)
+        let typedItems = try await self.buildAttachments(for: itemsAndProgresses, attachmentLimits: attachmentLimits)
         try Task.checkCancellation()
 
         // Make sure the user is not trying to share more than our attachment limit.
@@ -461,11 +466,14 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate, SA
         throw ShareViewControllerError.noConformingInputItem
     }
 
-    private nonisolated func buildAttachments(for itemsAndProgresses: [(TypedItemProvider, Progress)]) async throws -> [TypedItem] {
+    private nonisolated func buildAttachments(
+        for itemsAndProgresses: [(TypedItemProvider, Progress)],
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) async throws -> [TypedItem] {
         // FIXME: does not use a task group because SignalAttachment likes to load things into RAM and resize them; doing this in parallel can exhaust available RAM
         var result: [TypedItem] = []
         for (typedItemProvider, progress) in itemsAndProgresses {
-            result.append(try await typedItemProvider.buildAttachment(progress: progress))
+            result.append(try await typedItemProvider.buildAttachment(attachmentLimits: attachmentLimits, progress: progress))
         }
         return result
     }

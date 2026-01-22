@@ -61,7 +61,7 @@ protocol ConversationInputToolbarDelegate: AnyObject {
 
     func pollButtonPressed()
 
-    func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment)
+    func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits)
 
     func showUnblockConversationUI(completion: ((Bool) -> Void)?)
 }
@@ -3256,8 +3256,8 @@ extension ConversationInputToolbar: StickerKeyboardDelegate {
 
 extension ConversationInputToolbar: AttachmentKeyboardDelegate {
 
-    func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment) {
-        inputToolbarDelegate?.didSelectRecentPhoto(asset: asset, attachment: attachment)
+    func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits) {
+        inputToolbarDelegate?.didSelectRecentPhoto(asset: asset, attachment: attachment, attachmentLimits: attachmentLimits)
     }
 
     func didTapPhotos() {

@@ -113,14 +113,18 @@ public struct PreviewableAttachment {
     }
 
     // Factory method for video attachments.
-    public static func videoAttachment(dataSource: DataSourcePath, dataUTI: String) throws -> Self {
+    public static func videoAttachment(
+        dataSource: DataSourcePath,
+        dataUTI: String,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) throws -> Self {
         try OWSMediaUtils.validateVideoExtension(ofPath: dataSource.fileUrl.path)
         try OWSMediaUtils.validateVideoAsset(atPath: dataSource.fileUrl.path)
         return try newAttachment(
             dataSource: dataSource,
             dataUTI: dataUTI,
             validUTISet: SignalAttachment.videoUTISet,
-            maxFileSize: OutgoingAttachmentLimits.currentLimits().maxPlaintextVideoBytes,
+            maxFileSize: attachmentLimits.maxPlaintextVideoBytes,
         )
     }
 
@@ -131,16 +135,26 @@ public struct PreviewableAttachment {
     }
 
     @MainActor
-    public static func compressVideoAsMp4(dataSource: DataSourcePath, sessionCallback: (@MainActor (AVAssetExportSession) -> Void)? = nil) async throws -> Self {
+    public static func compressVideoAsMp4(
+        dataSource: DataSourcePath,
+        attachmentLimits: OutgoingAttachmentLimits,
+        sessionCallback: (@MainActor (AVAssetExportSession) -> Void)? = nil,
+    ) async throws -> Self {
         return try await compressVideoAsMp4(
             asset: AVAsset(url: dataSource.fileUrl),
             baseFilename: dataSource.sourceFilename,
+            attachmentLimits: attachmentLimits,
             sessionCallback: sessionCallback,
         )
     }
 
     @MainActor
-    public static func compressVideoAsMp4(asset: AVAsset, baseFilename: String?, sessionCallback: (@MainActor (AVAssetExportSession) -> Void)? = nil) async throws -> Self {
+    public static func compressVideoAsMp4(
+        asset: AVAsset,
+        baseFilename: String?,
+        attachmentLimits: OutgoingAttachmentLimits,
+        sessionCallback: (@MainActor (AVAssetExportSession) -> Void)? = nil,
+    ) async throws -> Self {
         let startTime = MonotonicDate()
 
         guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPreset640x480) else {
@@ -195,25 +209,33 @@ public struct PreviewableAttachment {
         let formattedDuration = OWSOperation.formattedNs((endTime - startTime).nanoseconds)
         Logger.info("transcoded video in \(formattedDuration)s")
 
-        return try videoAttachment(dataSource: dataSource, dataUTI: UTType.mpeg4Movie.identifier)
+        return try videoAttachment(dataSource: dataSource, dataUTI: UTType.mpeg4Movie.identifier, attachmentLimits: attachmentLimits)
     }
 
     // MARK: Audio Attachments
 
     // Factory method for audio attachments.
-    public static func audioAttachment(dataSource: DataSourcePath, dataUTI: String) throws(SignalAttachmentError) -> Self {
+    public static func audioAttachment(
+        dataSource: DataSourcePath,
+        dataUTI: String,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) throws(SignalAttachmentError) -> Self {
         return try newAttachment(
             dataSource: dataSource,
             dataUTI: dataUTI,
             validUTISet: SignalAttachment.audioUTISet,
-            maxFileSize: OutgoingAttachmentLimits.currentLimits().maxPlaintextAudioBytes,
+            maxFileSize: attachmentLimits.maxPlaintextAudioBytes,
         )
     }
 
     // MARK: Generic Attachments
 
     // Factory method for generic attachments.
-    public static func genericAttachment(dataSource: DataSourcePath, dataUTI: String) throws(SignalAttachmentError) -> Self {
+    public static func genericAttachment(
+        dataSource: DataSourcePath,
+        dataUTI: String,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) throws(SignalAttachmentError) -> Self {
         // [15M] TODO: Enforce this at compile-time rather than runtime.
         owsPrecondition(!SignalAttachment.videoUTISet.contains(dataUTI))
         owsPrecondition(!SignalAttachment.inputImageUTISet.contains(dataUTI))
@@ -221,14 +243,18 @@ public struct PreviewableAttachment {
             dataSource: dataSource,
             dataUTI: dataUTI,
             validUTISet: nil,
-            maxFileSize: OutgoingAttachmentLimits.currentLimits().maxPlaintextBytes,
+            maxFileSize: attachmentLimits.maxPlaintextBytes,
         )
     }
 
     // MARK: Voice Messages
 
-    public static func voiceMessageAttachment(dataSource: DataSourcePath, dataUTI: String) throws(SignalAttachmentError) -> Self {
-        let attachment = try audioAttachment(dataSource: dataSource, dataUTI: dataUTI)
+    public static func voiceMessageAttachment(
+        dataSource: DataSourcePath,
+        dataUTI: String,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) throws(SignalAttachmentError) -> Self {
+        let attachment = try audioAttachment(dataSource: dataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
         attachment.rawValue.isVoiceMessage = true
         return attachment
     }
@@ -260,6 +286,7 @@ public struct PreviewableAttachment {
         ofTypes types: AttachmentTypes = .all,
         dataSource: DataSourcePath,
         dataUTI: String,
+        attachmentLimits: OutgoingAttachmentLimits,
         options: BuildOptions = [],
     ) throws -> Self {
         if SignalAttachment.inputImageUTISet.contains(dataUTI) {
@@ -272,18 +299,18 @@ public struct PreviewableAttachment {
             guard types.contains(.video) else {
                 throw SignalAttachmentError.invalidFileFormat
             }
-            return try videoAttachment(dataSource: dataSource, dataUTI: dataUTI)
+            return try videoAttachment(dataSource: dataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
         }
         if SignalAttachment.audioUTISet.contains(dataUTI) {
             guard types.contains(.audio) else {
                 throw SignalAttachmentError.invalidFileFormat
             }
-            return try audioAttachment(dataSource: dataSource, dataUTI: dataUTI)
+            return try audioAttachment(dataSource: dataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
         }
         guard types.contains(.other) else {
             throw SignalAttachmentError.invalidFileFormat
         }
-        return try genericAttachment(dataSource: dataSource, dataUTI: dataUTI)
+        return try genericAttachment(dataSource: dataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
     }
 
     // MARK: Helper Methods

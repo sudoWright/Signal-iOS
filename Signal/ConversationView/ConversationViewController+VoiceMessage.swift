@@ -105,13 +105,16 @@ extension ConversationViewController {
     func sendVoiceMessageDraft(_ voiceMemoDraft: VoiceMessageSendableDraft) {
         inputToolbar?.hideVoiceMemoUI(animated: true)
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         do {
-            let attachment = try voiceMemoDraft.prepareAttachment()
+            let attachment = try voiceMemoDraft.prepareAttachment(attachmentLimits: attachmentLimits)
             Task { @MainActor in
                 await self.sendAttachments(
                     ApprovedAttachments(nonViewOnceAttachments: [attachment], imageQuality: .standard),
                     messageBody: nil,
                     from: self,
+                    attachmentLimits: attachmentLimits,
                 )
                 clearVoiceMessageDraft()
             }

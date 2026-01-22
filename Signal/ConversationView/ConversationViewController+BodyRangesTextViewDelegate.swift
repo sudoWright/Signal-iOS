@@ -40,7 +40,11 @@ extension ConversationViewController: BodyRangesTextViewDelegate {
 
     public func textViewDidInsertMemoji(_ memojiGlyph: OWSAdaptiveImageGlyph) {
         do {
-            self.didPasteAttachments([try PasteboardAttachment.loadPreviewableMemojiAttachment(fromMemojiGlyph: memojiGlyph)])
+            let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+            self.didPasteAttachments(
+                [try PasteboardAttachment.loadPreviewableMemojiAttachment(fromMemojiGlyph: memojiGlyph)],
+                attachmentLimits: attachmentLimits,
+            )
         } catch {
             self.showErrorAlert(attachmentError: error as? SignalAttachmentError)
         }

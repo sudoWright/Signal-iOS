@@ -26,6 +26,8 @@ class SharingThreadPickerViewController: ConversationPickerViewController {
     /// actually sending if stories are selected.
     let areAttachmentStoriesCompatPrecheck: Bool
 
+    private let attachmentLimits: OutgoingAttachmentLimits
+
     var typedItems: [TypedItem] {
         didSet {
             owsPrecondition(typedItems.count <= 1 || typedItems.allSatisfy(\.isVisualMedia))
@@ -38,9 +40,14 @@ class SharingThreadPickerViewController: ConversationPickerViewController {
 
     private var selectedConversations: [ConversationItem] { selection.conversations }
 
-    init(areAttachmentStoriesCompatPrecheck: Bool, shareViewDelegate: ShareViewDelegate) {
+    init(
+        areAttachmentStoriesCompatPrecheck: Bool,
+        attachmentLimits: OutgoingAttachmentLimits,
+        shareViewDelegate: ShareViewDelegate,
+    ) {
         self.typedItems = []
         self.areAttachmentStoriesCompatPrecheck = areAttachmentStoriesCompatPrecheck
+        self.attachmentLimits = attachmentLimits
         self.shareViewDelegate = shareViewDelegate
 
         super.init(selection: ConversationPickerSelection())
@@ -165,7 +172,11 @@ class SharingThreadPickerViewController: ConversationPickerViewController {
             if self.selection.conversations.contains(where: \.isStory) {
                 approvalVCOptions.insert(.disallowViewOnce)
             }
-            let approvalView = AttachmentApprovalViewController.loadWithSneakyTransaction(attachmentApprovalItems: approvalItems, options: approvalVCOptions)
+            let approvalView = AttachmentApprovalViewController.loadWithSneakyTransaction(
+                attachmentApprovalItems: approvalItems,
+                attachmentLimits: attachmentLimits,
+                options: approvalVCOptions,
+            )
             approvalVC = approvalView
             approvalView.approvalDelegate = self
             approvalView.approvalDataSource = self
@@ -287,6 +298,7 @@ class SharingThreadPickerViewController: ConversationPickerViewController {
                     conversations: selectedConversations,
                     approvedMessageBody: messageBody,
                     approvedAttachments: attachments,
+                    attachmentLimits: attachmentLimits,
                 )
             } catch {
                 return SendFailure(outgoingMessages: [], error: error)

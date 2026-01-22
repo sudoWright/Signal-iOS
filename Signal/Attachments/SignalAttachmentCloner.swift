@@ -8,7 +8,10 @@ import SignalServiceKit
 import SignalUI
 
 enum SignalAttachmentCloner {
-    static func cloneAsSignalAttachment(attachment: ReferencedAttachmentStream) throws -> PreviewableAttachment {
+    static func cloneAsSignalAttachment(
+        attachment: ReferencedAttachmentStream,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) throws -> PreviewableAttachment {
         guard let dataUTI = MimeTypeUtil.utiTypeForMimeType(attachment.attachmentStream.mimeType) else {
             throw OWSAssertionError("Missing dataUTI.")
         }
@@ -24,14 +27,14 @@ enum SignalAttachmentCloner {
         let result: PreviewableAttachment
         switch attachment.reference.renderingFlag {
         case .default:
-            result = try PreviewableAttachment.buildAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
+            result = try PreviewableAttachment.buildAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
         case .voiceMessage:
-            result = try PreviewableAttachment.voiceMessageAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
+            result = try PreviewableAttachment.voiceMessageAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
         case .borderless:
             result = try PreviewableAttachment.imageAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
             result.rawValue.isBorderless = true
         case .shouldLoop:
-            result = try PreviewableAttachment.buildAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
+            result = try PreviewableAttachment.buildAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
             result.rawValue.isLoopingVideo = true
         }
         return result

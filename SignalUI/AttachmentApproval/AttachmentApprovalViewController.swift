@@ -151,14 +151,18 @@ public final class AttachmentApprovalViewController: UIPageViewController, UIPag
         }
     }
 
+    public let attachmentLimits: OutgoingAttachmentLimits
+
     public static func loadWithSneakyTransaction(
         attachmentApprovalItems: [AttachmentApprovalItem],
+        attachmentLimits: OutgoingAttachmentLimits,
         options: AttachmentApprovalViewControllerOptions,
     ) -> Self {
         let databaseStorage = SSKEnvironment.shared.databaseStorageRef
         return Self(
             attachmentApprovalItems: attachmentApprovalItems,
             defaultImageQuality: databaseStorage.read(block: ImageQuality.fetchValue(tx:)),
+            attachmentLimits: attachmentLimits,
             options: options,
         )
     }
@@ -166,11 +170,13 @@ public final class AttachmentApprovalViewController: UIPageViewController, UIPag
     private init(
         attachmentApprovalItems: [AttachmentApprovalItem],
         defaultImageQuality: ImageQuality,
+        attachmentLimits: OutgoingAttachmentLimits,
         options: AttachmentApprovalViewControllerOptions,
     ) {
         assert(attachmentApprovalItems.count > 0)
 
         self.outputImageQuality = defaultImageQuality
+        self.attachmentLimits = attachmentLimits
         self.receivedOptions = options
 
         let pageOptions: [UIPageViewController.OptionsKey: Any] = [.interPageSpacing: kSpacingBetweenItems]
@@ -210,6 +216,7 @@ public final class AttachmentApprovalViewController: UIPageViewController, UIPag
         attachments: [PreviewableAttachment],
         initialMessageBody: MessageBody?,
         hasQuotedReplyDraft: Bool,
+        attachmentLimits: OutgoingAttachmentLimits,
         approvalDelegate: AttachmentApprovalViewControllerDelegate,
         approvalDataSource: AttachmentApprovalViewControllerDataSource,
         stickerSheetDelegate: StickerPickerSheetDelegate?,
@@ -221,7 +228,11 @@ public final class AttachmentApprovalViewController: UIPageViewController, UIPag
         if hasQuotedReplyDraft {
             options.insert(.disallowViewOnce)
         }
-        let vc = AttachmentApprovalViewController.loadWithSneakyTransaction(attachmentApprovalItems: attachmentApprovalItems, options: options)
+        let vc = AttachmentApprovalViewController.loadWithSneakyTransaction(
+            attachmentApprovalItems: attachmentApprovalItems,
+            attachmentLimits: attachmentLimits,
+            options: options,
+        )
         // The data source needs to be set before the message body because it is needed to hydrate mentions.
         vc.approvalDataSource = approvalDataSource
         vc.setMessageBody(initialMessageBody, txProvider: DependenciesBridge.shared.db.readTxProvider)
@@ -771,7 +782,7 @@ public final class AttachmentApprovalViewController: UIPageViewController, UIPag
         }
         dataSource.sourceFilename = filename
 
-        return try PreviewableAttachment.videoAttachment(dataSource: dataSource, dataUTI: dataUTI)
+        return try PreviewableAttachment.videoAttachment(dataSource: dataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
     }
 
     func attachmentApprovalItem(before currentItem: AttachmentApprovalItem) -> AttachmentApprovalItem? {

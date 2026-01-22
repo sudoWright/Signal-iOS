@@ -22,6 +22,7 @@ public class AttachmentMultisend {
         conversations: [ConversationItem],
         approvedMessageBody: MessageBody?,
         approvedAttachments: ApprovedAttachments,
+        attachmentLimits: OutgoingAttachmentLimits,
     ) async throws -> [EnqueueResult] {
         let destinations = try await prepareDestinations(
             forSendingMessageBody: approvedMessageBody,
@@ -40,7 +41,10 @@ public class AttachmentMultisend {
         }
 
         let imageQuality = approvedAttachments.imageQuality
-        let imageQualityLevel = ImageQualityLevel.resolvedValue(imageQuality: imageQuality)
+        let imageQualityLevel = ImageQualityLevel.resolvedValue(
+            imageQuality: imageQuality,
+            standardQualityLevel: attachmentLimits.standardQualityLevel,
+        )
         let sendableAttachments = try await approvedAttachments.attachments.mapAsync {
             return try await SendableAttachment.forPreviewableAttachment($0, imageQualityLevel: imageQualityLevel)
         }
@@ -50,6 +54,7 @@ public class AttachmentMultisend {
             sendableAttachments: sendableAttachments,
             hasNonStoryDestination: hasNonStoryDestination,
             hasStoryDestination: hasStoryDestination,
+            attachmentLimits: attachmentLimits,
         )
 
         return try await deps.databaseStorage.awaitableWrite { tx in
@@ -153,6 +158,7 @@ public class AttachmentMultisend {
         sendableAttachments: [SendableAttachment],
         hasNonStoryDestination: Bool,
         hasStoryDestination: Bool,
+        attachmentLimits: OutgoingAttachmentLimits,
     ) async throws -> [SegmentAttachmentResult] {
         let maxSegmentDurations = conversations.compactMap(\.videoAttachmentDurationLimit)
         guard hasStoryDestination, !maxSegmentDurations.isEmpty, let requiredSegmentDuration = maxSegmentDurations.min() else {
@@ -174,7 +180,10 @@ public class AttachmentMultisend {
 
         var segmentedResults = [SegmentAttachmentResult]()
         for attachment in sendableAttachments {
-            let segmentingResult = try await attachment.segmentedIfNecessary(segmentDuration: requiredSegmentDuration)
+            let segmentingResult = try await attachment.segmentedIfNecessary(
+                segmentDuration: requiredSegmentDuration,
+                attachmentLimits: attachmentLimits,
+            )
 
             let originalDataSource: AttachmentDataSource?
             if hasNonStoryDestination || segmentingResult.segmented == nil {

@@ -21,6 +21,7 @@ extension ConversationViewController: AttachmentApprovalViewControllerDelegate {
                 approvedAttachments,
                 messageBody: messageBody,
                 from: attachmentApproval,
+                attachmentLimits: attachmentApproval.attachmentLimits,
             )
         }
     }
@@ -221,11 +222,16 @@ extension ConversationViewController: ConversationHeaderViewDelegate {
 
 extension ConversationViewController: ConversationInputTextViewDelegate {
     public func didAttemptAttachmentPaste() {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         // If trying to paste a sticker, forego anything async since
         // the pasteboard will be cleared as soon as paste() exits.
         if PasteboardAttachment.hasStickerAttachment() {
             do {
-                self.didPasteAttachments([try PasteboardAttachment.loadPreviewableStickerAttachment()].compacted())
+                self.didPasteAttachments(
+                    [try PasteboardAttachment.loadPreviewableStickerAttachment()].compacted(),
+                    attachmentLimits: attachmentLimits,
+                )
             } catch {
                 self.showErrorAlert(attachmentError: error as? SignalAttachmentError)
             }
@@ -234,10 +240,10 @@ extension ConversationViewController: ConversationInputTextViewDelegate {
 
         ModalActivityIndicatorViewController.present(fromViewController: self, asyncBlock: { modal in
             do {
-                let attachments = try await PasteboardAttachment.loadPreviewableAttachments()
+                let attachments = try await PasteboardAttachment.loadPreviewableAttachments(attachmentLimits: attachmentLimits)
                 modal.dismiss {
                     // Note: attachment array might be nil at this point; that's fine.
-                    self.didPasteAttachments(attachments)
+                    self.didPasteAttachments(attachments, attachmentLimits: attachmentLimits)
                 }
             } catch {
                 modal.dismiss {
@@ -247,7 +253,10 @@ extension ConversationViewController: ConversationInputTextViewDelegate {
         })
     }
 
-    func didPasteAttachments(_ attachments: [PreviewableAttachment]?) {
+    func didPasteAttachments(
+        _ attachments: [PreviewableAttachment]?,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) {
         AssertIsOnMainThread()
 
         guard let attachments, attachments.count > 0 else {
@@ -263,11 +272,12 @@ extension ConversationViewController: ConversationInputTextViewDelegate {
                     ApprovedAttachments(nonViewOnceAttachments: [a], imageQuality: .standard),
                     messageBody: nil,
                     from: self,
+                    attachmentLimits: attachmentLimits,
                 )
             }
         } else {
             dismissKeyBoard()
-            showApprovalDialog(forAttachments: attachments)
+            showApprovalDialog(forAttachments: attachments, attachmentLimits: attachmentLimits)
         }
     }
 

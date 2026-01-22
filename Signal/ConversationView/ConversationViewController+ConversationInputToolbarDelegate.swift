@@ -367,15 +367,17 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
     }
 
     @MainActor
-    func tryToSendAttachments(
+    fileprivate func tryToSendAttachments(
         _ approvedAttachments: ApprovedAttachments,
         from viewController: UIViewController,
         messageBody: MessageBody?,
+        attachmentLimits: OutgoingAttachmentLimits,
     ) async throws -> Bool {
         return try await tryToSendAttachments(
             approvedAttachments,
             messageBody: messageBody,
             from: viewController,
+            attachmentLimits: attachmentLimits,
             untrustedThreshold: Date().addingTimeInterval(-OWSIdentityManagerImpl.Constants.defaultUntrustedInterval),
         )
     }
@@ -392,6 +394,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         _ approvedAttachments: ApprovedAttachments,
         messageBody: MessageBody?,
         from viewController: UIViewController,
+        attachmentLimits: OutgoingAttachmentLimits,
         untrustedThreshold: Date,
     ) async throws -> Bool {
         AssertIsOnMainThread()
@@ -401,7 +404,10 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         }
 
         let imageQuality = approvedAttachments.imageQuality
-        let imageQualityLevel = ImageQualityLevel.resolvedValue(imageQuality: imageQuality)
+        let imageQualityLevel = ImageQualityLevel.resolvedValue(
+            imageQuality: imageQuality,
+            standardQualityLevel: attachmentLimits.standardQualityLevel,
+        )
         let sendableAttachments = try await approvedAttachments.attachments.mapAsync {
             return try await SendableAttachment.forPreviewableAttachment($0, imageQualityLevel: imageQualityLevel)
         }
@@ -539,7 +545,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         present(OWSNavigationController(rootViewController: newPollViewController), animated: true)
     }
 
-    public func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment) {
+    public func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits) {
         AssertIsOnMainThread()
 
         dismissKeyBoard()
@@ -548,6 +554,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
             asset: asset,
             attachment: attachment,
             hasQuotedReplyDraft: inputToolbar?.quotedReplyDraft != nil,
+            attachmentLimits: attachmentLimits,
             delegate: self,
             dataSource: self,
         )
@@ -572,7 +579,7 @@ public extension ConversationViewController {
         )
     }
 
-    func showApprovalDialog(forAttachments attachments: [PreviewableAttachment]) {
+    func showApprovalDialog(forAttachments attachments: [PreviewableAttachment], attachmentLimits: OutgoingAttachmentLimits) {
         AssertIsOnMainThread()
 
         guard hasViewWillAppearEverBegun else {
@@ -587,6 +594,7 @@ public extension ConversationViewController {
             attachments: attachments,
             initialMessageBody: inputToolbar.messageBodyForSending,
             hasQuotedReplyDraft: inputToolbar.quotedReplyDraft != nil,
+            attachmentLimits: attachmentLimits,
             approvalDelegate: self,
             approvalDataSource: self,
             stickerSheetDelegate: self,
@@ -647,6 +655,7 @@ private extension ConversationViewController {
     func takePictureOrVideo() {
         AssertIsOnMainThread()
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         ows_askForCameraPermissions { [weak self] cameraGranted in
             guard let self else { return }
             guard cameraGranted else {
@@ -663,6 +672,7 @@ private extension ConversationViewController {
 
                 let pickerModal = SendMediaNavigationController.showingCameraFirst(
                     hasQuotedReplyDraft: self.inputToolbar?.quotedReplyDraft != nil,
+                    attachmentLimits: attachmentLimits,
                 )
                 pickerModal.sendMediaNavDelegate = self
                 pickerModal.sendMediaNavDataSource = self
@@ -689,6 +699,7 @@ private extension ConversationViewController {
 
         let pickerModal = SendMediaNavigationController.showingNativePicker(
             hasQuotedReplyDraft: inputToolbar?.quotedReplyDraft != nil,
+            attachmentLimits: .currentLimits(),
         )
         pickerModal.sendMediaNavDelegate = self
         pickerModal.sendMediaNavDataSource = self
@@ -819,17 +830,19 @@ extension ConversationViewController: UIDocumentPickerDelegate {
 
         let contentTypeIdentifier = (resourceValues?.contentType ?? .data).identifier
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         // Although we want to be able to send higher quality attachments through
         // the document picker, it's more important that we ensure the sent format
         // is one all clients can accept (e.g., *not* QuickTime .mov).
         if SignalAttachment.videoUTISet.contains(contentTypeIdentifier) {
-            self.showApprovalDialogAfterProcessingVideo(dataSource: dataSource)
+            self.showApprovalDialogAfterProcessingVideo(dataSource: dataSource, attachmentLimits: attachmentLimits)
             return
         }
 
         let attachment: PreviewableAttachment
         do {
-            attachment = try PreviewableAttachment.buildAttachment(dataSource: dataSource, dataUTI: contentTypeIdentifier)
+            attachment = try PreviewableAttachment.buildAttachment(dataSource: dataSource, dataUTI: contentTypeIdentifier, attachmentLimits: attachmentLimits)
         } catch {
             DispatchQueue.main.async {
                 self.showErrorAlert(attachmentError: error as? SignalAttachmentError)
@@ -837,10 +850,10 @@ extension ConversationViewController: UIDocumentPickerDelegate {
             return
         }
 
-        showApprovalDialog(forAttachments: [attachment])
+        showApprovalDialog(forAttachments: [attachment], attachmentLimits: attachmentLimits)
     }
 
-    private func showApprovalDialogAfterProcessingVideo(dataSource: DataSourcePath) {
+    private func showApprovalDialogAfterProcessingVideo(dataSource: DataSourcePath, attachmentLimits: OutgoingAttachmentLimits) {
         AssertIsOnMainThread()
 
         ModalActivityIndicatorViewController.present(
@@ -848,9 +861,9 @@ extension ConversationViewController: UIDocumentPickerDelegate {
             canCancel: true,
             asyncBlock: { modalActivityIndicator in
                 do {
-                    let attachment = try await PreviewableAttachment.compressVideoAsMp4(dataSource: dataSource)
+                    let attachment = try await PreviewableAttachment.compressVideoAsMp4(dataSource: dataSource, attachmentLimits: attachmentLimits)
                     modalActivityIndicator.dismissIfNotCanceled(completionIfNotCanceled: {
-                        self.showApprovalDialog(forAttachments: [attachment])
+                        self.showApprovalDialog(forAttachments: [attachment], attachmentLimits: attachmentLimits)
                     })
                 } catch {
                     owsFailDebug("Error: \(error).")
@@ -881,6 +894,7 @@ extension ConversationViewController: SendMediaNavDelegate {
                 approvedAttachments,
                 messageBody: messageBody,
                 from: sendMediaNavigationController,
+                attachmentLimits: sendMediaNavigationController.attachmentLimits,
             )
         }
     }
@@ -891,6 +905,7 @@ extension ConversationViewController: SendMediaNavDelegate {
         _ approvedAttachments: ApprovedAttachments,
         messageBody: MessageBody?,
         from viewController: UIViewController,
+        attachmentLimits: OutgoingAttachmentLimits,
     ) async {
         let didSend: Bool
         do {
@@ -898,6 +913,7 @@ extension ConversationViewController: SendMediaNavDelegate {
                 approvedAttachments,
                 from: viewController,
                 messageBody: messageBody,
+                attachmentLimits: attachmentLimits,
             )
         } catch {
             self.showErrorAlert(attachmentError: error as? SignalAttachmentError)

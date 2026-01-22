@@ -20,14 +20,20 @@ class ForwardMessageViewController: OWSNavigationController {
     private typealias Content = ForwardMessageContent
 
     private var content: Content
+    private let attachmentLimits: OutgoingAttachmentLimits
 
     private var textMessage: String?
 
     private let selection = ConversationPickerSelection()
     var selectedConversations: [ConversationItem] { selection.conversations }
 
-    private init(content: Content) {
+    private init(
+        content: Content,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) {
         self.content = content
+        self.attachmentLimits = attachmentLimits
+
         self.pickerVC = ConversationPickerViewController(
             selection: selection,
             overrideTitle: OWSLocalizedString(
@@ -71,11 +77,12 @@ class ForwardMessageViewController: OWSNavigationController {
         from fromViewController: UIViewController,
         delegate: ForwardMessageDelegate,
     ) {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         do {
             let content: Content = try SSKEnvironment.shared.databaseStorageRef.read { tx in
-                return try Content.build(itemViewModel: itemViewModel, tx: tx)
+                return try Content.build(itemViewModel: itemViewModel, attachmentLimits: attachmentLimits, tx: tx)
             }
-            present(content: content, from: fromViewController, delegate: delegate)
+            present(content: content, from: fromViewController, attachmentLimits: attachmentLimits, delegate: delegate)
         } catch {
             ForwardMessageViewController.showAlertForForwardError(error: error, forwardedInteractionCount: 1)
         }
@@ -86,11 +93,12 @@ class ForwardMessageViewController: OWSNavigationController {
         from fromViewController: UIViewController,
         delegate: ForwardMessageDelegate,
     ) {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         do {
             let content: Content = try SSKEnvironment.shared.databaseStorageRef.read { tx in
-                try Content.build(selectionItems: selectionItems, tx: tx)
+                try Content.build(selectionItems: selectionItems, attachmentLimits: attachmentLimits, tx: tx)
             }
-            present(content: content, from: fromViewController, delegate: delegate)
+            present(content: content, from: fromViewController, attachmentLimits: attachmentLimits, delegate: delegate)
         } catch {
             ForwardMessageViewController.showAlertForForwardError(error: error, forwardedInteractionCount: selectionItems.count)
         }
@@ -102,13 +110,15 @@ class ForwardMessageViewController: OWSNavigationController {
         from fromViewController: UIViewController,
         delegate: ForwardMessageDelegate,
     ) {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         do {
             let attachments = try attachmentStreams.map { attachmentStream in
-                try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachmentStream)
+                try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachmentStream, attachmentLimits: attachmentLimits)
             }
             present(
                 content: ForwardMessageContent(allItems: [ForwardMessageItem(interaction: message, attachments: attachments)]),
                 from: fromViewController,
+                attachmentLimits: attachmentLimits,
                 delegate: delegate,
             )
         } catch let error {
@@ -124,6 +134,7 @@ class ForwardMessageViewController: OWSNavigationController {
         from fromViewController: UIViewController,
         delegate: ForwardMessageDelegate,
     ) {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         var attachments: [PreviewableAttachment] = []
         var textAttachment: TextAttachment?
         switch storyMessage.attachment {
@@ -144,7 +155,7 @@ class ForwardMessageViewController: OWSNavigationController {
                 guard let attachment else {
                     throw OWSAssertionError("Missing attachment stream for forwarded story message")
                 }
-                let signalAttachment = try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachment)
+                let signalAttachment = try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachment, attachmentLimits: attachmentLimits)
                 attachments = [signalAttachment]
             } catch let error {
                 ForwardMessageViewController.showAlertForForwardError(
@@ -159,6 +170,7 @@ class ForwardMessageViewController: OWSNavigationController {
         present(
             content: ForwardMessageContent(allItems: [ForwardMessageItem(attachments: attachments, textAttachment: textAttachment)]),
             from: fromViewController,
+            attachmentLimits: attachmentLimits,
             delegate: delegate,
         )
     }
@@ -171,6 +183,7 @@ class ForwardMessageViewController: OWSNavigationController {
         present(
             content: ForwardMessageContent(allItems: [ForwardMessageItem(messageBody: messageBody)]),
             from: fromViewController,
+            attachmentLimits: .currentLimits(),
             delegate: delegate,
         )
     }
@@ -178,9 +191,10 @@ class ForwardMessageViewController: OWSNavigationController {
     private class func present(
         content: Content,
         from fromViewController: UIViewController,
+        attachmentLimits: OutgoingAttachmentLimits,
         delegate: ForwardMessageDelegate,
     ) {
-        let sheet = ForwardMessageViewController(content: content)
+        let sheet = ForwardMessageViewController(content: content, attachmentLimits: attachmentLimits)
         sheet.forwardMessageDelegate = delegate
         fromViewController.present(sheet, animated: true) {
             UIApplication.shared.hideKeyboard()
@@ -346,6 +360,7 @@ extension ForwardMessageViewController {
                 conversations: conversations,
                 approvedMessageBody: item.messageBody,
                 approvedAttachments: ApprovedAttachments(nonViewOnceAttachments: item.attachments, imageQuality: .high),
+                attachmentLimits: attachmentLimits,
             )
         } else if let textAttachment = item.textAttachment {
             // TODO: we want to reuse the uploaded link preview image attachment instead of re-uploading
@@ -569,6 +584,7 @@ struct ForwardMessageItem {
         interaction: TSInteraction,
         componentState: CVComponentState,
         selectionType: CVSelectionType,
+        attachmentLimits: OutgoingAttachmentLimits,
         transaction: DBReadTransaction,
     ) throws -> Self {
         let shouldHaveText = (selectionType == .allContent || selectionType == .secondaryContent)
@@ -622,7 +638,7 @@ struct ForwardMessageItem {
             }
 
             attachments = try attachmentStreams.map { attachmentStream in
-                try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachmentStream)
+                try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachmentStream, attachmentLimits: attachmentLimits)
             }
 
             stickerMetadata = componentState.stickerMetadata
@@ -742,18 +758,21 @@ private struct ForwardMessageContent {
 
     static func build(
         itemViewModel: CVItemViewModelImpl,
+        attachmentLimits: OutgoingAttachmentLimits,
         tx: DBReadTransaction,
     ) throws -> Self {
         return Self(allItems: [try ForwardMessageItem.build(
             interaction: itemViewModel.interaction,
             componentState: itemViewModel.renderItem.componentState,
             selectionType: .allContent,
+            attachmentLimits: attachmentLimits,
             transaction: tx,
         )])
     }
 
     static func build(
         selectionItems: [CVSelectionItem],
+        attachmentLimits: OutgoingAttachmentLimits,
         tx: DBReadTransaction,
     ) throws -> Self {
         let items = try selectionItems.map { selectionItem throws -> ForwardMessageItem in
@@ -766,6 +785,7 @@ private struct ForwardMessageContent {
                 interaction: interaction,
                 componentState: componentState,
                 selectionType: selectionItem.selectionType,
+                attachmentLimits: attachmentLimits,
                 transaction: tx,
             )
         }

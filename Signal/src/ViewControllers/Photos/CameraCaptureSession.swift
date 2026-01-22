@@ -61,6 +61,7 @@ protocol CameraCaptureSessionDelegate: AnyObject {
 class CameraCaptureSession: NSObject {
 
     private weak var delegate: CameraCaptureSessionDelegate?
+    private let attachmentLimits: OutgoingAttachmentLimits
 
     // There can only ever be one `CapturePreviewView` per AVCaptureSession
     lazy var previewView = CapturePreviewView(session: avCaptureSession)
@@ -84,12 +85,13 @@ class CameraCaptureSession: NSObject {
 
     init(
         delegate: CameraCaptureSessionDelegate,
-        maxPlaintextVideoBytes: UInt64,
+        attachmentLimits: OutgoingAttachmentLimits,
         qrCodeSampleBufferScanner: QRCodeSampleBufferScanner,
     ) {
         self.delegate = delegate
+        self.attachmentLimits = attachmentLimits
         self.videoCapture = VideoCapture(
-            maxPlaintextVideoBytes: maxPlaintextVideoBytes,
+            attachmentLimits: attachmentLimits,
             qrCodeSampleBufferScanner: qrCodeSampleBufferScanner,
         )
 
@@ -838,6 +840,7 @@ class CameraCaptureSession: NSObject {
         let attachment = try PreviewableAttachment.videoAttachment(
             dataSource: dataSource,
             dataUTI: UTType.mpeg4Movie.identifier,
+            attachmentLimits: self.attachmentLimits,
         )
         delegate?.cameraCaptureSession(self, didFinishProcessing: attachment)
     }
@@ -1144,7 +1147,7 @@ private enum VideoCaptureError: Error {
 
 private class VideoCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate {
 
-    private let maxPlaintextVideoBytes: UInt64
+    private let attachmentLimits: OutgoingAttachmentLimits
     private let qrCodeSampleBufferScanner: QRCodeSampleBufferScanner
 
     let videoDataOutput = AVCaptureVideoDataOutput()
@@ -1179,8 +1182,8 @@ private class VideoCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
         }
     }
 
-    init(maxPlaintextVideoBytes: UInt64, qrCodeSampleBufferScanner: QRCodeSampleBufferScanner) {
-        self.maxPlaintextVideoBytes = maxPlaintextVideoBytes
+    init(attachmentLimits: OutgoingAttachmentLimits, qrCodeSampleBufferScanner: QRCodeSampleBufferScanner) {
+        self.attachmentLimits = attachmentLimits
         self.qrCodeSampleBufferScanner = qrCodeSampleBufferScanner
 
         super.init()
@@ -1409,7 +1412,7 @@ private class VideoCapture: NSObject, AVCaptureVideoDataOutputSampleBufferDelega
             if
                 shouldCheckFileSize,
                 let fileSize = (try? OWSFileSystem.fileSize(of: assetWriter.outputURL)),
-                (fileSize + estimatedTeardownOverhead) >= self.maxPlaintextVideoBytes
+                (fileSize + estimatedTeardownOverhead) >= self.attachmentLimits.maxPlaintextVideoBytes
             {
                 Logger.warn("stopping recording before hitting max file size")
                 needsFinishAssetWriterSession = true

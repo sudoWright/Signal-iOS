@@ -105,7 +105,10 @@ public struct SendableAttachment {
     /// If the attachment is a video longer than `storyVideoSegmentMaxDuration`,
     /// segments into separate attachments under that duration.
     /// Otherwise returns a result with only the original and nil segmented attachments.
-    public func segmentedIfNecessary(segmentDuration: TimeInterval) async throws -> SegmentAttachmentResult {
+    public func segmentedIfNecessary(
+        segmentDuration: TimeInterval,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) async throws -> SegmentAttachmentResult {
         guard SignalAttachment.videoUTISet.contains(self.dataUTI) else {
             return SegmentAttachmentResult(self, segmented: nil)
         }
@@ -132,7 +135,7 @@ public struct SendableAttachment {
         let segments = try segmentFileUrls.map { url in
             let dataSource = DataSourcePath(fileUrl: url, ownership: .owned)
             // [15M] TODO: This doesn't transfer all SignalAttachment fields.
-            let attachment = try PreviewableAttachment.videoAttachment(dataSource: dataSource, dataUTI: self.dataUTI)
+            let attachment = try PreviewableAttachment.videoAttachment(dataSource: dataSource, dataUTI: self.dataUTI, attachmentLimits: attachmentLimits)
             return Self(nonImagePreviewableAttachment: attachment)
         }
         return SegmentAttachmentResult(self, segmented: segments)

@@ -9,7 +9,7 @@ import SignalServiceKit
 import SignalUI
 
 protocol RecentPhotosDelegate: AnyObject {
-    func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment)
+    func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits)
 }
 
 class RecentPhotosCollectionView: UICollectionView {
@@ -256,13 +256,14 @@ extension RecentPhotosCollectionView: UICollectionViewDelegate, UICollectionView
 
         self.fetchingAttachmentIndex = indexPath
         let asset = collectionContents.asset(at: indexPath.item)
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         Task {
             defer {
                 self.fetchingAttachmentIndex = nil
             }
             do {
-                let attachment = try await collectionContents.outgoingAttachment(for: asset)
-                self.recentPhotosDelegate?.didSelectRecentPhoto(asset: asset, attachment: attachment)
+                let attachment = try await collectionContents.outgoingAttachment(for: asset, attachmentLimits: attachmentLimits)
+                self.recentPhotosDelegate?.didSelectRecentPhoto(asset: asset, attachment: attachment, attachmentLimits: attachmentLimits)
             } catch {
                 Logger.warn("\(error)")
                 switch error {

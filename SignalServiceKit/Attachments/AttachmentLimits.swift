@@ -36,13 +36,21 @@ public struct IncomingAttachmentLimits {
 /// Limits imposed on attachments we send to others.
 public struct OutgoingAttachmentLimits {
     private let remoteConfig: RemoteConfig
+    private let callingCode: Int?
 
-    public static func currentLimits(remoteConfig: RemoteConfig = .current) -> Self {
-        return Self(remoteConfig: remoteConfig)
+    public static func currentLimits(
+        remoteConfig: RemoteConfig = .current,
+        callingCode: Int? = ImageQualityLevel.defaultCallingCode(),
+    ) -> Self {
+        return Self(remoteConfig: remoteConfig, callingCode: callingCode)
     }
 
-    init(remoteConfig: RemoteConfig) {
+    init(
+        remoteConfig: RemoteConfig,
+        callingCode: Int?,
+    ) {
         self.remoteConfig = remoteConfig
+        self.callingCode = callingCode
     }
 
     // MARK: - Overall
@@ -67,5 +75,12 @@ public struct OutgoingAttachmentLimits {
             return 95_000_000
         }
         return maxPlaintextBytes
+    }
+
+    public var standardQualityLevel: ImageQualityLevel {
+        return ImageQualityLevel.standardQualityLevel(
+            remoteConfig: remoteConfig,
+            callingCode: callingCode,
+        )
     }
 }

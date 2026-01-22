@@ -13,7 +13,11 @@ protocol SendMediaNavDelegate: AnyObject {
 
     func sendMediaNavDidCancel(_ sendMediaNavigationController: SendMediaNavigationController)
 
-    func sendMediaNav(_ sendMediaNavigationController: SendMediaNavigationController, didApproveAttachments approvedAttachments: ApprovedAttachments, messageBody: MessageBody?)
+    func sendMediaNav(
+        _ sendMediaNavigationController: SendMediaNavigationController,
+        didApproveAttachments approvedAttachments: ApprovedAttachments,
+        messageBody: MessageBody?,
+    )
 
     func sendMediaNav(_ sendMediaNavigationController: SendMediaNavigationController, didFinishWithTextAttachment textAttachment: UnsentTextAttachment)
 
@@ -48,12 +52,17 @@ class CameraFirstCaptureNavigationController: SendMediaNavigationController {
     class func cameraFirstModal(
         storiesOnly: Bool = false,
         hasQuotedReplyDraft: Bool,
+        attachmentLimits: OutgoingAttachmentLimits,
         delegate: CameraFirstCaptureDelegate,
     ) -> CameraFirstCaptureNavigationController {
-        let navController = CameraFirstCaptureNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft)
+        let navController = CameraFirstCaptureNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft, attachmentLimits: attachmentLimits)
         navController.setViewControllers([navController.captureViewController], animated: false)
 
-        let cameraFirstCaptureSendFlow = CameraFirstCaptureSendFlow(storiesOnly: storiesOnly, delegate: delegate)
+        let cameraFirstCaptureSendFlow = CameraFirstCaptureSendFlow(
+            storiesOnly: storiesOnly,
+            attachmentLimits: attachmentLimits,
+            delegate: delegate,
+        )
         navController.cameraFirstCaptureSendFlow = cameraFirstCaptureSendFlow
         navController.sendMediaNavDelegate = cameraFirstCaptureSendFlow
         navController.sendMediaNavDataSource = cameraFirstCaptureSendFlow
@@ -74,9 +83,11 @@ class SendMediaNavigationController: OWSNavigationController {
     fileprivate var storiesOnly: Bool = false
 
     private let hasQuotedReplyDraft: Bool
+    let attachmentLimits: OutgoingAttachmentLimits
 
-    fileprivate init(hasQuotedReplyDraft: Bool) {
+    fileprivate init(hasQuotedReplyDraft: Bool, attachmentLimits: OutgoingAttachmentLimits) {
         self.hasQuotedReplyDraft = hasQuotedReplyDraft
+        self.attachmentLimits = attachmentLimits
         super.init()
     }
 
@@ -91,8 +102,8 @@ class SendMediaNavigationController: OWSNavigationController {
     weak var sendMediaNavDelegate: SendMediaNavDelegate?
     weak var sendMediaNavDataSource: SendMediaNavDataSource?
 
-    class func showingCameraFirst(hasQuotedReplyDraft: Bool) -> SendMediaNavigationController {
-        let navController = SendMediaNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft)
+    class func showingCameraFirst(hasQuotedReplyDraft: Bool, attachmentLimits: OutgoingAttachmentLimits) -> SendMediaNavigationController {
+        let navController = SendMediaNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft, attachmentLimits: attachmentLimits)
         navController.setViewControllers([navController.captureViewController], animated: false)
         return navController
     }
@@ -107,13 +118,13 @@ class SendMediaNavigationController: OWSNavigationController {
         return config
     }
 
-    class func showingNativePicker(hasQuotedReplyDraft: Bool) -> SendMediaNavigationController {
+    class func showingNativePicker(hasQuotedReplyDraft: Bool, attachmentLimits: OutgoingAttachmentLimits) -> SendMediaNavigationController {
         // We want to present the photo picker in a sheet and then have the
         // editor appear behind it after you select photos, so present this
         // navigation controller as transparent with an empty view, then when
         // you select photos, `showApprovalViewController` will make it appear
         // behind the dismissing sheet and transition to the editor.
-        let navController = SendMediaNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft)
+        let navController = SendMediaNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft, attachmentLimits: attachmentLimits)
         navController.pushViewController(UIViewController(), animated: false)
         navController.view.layer.opacity = 0
         navController.modalPresentationStyle = .overCurrentContext
@@ -141,10 +152,11 @@ class SendMediaNavigationController: OWSNavigationController {
         asset: PHAsset,
         attachment: PreviewableAttachment,
         hasQuotedReplyDraft: Bool,
+        attachmentLimits: OutgoingAttachmentLimits,
         delegate: SendMediaNavDelegate,
         dataSource: SendMediaNavDataSource,
     ) -> SendMediaNavigationController {
-        let navController = SendMediaNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft)
+        let navController = SendMediaNavigationController(hasQuotedReplyDraft: hasQuotedReplyDraft, attachmentLimits: attachmentLimits)
         navController.sendMediaNavDelegate = delegate
         navController.sendMediaNavDataSource = dataSource
         navController.modalPresentationStyle = .overCurrentContext
@@ -175,7 +187,7 @@ class SendMediaNavigationController: OWSNavigationController {
     // MARK: - Child View Controllers
 
     fileprivate lazy var captureViewController: PhotoCaptureViewController = {
-        let viewController = PhotoCaptureViewController()
+        let viewController = PhotoCaptureViewController(attachmentLimits: attachmentLimits)
         viewController.delegate = self
         viewController.dataSource = self
         return viewController
@@ -208,6 +220,7 @@ class SendMediaNavigationController: OWSNavigationController {
         }
         let approvalViewController = AttachmentApprovalViewController.loadWithSneakyTransaction(
             attachmentApprovalItems: pendingAttachments.map(\.approvalItem),
+            attachmentLimits: attachmentLimits,
             options: options,
         )
         approvalViewController.approvalDelegate = self
@@ -408,8 +421,11 @@ extension SendMediaNavigationController: PHPickerViewControllerDelegate {
                 }
             } else {
                 didAddAttachments = true
-                return {
-                    let attachment = try await TypedItemProvider.buildVisualMediaAttachment(forItemProvider: result.itemProvider)
+                return { [attachmentLimits] in
+                    let attachment = try await TypedItemProvider.buildVisualMediaAttachment(
+                        forItemProvider: result.itemProvider,
+                        attachmentLimits: attachmentLimits,
+                    )
                     let approvalItem = AttachmentApprovalItem(attachment: attachment, canSave: false)
                     return PendingAttachment(source: .systemLibrary(systemIdentifier: assetIdentifier), approvalItem: approvalItem)
                 }
@@ -454,8 +470,11 @@ extension SendMediaNavigationController: PHPickerViewControllerDelegate {
                 continue
             }
             didAddAttachments = true
-            resolvablePendingAttachments.append({
-                let attachment = try await TypedItemProvider.buildVisualMediaAttachment(forItemProvider: result.itemProvider)
+            resolvablePendingAttachments.append({ [attachmentLimits] in
+                let attachment = try await TypedItemProvider.buildVisualMediaAttachment(
+                    forItemProvider: result.itemProvider,
+                    attachmentLimits: attachmentLimits,
+                )
                 let approvalItem = AttachmentApprovalItem(attachment: attachment, canSave: false)
                 return PendingAttachment(source: .systemLibrary(systemIdentifier: assetIdentifier), approvalItem: approvalItem)
             })

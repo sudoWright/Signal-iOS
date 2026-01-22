@@ -31,12 +31,13 @@ class GifPickerNavigationViewController: OWSNavigationController {
 }
 
 extension GifPickerNavigationViewController: GifPickerViewControllerDelegate {
-    func gifPickerDidSelect(attachment: PreviewableAttachment) {
+    func gifPickerDidSelect(attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits) {
         AssertIsOnMainThread()
 
         let attachmentApprovalItem = AttachmentApprovalItem(attachment: attachment, canSave: false)
         let attachmentApproval = AttachmentApprovalViewController.loadWithSneakyTransaction(
             attachmentApprovalItems: [attachmentApprovalItem],
+            attachmentLimits: attachmentLimits,
             options: self.hasQuotedReplyDraft ? [.disallowViewOnce] : [],
         )
         attachmentApproval.approvalDataSource = self
@@ -60,7 +61,11 @@ extension GifPickerNavigationViewController: AttachmentApprovalViewControllerDel
         didApproveAttachments approvedAttachments: ApprovedAttachments,
         messageBody: MessageBody?,
     ) {
-        approvalDelegate?.attachmentApproval(attachmentApproval, didApproveAttachments: approvedAttachments, messageBody: messageBody)
+        approvalDelegate?.attachmentApproval(
+            attachmentApproval,
+            didApproveAttachments: approvedAttachments,
+            messageBody: messageBody,
+        )
     }
 
     func attachmentApprovalDidCancel() {
@@ -99,7 +104,7 @@ extension GifPickerNavigationViewController: AttachmentApprovalViewControllerDat
 
 protocol GifPickerViewControllerDelegate: AnyObject {
     @MainActor
-    func gifPickerDidSelect(attachment: PreviewableAttachment)
+    func gifPickerDidSelect(attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits)
     @MainActor
     func gifPickerDidCancel()
 }
@@ -495,12 +500,14 @@ class GifPickerViewController: OWSViewController, UISearchBarDelegate, UICollect
     func getFileForCell(_ cell: GifPickerCell) {
         GiphyDownloader.giphyDownloader.cancelAllRequests()
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         fileForCellTask?.cancel()
         fileForCellTask = Task {
             do {
                 let asset = try await cell.requestRenditionForSending()
-                let attachment = try await buildAttachment(forAsset: asset)
-                self.delegate?.gifPickerDidSelect(attachment: attachment)
+                let attachment = try await buildAttachment(forAsset: asset, attachmentLimits: attachmentLimits)
+                self.delegate?.gifPickerDidSelect(attachment: attachment, attachmentLimits: attachmentLimits)
             } catch {
                 let alert = ActionSheetController(
                     title: OWSLocalizedString("GIF_PICKER_FAILURE_ALERT_TITLE", comment: "Shown when selected GIF couldn't be fetched"),
@@ -518,7 +525,10 @@ class GifPickerViewController: OWSViewController, UISearchBarDelegate, UICollect
     }
 
     @concurrent
-    private nonisolated func buildAttachment(forAsset asset: ProxiedContentAsset) async throws -> PreviewableAttachment {
+    private nonisolated func buildAttachment(
+        forAsset asset: ProxiedContentAsset,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) async throws -> PreviewableAttachment {
         guard let giphyAsset = asset.assetDescription as? GiphyAsset else {
             throw OWSAssertionError("Invalid asset description.")
         }
@@ -531,7 +541,7 @@ class GifPickerViewController: OWSViewController, UISearchBarDelegate, UICollect
         try FileManager.default.copyItem(atPath: assetFilePath, toPath: consumableFilePath)
         let dataSource = DataSourcePath(filePath: consumableFilePath, ownership: .owned)
 
-        let attachment = try PreviewableAttachment.buildAttachment(dataSource: dataSource, dataUTI: assetTypeIdentifier)
+        let attachment = try PreviewableAttachment.buildAttachment(dataSource: dataSource, dataUTI: assetTypeIdentifier, attachmentLimits: attachmentLimits)
         attachment.rawValue.isLoopingVideo = attachment.isVideo
         return attachment
     }

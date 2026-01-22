@@ -259,6 +259,8 @@ class StoriesViewController: OWSViewController, StoryListDataSourceDelegate, Hom
         // Dismiss any message actions if they're presented
         conversationSplitViewController?.selectedConversationViewController?.dismissMessageContextMenu(animated: true)
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         ows_askForCameraPermissions { cameraGranted in
             guard cameraGranted else {
                 return Logger.warn("camera permission denied.")
@@ -273,6 +275,7 @@ class StoriesViewController: OWSViewController, StoryListDataSourceDelegate, Hom
                 let modal = CameraFirstCaptureNavigationController.cameraFirstModal(
                     storiesOnly: true,
                     hasQuotedReplyDraft: false,
+                    attachmentLimits: attachmentLimits,
                     delegate: self,
                 )
                 self.presentFullScreen(modal, animated: true)

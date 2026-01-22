@@ -26,10 +26,12 @@ class CameraFirstCaptureSendFlow {
     private var selectedConversations: [ConversationItem] { selection.conversations }
 
     private let storiesOnly: Bool
+    private let attachmentLimits: OutgoingAttachmentLimits
     private var showsStoriesInPicker = true
 
-    init(storiesOnly: Bool, delegate: CameraFirstCaptureDelegate) {
+    init(storiesOnly: Bool, attachmentLimits: OutgoingAttachmentLimits, delegate: CameraFirstCaptureDelegate) {
         self.storiesOnly = storiesOnly
+        self.attachmentLimits = attachmentLimits
         self.delegate = delegate
     }
 
@@ -167,12 +169,13 @@ extension CameraFirstCaptureSendFlow: ConversationPickerDelegate {
         if let approvedAttachments {
             let approvedMessageBody = self.approvedMessageBody
             let selectedConversations = self.selectedConversations
-            Task { @MainActor in
+            Task { @MainActor [attachmentLimits] in
                 do {
                     _ = try await AttachmentMultisend.enqueueApprovedMedia(
                         conversations: selectedConversations,
                         approvedMessageBody: approvedMessageBody,
                         approvedAttachments: approvedAttachments,
+                        attachmentLimits: attachmentLimits,
                     )
                     self.delegate?.cameraFirstCaptureSendFlowDidComplete(self)
                 } catch {

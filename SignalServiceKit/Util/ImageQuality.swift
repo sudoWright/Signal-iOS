@@ -55,15 +55,17 @@ public enum ImageQualityLevel: UInt, Comparable {
     // High quality is always level three. If not remotely specified, standard
     // uses quality level two.
     public static func standardQualityLevel(
-        remoteConfig: RemoteConfig = .current,
-        callingCode: Int? = { () -> Int? in
-            let phoneNumberUtil = SSKEnvironment.shared.phoneNumberUtilRef
-            let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-            let localIdentifiers = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction
-            return localIdentifiers.flatMap({ phoneNumberUtil.parseE164($0.phoneNumber) })?.getCallingCode()
-        }(),
+        remoteConfig: RemoteConfig,
+        callingCode: Int?,
     ) -> ImageQualityLevel {
         return remoteConfig.standardMediaQualityLevel(callingCode: callingCode) ?? .two
+    }
+
+    public static func defaultCallingCode(
+        phoneNumberUtil: PhoneNumberUtil = SSKEnvironment.shared.phoneNumberUtilRef,
+        localIdentifiers: LocalIdentifiers? = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction,
+    ) -> Int? {
+        return localIdentifiers.flatMap({ phoneNumberUtil.parseE164($0.phoneNumber) })?.getCallingCode()
     }
 
     public var startingTier: ImageQualityTier {
@@ -109,7 +111,7 @@ public enum ImageQualityLevel: UInt, Comparable {
 
     public static func resolvedValue(
         imageQuality: ImageQuality,
-        standardQualityLevel: @autoclosure () -> Self = .standardQualityLevel(),
+        standardQualityLevel: Self,
         maximumForCurrentAppContext: Self = .maximumForCurrentAppContext(),
     ) -> ImageQualityLevel {
         let targetQualityLevel: Self
@@ -117,7 +119,7 @@ public enum ImageQualityLevel: UInt, Comparable {
         case .high:
             targetQualityLevel = .three
         case .standard:
-            targetQualityLevel = standardQualityLevel()
+            targetQualityLevel = standardQualityLevel
         }
         // If the max quality we allow is less than the stored preference,
         // we have to restrict ourselves to the max allowed.

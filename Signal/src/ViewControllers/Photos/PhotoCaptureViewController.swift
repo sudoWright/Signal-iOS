@@ -37,6 +37,12 @@ protocol PhotoCaptureViewControllerDataSource: AnyObject {
 }
 
 class PhotoCaptureViewController: OWSViewController, OWSNavigationChildController {
+    private let attachmentLimits: OutgoingAttachmentLimits
+
+    init(attachmentLimits: OutgoingAttachmentLimits) {
+        self.attachmentLimits = attachmentLimits
+        super.init()
+    }
 
     weak var delegate: PhotoCaptureViewControllerDelegate?
     weak var dataSource: PhotoCaptureViewControllerDataSource?
@@ -45,7 +51,7 @@ class PhotoCaptureViewController: OWSViewController, OWSNavigationChildControlle
     private lazy var qrCodeSampleBufferScanner = QRCodeSampleBufferScanner(delegate: self)
     private lazy var cameraCaptureSession = CameraCaptureSession(
         delegate: self,
-        maxPlaintextVideoBytes: OutgoingAttachmentLimits.currentLimits().maxPlaintextVideoBytes,
+        attachmentLimits: attachmentLimits,
         qrCodeSampleBufferScanner: qrCodeSampleBufferScanner,
     )
 

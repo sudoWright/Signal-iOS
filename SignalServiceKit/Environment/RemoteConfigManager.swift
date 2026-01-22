@@ -610,8 +610,8 @@ private enum ValueFlag: String, FlagType {
     var isHotSwappable: Bool {
         switch self {
         case .applePayDisabledRegions: true
-        case .attachmentMaxEncryptedBytes: false
-        case .attachmentMaxEncryptedReceiveBytes: false
+        case .attachmentMaxEncryptedBytes: true
+        case .attachmentMaxEncryptedReceiveBytes: true
         case .automaticSessionResetAttemptInterval: true
         case .backgroundRefreshInterval: true
         case .callQualitySurveyPPM: true
@@ -633,7 +633,7 @@ private enum ValueFlag: String, FlagType {
         case .reactiveProfileKeyAttemptInterval: true
         case .replaceableInteractionExpiration: false
         case .sepaEnabledRegions: true
-        case .standardMediaQualityLevel: false
+        case .standardMediaQualityLevel: true
         case .backupListMediaDefaultRefreshIntervalMs: true
         case .backupListMediaOutOfQuotaRefreshIntervalMs: true
         case .pinnedMessageLimit: true
