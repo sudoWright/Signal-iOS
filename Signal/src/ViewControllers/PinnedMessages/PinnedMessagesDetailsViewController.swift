@@ -13,6 +13,7 @@ class PinnedMessagesDetailsViewController: OWSViewController, DatabaseChangeDele
     private let db: DB
     private var messageLongPressDelegates: [PinnedMessageLongPressDelegate] = []
     private var pinnedMessageManager: PinnedMessageManager
+    let spoilerState: SpoilerRenderState
 
     private weak var delegate: PinnedMessageInteractionManagerDelegate?
 
@@ -27,12 +28,14 @@ class PinnedMessagesDetailsViewController: OWSViewController, DatabaseChangeDele
         delegate: PinnedMessageInteractionManagerDelegate,
         databaseChangeObserver: DatabaseChangeObserver,
         pinnedMessageManager: PinnedMessageManager,
+        spoilerState: SpoilerRenderState,
     ) {
         self.pinnedMessages = pinnedMessages
         self.threadViewModel = threadViewModel
         self.db = database
         self.delegate = delegate
         self.pinnedMessageManager = pinnedMessageManager
+        self.spoilerState = spoilerState
 
         super.init()
 
@@ -254,13 +257,12 @@ class PinnedMessagesDetailsViewController: OWSViewController, DatabaseChangeDele
             ),
         )
 
-        // TODO: correct spoilerState
         return CVLoader.buildStandaloneRenderItem(
             interaction: message,
             thread: thread,
             threadAssociatedData: threadAssociatedData,
             conversationStyle: conversationStyle,
-            spoilerState: SpoilerRenderState(),
+            spoilerState: self.spoilerState,
             transaction: tx,
         )
     }
@@ -414,10 +416,6 @@ private class PinnedMessageLongPressDelegate: NSObject, UIContextMenuInteraction
 // MARK: - CVComponentDelegate
 
 extension PinnedMessagesDetailsViewController: CVComponentDelegate {
-    var spoilerState: SignalUI.SpoilerRenderState {
-        return SpoilerRenderState()
-    }
-
     func enqueueReload() {}
 
     func enqueueReloadWithoutCaches() {}

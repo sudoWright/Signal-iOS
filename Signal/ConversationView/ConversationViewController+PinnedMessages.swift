@@ -370,6 +370,7 @@ extension ConversationViewController: PinnedMessageInteractionManagerDelegate {
             delegate: self,
             databaseChangeObserver: DependenciesBridge.shared.databaseChangeObserver,
             pinnedMessageManager: DependenciesBridge.shared.pinnedMessageManager,
+            spoilerState: self.viewState.spoilerState,
         ))
         pmDetailsController.modalPresentationStyle = .pageSheet
         present(pmDetailsController, animated: true)
