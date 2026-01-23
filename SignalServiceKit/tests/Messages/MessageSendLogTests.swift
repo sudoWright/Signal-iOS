@@ -545,15 +545,11 @@ class MessageSendLogTests: SSKBaseTest {
         transaction writeTx: DBWriteTransaction,
     ) -> TSOutgoingMessage {
 
-        let resolvedDate = date ?? {
-            let newDate = Date()
-            usleep(2000) // If we're taking the timestamp of Now, wait a bit to avoid collisions
-            return newDate
-        }()
+        let timestamp = date?.ows_millisecondsSince1970 ?? MessageTimestampGenerator.sharedInstance.generateTimestamp()
 
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(
             thread: ContactThreadFactory().create(transaction: writeTx),
-            timestamp: resolvedDate.ows_millisecondsSince1970,
+            timestamp: timestamp,
         )
         let testMessage = MSLTestMessage(outgoingMessageWithBuilder: builder, transaction: writeTx)
         testMessage._contentHint = contentHint
