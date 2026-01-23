@@ -293,7 +293,6 @@ private class GenericStreamProvider {
         let transformableInputStream = TransformingInputStream(
             transforms: transforms,
             inputStream: inputStream,
-            runLoop: streamRunloop,
         )
 
         let backupInputStream = BackupArchiveProtoInputStream(

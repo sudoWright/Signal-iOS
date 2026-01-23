@@ -12,18 +12,15 @@ public final class TransformingInputStream: InputStreamable {
 
     private let transforms: [any StreamTransform]
     private let inputStream: InputStreamable
-    private let runLoop: RunLoop?
 
     private var hasInitialized: Bool = false
 
     public init(
         transforms: [any StreamTransform],
         inputStream: InputStreamable,
-        runLoop: RunLoop? = nil,
     ) {
         self.transforms = transforms
         self.inputStream = inputStream
-        self.runLoop = runLoop
     }
 
     /// `hasBytesAvailable` should return true if any of the following is true:
