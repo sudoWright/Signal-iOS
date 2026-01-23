@@ -122,9 +122,6 @@ public enum Upload {
         /// The length of the encrypted data, consiting of "iv  + encrypted data + hmac"
         public let encryptedDataLength: UInt32
 
-        /// The length of the unencrypted data
-        public let plaintextDataLength: UInt32
-
         /// The total size of all backup-able attachments in the backup.
         /// Does NOT take into account current backup plan state; just per-attachment
         /// backup eligibility.

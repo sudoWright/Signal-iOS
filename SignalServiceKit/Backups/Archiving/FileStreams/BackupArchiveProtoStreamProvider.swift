@@ -116,11 +116,9 @@ public class BackupArchiveEncryptedProtoStreamProvider {
     ) -> ProtoStream.OpenOutputStreamResult<Upload.EncryptedBackupUploadMetadata> {
         let backupEncryptionKey = encryptionMetadata.encryptionKey
         do {
-            let inputTrackingTransform = MetadataStreamTransform(calculateDigest: false)
-            let outputTrackingTransform = MetadataStreamTransform(calculateDigest: true)
+            let outputTrackingTransform = MetadataStreamTransform()
 
             let transforms: [any StreamTransform] = [
-                inputTrackingTransform,
                 ChunkedOutputStreamTransform(),
                 try GzipStreamTransform(.compress),
                 try EncryptingStreamTransform(
@@ -153,7 +151,6 @@ public class BackupArchiveEncryptedProtoStreamProvider {
                         fileUrl: fileUrl,
                         digest: try outputTrackingTransform.digest(),
                         encryptedDataLength: UInt32(clamping: outputTrackingTransform.count),
-                        plaintextDataLength: UInt32(clamping: inputTrackingTransform.count),
                         attachmentByteSize: attachmentByteCounter.attachmentByteSize(),
                         nonceMetadata: encryptionMetadata.nonceMetadata,
                     )

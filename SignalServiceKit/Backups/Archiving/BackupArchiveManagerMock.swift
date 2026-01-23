@@ -54,7 +54,6 @@ open class BackupArchiveManagerMock: BackupArchiveManager {
             fileUrl: URL(string: "file://")!,
             digest: Data(),
             encryptedDataLength: 0,
-            plaintextDataLength: 0,
             attachmentByteSize: 0,
             nonceMetadata: nil,
         )
