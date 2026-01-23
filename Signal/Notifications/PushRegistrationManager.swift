@@ -202,11 +202,6 @@ public class PushRegistrationManager: NSObject, PKPushRegistryDelegate {
      */
     @MainActor
     private func isSusceptibleToFailedPushRegistration() async -> Bool {
-
-        if Platform.isSimulator {
-            return true
-        }
-
         // Only affects users who have disabled both: background refresh *and* notifications
         guard UIApplication.shared.backgroundRefreshStatus == .denied else {
             Logger.info("has backgroundRefreshStatus != .denied, not susceptible to push registration failure")
@@ -269,7 +264,7 @@ public class PushRegistrationManager: NSObject, PKPushRegistryDelegate {
                 return try await promise.awaitable()
             })
         } catch is UncooperativeTimeoutError {
-            if await self.isSusceptibleToFailedPushRegistration() {
+            if await self.isSusceptibleToFailedPushRegistration() || Platform.isSimulator {
                 // If we've timed out on a device known to be susceptible to failures, quit trying
                 // so the user doesn't remain indefinitely hung for no good reason.
                 throw PushRegistrationError.pushNotSupported(description: "Device configuration disallows push notifications")
