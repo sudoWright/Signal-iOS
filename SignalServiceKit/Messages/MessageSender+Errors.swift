@@ -298,23 +298,3 @@ class MessageDeletedBeforeSentError: CustomNSError, IsRetryableProvider {
 
     var isRetryableProvider: Bool { false }
 }
-
-// MARK: -
-
-class MessageSendEncryptionError: CustomNSError, IsRetryableProvider {
-    let serviceId: ServiceId
-    let deviceId: DeviceId
-
-    init(serviceId: ServiceId, deviceId: DeviceId) {
-        self.serviceId = serviceId
-        self.deviceId = deviceId
-    }
-
-    // NSError bridging: the domain of the error.
-    static let errorDomain = OWSError.errorDomain
-
-    // NSError bridging: the error code within the given domain.
-    var errorCode: Int { OWSErrorCode.messageSendEncryptionFailure.rawValue }
-
-    var isRetryableProvider: Bool { true }
-}
