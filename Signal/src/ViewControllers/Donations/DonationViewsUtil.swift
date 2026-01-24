@@ -397,18 +397,16 @@ public enum DonationViewsUtil {
                     paymentStore.getPendingSubscription(tx: tx)
                 })
             else {
-                Logger.error("[Donations] Could not find iDEAL subscription to complete")
-                throw OWSUnretryableError()
+                throw OWSGenericError("[Donations] Could not find iDEAL subscription to complete")
             }
             guard
                 clientSecret == monthlyDonation.clientSecret,
                 intentId == monthlyDonation.setupIntentId
             else {
-                owsFailDebug("[Donations] Pending iDEAL subscription details do not match")
-                throw OWSUnretryableError()
+                throw OWSAssertionError("[Donations] Pending iDEAL subscription details do not match")
             }
             guard success else {
-                throw OWSUnretryableError()
+                throw OWSGenericError("")
             }
 
             return try await DonationViewsUtil.completeMonthlyDonations(
@@ -425,15 +423,13 @@ public enum DonationViewsUtil {
                     paymentStore.getPendingOneTimeDonation(tx: tx)
                 })
             else {
-                Logger.error("[Donations] Could not find iDEAL payment to complete")
-                throw OWSUnretryableError()
+                throw OWSGenericError("[Donations] Could not find iDEAL payment to complete")
             }
             guard intentId == oneTimePayment.paymentIntentId else {
-                owsFailDebug("[Donations] Could not find iDEAL subscription to complete")
-                throw OWSUnretryableError()
+                throw OWSAssertionError("[Donations] Could not find iDEAL subscription to complete")
             }
             guard success else {
-                throw OWSUnretryableError()
+                throw OWSGenericError("")
             }
 
             return try await DonationViewsUtil.completeOneTimeDonation(

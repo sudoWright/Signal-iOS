@@ -100,31 +100,3 @@ public class OWSRetryableError: CustomNSError, IsRetryableProvider {
 
     public var isRetryableProvider: Bool { true }
 }
-
-// MARK: -
-
-// NOTE: We typically prefer to use a more specific error.
-public class OWSUnretryableError: CustomNSError, IsRetryableProvider {
-    public static var asNSError: NSError {
-        OWSUnretryableError() as Error as NSError
-    }
-
-    public init() {}
-
-    // MARK: - IsRetryableProvider
-
-    public var isRetryableProvider: Bool { false }
-}
-
-// MARK: -
-
-public enum SSKUnretryableError: Error, IsRetryableProvider {
-    case stickerDecryptionFailure
-    case downloadCouldNotMoveFile
-    case downloadCouldNotDeleteFile
-    case messageProcessingFailed
-
-    // MARK: - IsRetryableProvider
-
-    public var isRetryableProvider: Bool { false }
-}

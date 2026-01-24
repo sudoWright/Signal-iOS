@@ -995,8 +995,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         case .mediaTier(_, isThumbnail: false):
             // We never allow uploads of data we don't have locally.
             guard let stream = attachment.asStream() else {
-                logger.warn("Attachment is not uploadable.")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Attachment is not uploadable.")
             }
 
             let now: Date = dateProvider()
@@ -1044,14 +1043,12 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 let stream = attachment.asStream(),
                 let mediaName = attachment.mediaName
             else {
-                logger.warn("Attachment is not uploadable.")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Attachment is not uploadable.")
             }
             let fileUrl = fileSystem.temporaryFileUrl()
 
             guard let mrbk = db.read(block: { accountKeyStore.getMediaRootBackupKey(tx: $0) }) else {
-                logger.warn("Media tier upload missing root key.")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Media tier upload missing root key.")
             }
 
             let encryptionKey = try mrbk.mediaEncryptionMetadata(
@@ -1064,8 +1061,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                     quality: .backupThumbnail,
                 )
             else {
-                logger.warn("Unable to generate thumbnail; may not be visual media?")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Unable to generate thumbnail; may not be visual media?")
             }
 
             let thumbnailData = try attachmentThumbnailService.backupThumbnailData(image: thumbnailImage)
@@ -1091,9 +1087,8 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         case .transitTier:
             switch attachment.transitUploadStrategy(dateProvider: dateProvider) {
             case .cannotUpload:
-                logger.warn("Attachment is not uploadable.")
                 // Can't upload non-stream attachments; terminal failure.
-                throw OWSUnretryableError()
+                throw OWSGenericError("Attachment is not uploadable.")
             case .reuseExistingUpload(let metadata):
                 logger.debug("Attachment previously uploaded.")
                 return .alreadyUploaded(metadata)
@@ -1128,9 +1123,8 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         tx: DBReadTransaction,
     ) throws -> Attachment {
         guard let attachment = attachmentStore.fetch(id: attachmentId, tx: tx) else {
-            logger.warn("Missing attachment.")
             // Not finding a local attachment is a terminal failure.
-            throw OWSUnretryableError()
+            throw OWSGenericError("Missing attachment.")
         }
         return attachment
     }

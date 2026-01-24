@@ -53,9 +53,8 @@ enum DownloadStickerOperation {
         do {
             decryptedFileUrl = try StickerManager.decrypt(at: encryptedFileUrl, packKey: stickerInfo.packKey)
         } catch {
-            owsFailDebug("Decryption failed: \(error)")
             CDNDownloadOperation.markUrlPathAsCorrupt(urlPath)
-            throw SSKUnretryableError.stickerDecryptionFailure
+            throw OWSAssertionError("Decryption failed: \(error)")
         }
 
         DownloadStickerOperation.setCachedUrl(decryptedFileUrl, for: stickerInfo)

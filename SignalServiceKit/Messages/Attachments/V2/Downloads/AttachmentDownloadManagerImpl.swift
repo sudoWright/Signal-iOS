@@ -1979,8 +1979,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
         ) async throws -> DownloadResult {
             return try await db.awaitableWriteWithRollbackIfThrows { tx in
                 guard let attachmentWeJustDownloaded = self.attachmentStore.fetch(id: attachmentId, tx: tx) else {
-                    Logger.error("Missing attachment after download; could have been deleted while downloading.")
-                    throw OWSUnretryableError()
+                    throw OWSGenericError("Missing attachment after download; could have been deleted while downloading.")
                 }
                 if let stream = attachmentWeJustDownloaded.asStream() {
                     // Its already a stream?
@@ -2148,8 +2147,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
         ) async throws -> AttachmentStream {
             return try await db.awaitableWriteWithRollbackIfThrows { tx -> AttachmentStream in
                 guard let existingAttachment = self.attachmentStore.fetch(id: attachmentId, tx: tx) else {
-                    Logger.error("Missing attachment after download; could have been deleted while downloading.")
-                    throw OWSUnretryableError()
+                    throw OWSGenericError("Missing attachment after download; could have been deleted while downloading.")
                 }
                 if let stream = existingAttachment.asStream() {
                     // Its already a stream?

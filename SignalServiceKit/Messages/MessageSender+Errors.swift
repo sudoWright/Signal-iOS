@@ -272,19 +272,6 @@ class OWSRetryableMessageSenderError: Error, IsRetryableProvider {
 
 // MARK: -
 
-// NOTE: We typically prefer to use a more specific error.
-class OWSUnretryableMessageSenderError: Error, IsRetryableProvider {
-    static var asNSError: NSError {
-        OWSUnretryableMessageSenderError() as Error as NSError
-    }
-
-    // MARK: - IsRetryableProvider
-
-    var isRetryableProvider: Bool { false }
-}
-
-// MARK: -
-
 class MessageDeletedBeforeSentError: CustomNSError, IsRetryableProvider {
     static var asNSError: NSError {
         MessageDeletedBeforeSentError() as Error as NSError

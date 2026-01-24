@@ -599,7 +599,7 @@ public class MessageSender {
 
     private func sendPreparedMessage(_ message: TSOutgoingMessage) async throws -> SendMessageFailure? {
         if !areAttachmentsUploadedWithSneakyTransaction(for: message) {
-            throw OWSUnretryableMessageSenderError()
+            throw OWSGenericError("attachments aren't uploaded")
         }
         if DependenciesBridge.shared.appExpiry.isExpired(now: Date()) {
             throw AppExpiredError()
@@ -615,7 +615,7 @@ public class MessageSender {
             }
         }
         if DebugFlags.messageSendsFail.get() {
-            throw OWSUnretryableMessageSenderError()
+            throw OWSGenericError("failure toggle is enabled")
         }
         try await waitForPreKeyRotationIfNeeded()
         let udManager = SSKEnvironment.shared.udManagerRef
@@ -1318,8 +1318,7 @@ public class MessageSender {
                     }
                 }()
                 guard hasValidMessageType else {
-                    owsFailDebug("Invalid message type: \(deviceMessage.type)")
-                    throw OWSUnretryableMessageSenderError()
+                    throw OWSAssertionError("Invalid message type: \(deviceMessage.type)")
                 }
             }
 

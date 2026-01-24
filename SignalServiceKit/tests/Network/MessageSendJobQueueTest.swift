@@ -164,7 +164,7 @@ class MessageSenderJobQueueTest: SSKBaseTest {
         }
 
         // simulate permanent failure
-        let error = OWSUnretryableError()
+        let error = OWSGenericError("")
         fakeMessageSender.stubbedFailingErrors = [error]
         jobQueue.setUp()
 

@@ -37,10 +37,9 @@ enum DownloadStickerPackOperation {
                     manifestData: manifestData,
                 )
             } catch {
-                owsFailDebug("Decryption failed: \(error)")
                 CDNDownloadOperation.markUrlPathAsCorrupt(urlPath)
                 // Fail immediately; do not retry.
-                throw SSKUnretryableError.stickerDecryptionFailure
+                throw OWSAssertionError("Decryption failed: \(error)")
             }
         } catch {
             if

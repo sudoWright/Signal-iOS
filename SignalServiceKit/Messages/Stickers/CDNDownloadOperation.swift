@@ -35,9 +35,8 @@ enum CDNDownloadOperation {
                 try OWSFileSystem.moveFile(from: downloadUrl, to: temporaryFileUrl)
                 return temporaryFileUrl
             } catch {
-                owsFailDebug("Could not move to temporary file: \(error)")
                 // Fail immediately; do not retry.
-                throw SSKUnretryableError.downloadCouldNotMoveFile
+                throw OWSAssertionError("Could not move to temporary file: \(error)")
             }
         } catch {
             Logger.warn("Download failed: \(error)")
@@ -52,9 +51,8 @@ enum CDNDownloadOperation {
             try OWSFileSystem.deleteFile(url: downloadUrl)
             return data
         } catch {
-            owsFailDebug("Could not load data failed: \(error)")
             // Fail immediately; do not retry.
-            throw SSKUnretryableError.downloadCouldNotDeleteFile
+            throw OWSAssertionError("Could not load data failed: \(error)")
         }
     }
 

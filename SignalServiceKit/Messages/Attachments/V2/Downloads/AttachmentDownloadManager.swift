@@ -128,8 +128,7 @@ public enum AttachmentDownloads {
                 let contentLengthRaw = headers["Content-Length"],
                 let contentLengthBytes = UInt(contentLengthRaw)
             else {
-                Logger.error("Missing content length from cdn")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Missing content length from cdn")
             }
             self.contentLength = contentLengthBytes
 
@@ -137,8 +136,7 @@ public enum AttachmentDownloads {
                 let lastModifiedRaw = headers["Last-Modified"],
                 let lastModifiedDate = Date.ows_parseFromHTTPDateString(lastModifiedRaw)
             else {
-                Logger.error("Missing last modified from cdn")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Missing last modified from cdn")
             }
             self.lastModified = lastModifiedDate
         }
