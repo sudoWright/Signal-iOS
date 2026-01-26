@@ -3545,19 +3545,19 @@
 "GENERIC_INCOMING_MESSAGE_NOTIFICATION" = "New Message!";
 
 /* Title for the 'Get Started' banner */
-"GET_STARTED_BANNER_TITLE" = "Get started";
-
-/* 'Get Started' button directing users to appearance */
-"GET_STARTED_CARD_APPEARANCE" = "Appearance";
+"GET_STARTED_BANNER_TITLE" = "Get Started";
 
 /* 'Get Started' button direction users to avatar builder */
 "GET_STARTED_CARD_AVATAR_BUILDER" = "Add Photo";
 
+/* 'Get Started' button directing users to Chat Color settings */
+"GET_STARTED_CARD_CHAT_COLOR" = "Chat Color";
+
 /* 'Get Started' button directing users to invite friends */
-"GET_STARTED_CARD_INVITE_FRIENDS" = "Invite friends";
+"GET_STARTED_CARD_INVITE_FRIENDS" = "Invite Friends";
 
 /* 'Get Started' button directing users to create a group */
-"GET_STARTED_CARD_NEW_GROUP" = "New group";
+"GET_STARTED_CARD_NEW_GROUP" = "New Group";
 
 /* Error displayed when there is a failure fetching a GIF from the remote service. */
 "GIF_PICKER_ERROR_FETCH_FAILURE" = "Failed to fetch the requested GIF. Please verify you are online.";

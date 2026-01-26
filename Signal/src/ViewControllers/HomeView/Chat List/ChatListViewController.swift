@@ -302,6 +302,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         if tableView.contentInset.bottom != bottomInset {
             UIView.animate(withDuration: CATransaction.animationDuration()) {
                 self.tableView.contentInset.bottom = bottomInset
+                self.tableView.verticalScrollIndicatorInsets.bottom = bottomInset
             }
         }
     }

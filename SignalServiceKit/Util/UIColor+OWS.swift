@@ -119,6 +119,29 @@ public extension UIColor {
         return UIColor(hue: hue, saturation: saturation, brightness: brightness, alpha: alpha)
     }
 
+    func overlaidOpaque(on backgroundColor: UIColor) -> UIColor {
+        var fgRed: CGFloat = 0
+        var fgGreen: CGFloat = 0
+        var fgBlue: CGFloat = 0
+        var fgAlpha: CGFloat = 0
+        var bgRed: CGFloat = 0
+        var bgGreen: CGFloat = 0
+        var bgBlue: CGFloat = 0
+
+        guard
+            self.getRed(&fgRed, green: &fgGreen, blue: &fgBlue, alpha: &fgAlpha),
+            backgroundColor.getRed(&bgRed, green: &bgGreen, blue: &bgBlue, alpha: nil)
+        else {
+            return self
+        }
+
+        let red = CGFloat.lerp(left: bgRed, right: fgRed, alpha: fgAlpha)
+        let green = CGFloat.lerp(left: bgGreen, right: fgGreen, alpha: fgAlpha)
+        let blue = CGFloat.lerp(left: bgBlue, right: fgBlue, alpha: fgAlpha)
+
+        return UIColor(red: red, green: green, blue: blue, alpha: 1)
+    }
+
     private func midPointRGB(with otherColor: UIColor) -> UIColor {
         var r1: CGFloat = 0
         var g1: CGFloat = 0

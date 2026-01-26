@@ -134,7 +134,6 @@
 		3236FCC42592B67B006D33B9 /* NameCollisionReviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3236FCC32592B67B006D33B9 /* NameCollisionReviewCell.swift */; };
 		326DF2612739F4D90017B789 /* FeaturedBadgeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326DF2602739F4D90017B789 /* FeaturedBadgeViewController.swift */; };
 		327CF66825ACE7DD00DA0A6F /* GetStartedBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327CF66725ACE7DC00DA0A6F /* GetStartedBannerViewController.swift */; };
-		329D42A225AD65C400DCB449 /* GetStartedBannerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 329D42A125AD65C400DCB449 /* GetStartedBannerCell.swift */; };
 		329D42A725AE673400DCB449 /* NetworkInterfacePreferenceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 329D42A625AE673400DCB449 /* NetworkInterfacePreferenceViewController.swift */; };
 		32A9E22624C11B3F00C43518 /* EmojiMoodPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32A9E22524C11B3F00C43518 /* EmojiMoodPickerView.swift */; };
 		32AC5CE7255B51E900829BD8 /* JoinGroupCallPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32AC5CE6255B51E900829BD8 /* JoinGroupCallPill.swift */; };
@@ -4196,7 +4195,6 @@
 		32525F9427C74B1A0099E801 /* GroupCallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupCallManager.swift; sourceTree = "<group>"; };
 		326DF2602739F4D90017B789 /* FeaturedBadgeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedBadgeViewController.swift; sourceTree = "<group>"; };
 		327CF66725ACE7DC00DA0A6F /* GetStartedBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetStartedBannerViewController.swift; sourceTree = "<group>"; };
-		329D42A125AD65C400DCB449 /* GetStartedBannerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetStartedBannerCell.swift; sourceTree = "<group>"; };
 		329D42A625AE673400DCB449 /* NetworkInterfacePreferenceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInterfacePreferenceViewController.swift; sourceTree = "<group>"; };
 		32A9E22524C11B3F00C43518 /* EmojiMoodPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiMoodPickerView.swift; sourceTree = "<group>"; };
 		32AC5CE6255B51E900829BD8 /* JoinGroupCallPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinGroupCallPill.swift; sourceTree = "<group>"; };
@@ -10917,7 +10915,6 @@
 				14E4A33F278EE999008408FD /* BlurredToolbarContainer.swift */,
 				32A9E22524C11B3F00C43518 /* EmojiMoodPickerView.swift */,
 				88905E9D229CCA96004E4234 /* ExpirationNagView.swift */,
-				329D42A125AD65C400DCB449 /* GetStartedBannerCell.swift */,
 				8845B0C8264F12F800FA694C /* GroupDescriptionPreviewView.swift */,
 				32AC5CE6255B51E900829BD8 /* JoinGroupCallPill.swift */,
 				88A941982409A391000E9700 /* LottieToggleButton.swift */,
@@ -17956,7 +17953,6 @@
 				D9E43BFC2CC194140001536E /* FlipCameraTooltip.swift in Sources */,
 				88EFF4F825AD1F0D000FAFBA /* ForwardMessageViewController.swift in Sources */,
 				50A76F582AF5765000FCF02D /* FullTextSearchOptimizer.swift in Sources */,
-				329D42A225AD65C400DCB449 /* GetStartedBannerCell.swift in Sources */,
 				327CF66825ACE7DD00DA0A6F /* GetStartedBannerViewController.swift in Sources */,
 				34D1F0501F7D45A60066283D /* GifPickerCell.swift in Sources */,
 				34BECE301F7ABCF800D7438D /* GifPickerLayout.swift in Sources */,
