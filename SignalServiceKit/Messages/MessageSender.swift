@@ -9,18 +9,8 @@ import LibSignalClient
 // MARK: - Message "isXYZ" properties
 
 extension TSOutgoingMessage {
-    var isTransientSKDM: Bool {
-        (self as? OutgoingSenderKeyDistributionMessage)?.isSentOnBehalfOfOnlineMessage ?? false
-    }
-
-    var isResendRequest: Bool {
-        self is OutgoingResendRequest
-    }
-
-    var isSyncMessage: Bool { self is OutgoingSyncMessage }
-
     var canSendToLocalAddress: Bool {
-        return isSyncMessage ||
+        return self is OutgoingSyncMessage ||
             self is OutgoingCallMessage ||
             self is OutgoingResendRequest ||
             self is OWSOutgoingResendResponse
@@ -471,7 +461,7 @@ public class MessageSender {
         localIdentifiers: LocalIdentifiers,
         tx: DBReadTransaction,
     ) throws -> [SignalServiceAddress] {
-        if message.isSyncMessage {
+        if message is OutgoingSyncMessage {
             return [localIdentifiers.aciAddress]
         }
 
@@ -1149,7 +1139,7 @@ public class MessageSender {
         // transcript is sent.
         //
         // NOTE: This only applies to the 'note to self' conversation.
-        if message.isSyncMessage {
+        if message is OutgoingSyncMessage {
             return
         }
         let thread = SSKEnvironment.shared.databaseStorageRef.read { tx in message.thread(tx: tx) }
@@ -1203,9 +1193,7 @@ public class MessageSender {
         let messageSend = try await databaseStorage.awaitableWrite { tx in
             let localThread = TSContactThread.getOrCreateThread(withContactAddress: localIdentifiers.aciAddress, transaction: tx)
 
-            guard let transcript = message.buildTranscriptSyncMessage(localThread: localThread, transaction: tx) else {
-                throw OWSAssertionError("Failed to build transcript")
-            }
+            let transcript = try message.buildSyncTranscriptMessage(localThread: localThread, tx: tx)
 
             let serializedMessage = try buildAndRecordMessage(transcript, in: localThread, tx: tx)
 
@@ -1233,9 +1221,7 @@ public class MessageSender {
         in thread: TSThread,
         tx: DBWriteTransaction,
     ) throws -> SerializedMessage {
-        guard let plaintextData = message.buildPlainTextData(thread, transaction: tx) else {
-            throw OWSAssertionError("couldn't serialize message")
-        }
+        let plaintextData = try message.buildPlaintextData(inThread: thread, tx: tx)
         let messageSendLog = SSKEnvironment.shared.messageSendLogRef
         let payloadId = messageSendLog.recordPayload(plaintextData, for: message, tx: tx)
         return SerializedMessage(plaintextData: plaintextData, payloadId: payloadId)
@@ -1376,15 +1362,12 @@ public class MessageSender {
         messageSend: OWSMessageSend,
         sealedSenderParameters: SealedSenderParameters?,
     ) async throws -> [DeviceMessage] {
-        guard messageSend.message.encryptionStyle == .whisper || messageSend.message.isResendRequest else {
-            throw OWSAssertionError("Unexpected message type")
-        }
         return try await buildDeviceMessages(
             serviceId: messageSend.serviceId,
             isSelfSend: messageSend.isSelfSend,
             encryptionStyle: messageSend.message.encryptionStyle,
             buildPlaintextContent: { _, _ in messageSend.plaintextContent },
-            isTransient: messageSend.message.isOnline || messageSend.message.isTransientSKDM,
+            isTransient: messageSend.message.isOnline || (messageSend.message as? OutgoingSenderKeyDistributionMessage)?.isSentOnBehalfOfOnlineMessage == true,
             sealedSenderParameters: sealedSenderParameters,
         )
     }

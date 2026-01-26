@@ -15,26 +15,32 @@ protocol SendableMessage {
 
     var timestamp: UInt64 { get }
 
-    var isSyncMessage: Bool { get }
-
+    /// If true, this message corresponds to a story and should use story=true
+    /// authentication and story account existence semantics.
     var isStorySend: Bool { get }
 
+    /// If true, this message should set the "online" flag to indicate that it
+    /// should only be delivered if the recipient is currently online (e.g.,
+    /// typing indicator messages).
     var isOnline: Bool { get }
 
-    var isTransientSKDM: Bool { get }
-
+    /// If true, this message should set the "urgent" flag (e.g., text messages
+    /// are urgent and receipts are not).
     var isUrgent: Bool { get }
-
-    var isResendRequest: Bool { get }
 
     var canSendToLocalAddress: Bool { get }
 
+    /// Indicates desired behavior if decryption fails.
     var contentHint: SealedSenderContentHint { get }
 
+    /// Indicates how the message should be encrypted.
     var encryptionStyle: EncryptionStyle { get }
 
-    func buildPlainTextData(_ thread: TSThread, transaction: DBWriteTransaction) -> Data?
+    // TODO: Remove the thread parameter?
+    /// Builds the serialized Content protobuf for this message.
+    func buildPlaintextData(inThread thread: TSThread, tx: DBWriteTransaction) throws -> Data
 
+    // TODO: Merge this into the return value when sending a message.
     var wasSentToAnyRecipient: Bool { get }
 
     func recipientAddresses() -> [SignalServiceAddress]
@@ -57,12 +63,23 @@ protocol SendableMessage {
 
     func update(withViewedRecipient recipientAddress: SignalServiceAddress, deviceId: DeviceId, viewedTimestamp timestamp: UInt64, tx: DBWriteTransaction)
 
+    // TODO: Add SyncTranscriptableMessage protocol for these properties.
+
+    /// Indicates that this message needs a sync transcript.
+    ///
+    /// If true, `buildSyncTranscriptMessage` will be invoked.
     func shouldSyncTranscript() -> Bool
+
+    /// Builds a sync transcript for this message.
+    ///
+    /// Only invoked if `shouldSyncTranscript` returns true.
+    func buildSyncTranscriptMessage(localThread: TSContactThread, tx: DBWriteTransaction) throws -> OutgoingSyncMessage
 
     func thread(tx: DBReadTransaction) -> TSThread?
 
     var shouldBeSaved: Bool { get }
 
+    /// True if this message should be stored in the Message Send Log.
     var shouldRecordSendLog: Bool { get }
 
     var relatedUniqueIds: Set<String> { get }
@@ -72,11 +89,6 @@ protocol SendableMessage {
     var isVoiceMessage: Bool { get }
 
     var isViewOnceMessage: Bool { get }
-
-    func buildTranscriptSyncMessage(
-        localThread: TSContactThread,
-        transaction: DBWriteTransaction,
-    ) -> OutgoingSyncMessage?
 
     func update(withHasSyncedTranscript: Bool, transaction: DBWriteTransaction)
 

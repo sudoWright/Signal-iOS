@@ -92,14 +92,9 @@ final class OutgoingResendRequest: TransientOutgoingMessage {
         return self.failedEnvelopeGroupId
     }
 
-    override func buildPlainTextData(_ thread: TSThread, transaction: DBWriteTransaction) -> Data? {
-        do {
-            let decryptionErrorMessage = try DecryptionErrorMessage(bytes: decryptionErrorData)
-            let plaintextContent = PlaintextContent(decryptionErrorMessage)
-            return plaintextContent.serialize()
-        } catch {
-            owsFailDebug("Failed to build plaintext: \(error)")
-            return nil
-        }
+    override func buildPlaintextData(inThread thread: TSThread, tx: DBWriteTransaction) throws -> Data {
+        let decryptionErrorMessage = try DecryptionErrorMessage(bytes: decryptionErrorData)
+        let plaintextContent = PlaintextContent(decryptionErrorMessage)
+        return plaintextContent.serialize()
     }
 }

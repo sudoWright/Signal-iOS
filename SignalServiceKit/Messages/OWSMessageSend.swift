@@ -28,7 +28,7 @@ final class SealedSenderParameters {
         self.endorsement = endorsement
     }
 
-    /// Indicates desired behavior on the case of decryption error.
+    /// Indicates desired behavior if decryption fails.
     var contentHint: SealedSenderContentHint {
         return message.contentHint
     }

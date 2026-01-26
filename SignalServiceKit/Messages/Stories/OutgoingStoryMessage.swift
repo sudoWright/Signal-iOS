@@ -125,19 +125,18 @@ public class OutgoingStoryMessage: TransientOutgoingMessage {
 
     override public func shouldSyncTranscript() -> Bool { !skipSyncTranscript }
 
-    override public func buildTranscriptSyncMessage(
+    override public func buildSyncTranscriptMessage(
         localThread: TSContactThread,
-        transaction: DBWriteTransaction,
-    ) -> OutgoingSyncMessage? {
-        guard let storyMessage = StoryMessage.anyFetch(uniqueId: storyMessageId, transaction: transaction) else {
-            owsFailDebug("Missing story message")
-            return nil
+        tx: DBWriteTransaction,
+    ) throws -> OutgoingSyncMessage {
+        guard let storyMessage = StoryMessage.anyFetch(uniqueId: storyMessageId, transaction: tx) else {
+            throw OWSAssertionError("missing story message")
         }
 
         return OutgoingStorySentMessageTranscript(
             localThread: localThread,
             storyMessage: storyMessage,
-            transaction: transaction,
+            transaction: tx,
         )
     }
 

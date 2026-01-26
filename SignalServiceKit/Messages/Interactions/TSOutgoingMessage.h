@@ -196,7 +196,9 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
 /**
  * The data representation of this message, to be encrypted, before being sent.
  */
-- (nullable NSData *)buildPlainTextData:(TSThread *)thread transaction:(DBWriteTransaction *)transaction;
+- (nullable NSData *)buildPlaintextDataInThread:(TSThread *)thread
+                                             tx:(DBWriteTransaction *)transaction
+                                          error:(NSError **)error NS_SWIFT_NAME(buildPlaintextData(inThread:tx:));
 
 /**
  * Intermediate protobuf representation
@@ -222,9 +224,10 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
  */
 - (BOOL)shouldSyncTranscript;
 
-- (nullable OWSOutgoingSyncMessage *)buildTranscriptSyncMessageWithLocalThread:(TSContactThread *)localThread
+- (nullable OWSOutgoingSyncMessage *)buildSyncTranscriptMessageWithLocalThread:(TSContactThread *)localThread
                                                                    transaction:(DBWriteTransaction *)transaction
-    NS_SWIFT_NAME(buildTranscriptSyncMessage(localThread:transaction:));
+                                                                         error:(NSError **)error
+    NS_SWIFT_NAME(buildSyncTranscriptMessage(localThread:tx:));
 
 #pragma mark - Update With... Methods
 

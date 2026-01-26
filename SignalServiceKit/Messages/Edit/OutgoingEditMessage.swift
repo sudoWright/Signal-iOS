@@ -123,23 +123,21 @@ public final class OutgoingEditMessage: TransientOutgoingMessage {
         )
     }
 
-    override public func buildTranscriptSyncMessage(
+    override public func buildSyncTranscriptMessage(
         localThread: TSContactThread,
-        transaction: DBWriteTransaction,
-    ) -> OutgoingSyncMessage? {
-        guard let thread = thread(tx: transaction) else {
-            owsFailDebug("Missing thread for interaction.")
-            return nil
+        tx: DBWriteTransaction,
+    ) throws -> OutgoingSyncMessage {
+        guard let thread = thread(tx: tx) else {
+            throw OWSAssertionError("missing thread for interaction")
         }
 
-        let transcript = OutgoingEditMessageSyncTranscript(
+        return OutgoingEditMessageSyncTranscript(
             localThread: localThread,
             messageThread: thread,
             message: self,
             isRecipientUpdate: false,
-            tx: transaction,
+            tx: tx,
         )
-        return transcript
     }
 
     /// This override is required to properly update the correct interaction row

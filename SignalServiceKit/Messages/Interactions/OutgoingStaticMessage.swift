@@ -61,7 +61,7 @@ final class OutgoingStaticMessage: TransientOutgoingMessage {
 
     override func shouldSyncTranscript() -> Bool { false }
 
-    override func buildPlainTextData(_ thread: TSThread, transaction: DBWriteTransaction) -> Data? {
+    override func buildPlaintextData(inThread thread: TSThread, tx: DBWriteTransaction) throws -> Data {
         return self.plaintextData
     }
 }

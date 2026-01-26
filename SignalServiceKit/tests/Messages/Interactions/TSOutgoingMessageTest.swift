@@ -93,7 +93,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = 100
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
             let content = try! SSKProtoContent(serializedData: messageData)
             XCTAssertNil(content.pniSignatureMessage)
         }
@@ -110,7 +110,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = 100
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
             let content = try! SSKProtoContent(serializedData: messageData)
 
             let messagePni = content.pniSignatureMessage!.pni
@@ -136,7 +136,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
             message.updateWithSentRecipients([otherAci], wasSentByUD: true, transaction: transaction)
 
@@ -176,7 +176,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
             message.updateWithSentRecipients([otherAci], wasSentByUD: true, transaction: transaction)
 
@@ -235,7 +235,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
             message.updateWithSentRecipients([otherAci], wasSentByUD: false, transaction: transaction)
 
@@ -275,7 +275,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
             message.updateWithSentRecipients([otherAci], wasSentByUD: true, transaction: transaction)
 
@@ -319,7 +319,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
             message.updateWithSentRecipients([otherAci], wasSentByUD: true, transaction: transaction)
 

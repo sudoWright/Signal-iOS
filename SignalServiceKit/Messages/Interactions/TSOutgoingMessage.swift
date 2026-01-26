@@ -372,6 +372,17 @@ extension TSOutgoingMessage {
     public var isStorySend: Bool { isGroupStoryReply }
 
     @objc
+    func _buildPlaintextData(inThread thread: TSThread, tx: DBWriteTransaction) throws -> Data {
+        guard let contentBuilder = self.contentBuilder(thread: thread, transaction: tx) else {
+            throw OWSAssertionError("couldn't build protobuf")
+        }
+        if let pniSignatureMessage = self.buildPniSignatureMessageIfNeeded(tx: tx) {
+            contentBuilder.setPniSignatureMessage(pniSignatureMessage)
+        }
+        return try contentBuilder.buildSerializedData()
+    }
+
+    @objc
     func _dataMessageBuilder(thread: TSThread, tx: DBReadTransaction) -> SSKProtoDataMessageBuilder? {
         let builder = SSKProtoDataMessage.builder()
         builder.setTimestamp(self.timestamp)
@@ -535,11 +546,11 @@ extension TSOutgoingMessage {
     }
 
     @objc
-    func _buildTranscriptSyncMessage(localThread: TSContactThread, tx: DBWriteTransaction) -> OutgoingSyncMessage? {
+    func _buildSyncTranscriptMessage(localThread: TSContactThread, tx: DBWriteTransaction) throws -> OutgoingSyncMessage {
         owsAssertDebug(self.shouldSyncTranscript())
 
         guard let messageThread = self.thread(tx: tx) else {
-            return nil
+            throw OWSAssertionError("missing thread for sent message")
         }
 
         return OutgoingSentMessageTranscript(
@@ -551,8 +562,7 @@ extension TSOutgoingMessage {
         )
     }
 
-    @objc(buildPniSignatureMessageIfNeededWithTransaction:)
-    func buildPniSignatureMessageIfNeeded(transaction tx: DBReadTransaction) -> SSKProtoPniSignatureMessage? {
+    private func buildPniSignatureMessageIfNeeded(tx: DBReadTransaction) -> SSKProtoPniSignatureMessage? {
         guard recipientAddressStates?.count == 1 else {
             // This is probably a group message, nothing to be alarmed about.
             return nil

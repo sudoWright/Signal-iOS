@@ -546,23 +546,11 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     return contentBuilder;
 }
 
-- (nullable NSData *)buildPlainTextData:(TSThread *)thread transaction:(DBWriteTransaction *)transaction
+- (nullable NSData *)buildPlaintextDataInThread:(TSThread *)thread
+                                             tx:(DBWriteTransaction *)transaction
+                                          error:(NSError **)error
 {
-    SSKProtoContentBuilder *_Nullable contentBuilder = [self contentBuilderWithThread:thread transaction:transaction];
-    if (!contentBuilder) {
-        OWSFailDebug(@"could not build protobuf.");
-        return nil;
-    }
-
-    [contentBuilder setPniSignatureMessage:[self buildPniSignatureMessageIfNeededWithTransaction:transaction]];
-
-    NSError *error;
-    NSData *_Nullable contentData = [contentBuilder buildSerializedDataAndReturnError:&error];
-    if (error || !contentData) {
-        OWSFailDebug(@"could not serialize protobuf: %@", error);
-        return nil;
-    }
-    return contentData;
+    return [self _buildPlaintextDataInThread:thread tx:transaction error:error];
 }
 
 - (BOOL)shouldSyncTranscript
@@ -570,10 +558,11 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     return YES;
 }
 
-- (nullable OWSOutgoingSyncMessage *)buildTranscriptSyncMessageWithLocalThread:(TSContactThread *)localThread
+- (nullable OWSOutgoingSyncMessage *)buildSyncTranscriptMessageWithLocalThread:(TSContactThread *)localThread
                                                                    transaction:(DBWriteTransaction *)transaction
+                                                                         error:(NSError **)error
 {
-    return [self _buildTranscriptSyncMessageWithLocalThread:localThread tx:transaction];
+    return [self _buildSyncTranscriptMessageWithLocalThread:localThread tx:transaction error:error];
 }
 
 @end

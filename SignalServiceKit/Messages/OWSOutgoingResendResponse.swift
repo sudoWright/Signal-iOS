@@ -148,7 +148,7 @@ final class OWSOutgoingResendResponse: TransientOutgoingMessage {
 
     override func envelopeGroupIdWithTransaction(_ transaction: DBReadTransaction) -> Data? { self.originalGroupId }
 
-    override func buildPlainTextData(_ thread: TSThread, transaction tx: DBWriteTransaction) -> Data? {
+    override func buildPlaintextData(inThread thread: TSThread, tx: DBWriteTransaction) throws -> Data {
         owsAssertDebug(self.recipientAddresses().count == 1)
 
         let contentBuilder: SSKProtoContentBuilder = {
@@ -188,12 +188,7 @@ final class OWSOutgoingResendResponse: TransientOutgoingMessage {
             }
         }
 
-        do {
-            return try contentBuilder.buildSerializedData()
-        } catch {
-            owsFailDebug("Failed to build plaintext message: \(error)")
-            return nil
-        }
+        return try contentBuilder.buildSerializedData()
     }
 
     private func resentProtoBuilder(from plaintextData: Data) throws -> SSKProtoContentBuilder {
