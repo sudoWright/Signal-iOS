@@ -6,7 +6,7 @@
 import Foundation
 import LibSignalClient
 
-public class OutgoingStoryMessage: TSOutgoingMessage {
+public class OutgoingStoryMessage: TransientOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -141,8 +141,6 @@ public class OutgoingStoryMessage: TSOutgoingMessage {
         )
     }
 
-    @objc
-    override public var shouldBeSaved: Bool { false }
     override var contentHint: SealedSenderContentHint { .implicit }
 
     override public func contentBuilder(

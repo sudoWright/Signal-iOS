@@ -8,7 +8,7 @@
 ///
 /// Not to be confused with an ``OWSGroupCallMessage``.
 @objc(OWSOutgoingGroupCallMessage)
-public final class OutgoingGroupCallUpdateMessage: TSOutgoingMessage {
+public final class OutgoingGroupCallUpdateMessage: TransientOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -55,8 +55,6 @@ public final class OutgoingGroupCallUpdateMessage: TSOutgoingMessage {
             transaction: tx,
         )
     }
-
-    override public var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { .default }
 

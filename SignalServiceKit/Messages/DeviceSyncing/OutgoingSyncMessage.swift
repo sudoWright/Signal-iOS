@@ -11,7 +11,7 @@ import Foundation
  * notifying your devices of sent messages, and "read" receipts.
  */
 @objc(OWSOutgoingSyncMessage)
-public class OutgoingSyncMessage: TSOutgoingMessage {
+public class OutgoingSyncMessage: TransientOutgoingMessage {
 
     override public class var supportsSecureCoding: Bool { true }
 
@@ -41,8 +41,6 @@ public class OutgoingSyncMessage: TSOutgoingMessage {
             transaction: tx,
         )
     }
-
-    override public var shouldBeSaved: Bool { false }
 
     override public func shouldSyncTranscript() -> Bool { false }
 

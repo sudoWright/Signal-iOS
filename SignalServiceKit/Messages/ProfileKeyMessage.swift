@@ -7,7 +7,7 @@ import Foundation
 public import LibSignalClient
 
 @objc(OWSProfileKeyMessage)
-public final class ProfileKeyMessage: TSOutgoingMessage {
+public final class ProfileKeyMessage: TransientOutgoingMessage {
 
     let profileKey: ProfileKey?
 
@@ -53,8 +53,6 @@ public final class ProfileKeyMessage: TSOutgoingMessage {
         guard self.profileKey?.serialize() == object.profileKey?.serialize() else { return false }
         return true
     }
-
-    override public var shouldBeSaved: Bool { false }
 
     override public func shouldSyncTranscript() -> Bool {
         return false

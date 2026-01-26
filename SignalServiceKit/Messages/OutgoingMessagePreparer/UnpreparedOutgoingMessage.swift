@@ -27,7 +27,8 @@ public class UnpreparedOutgoingMessage {
         let oversizeTextDataSource = (body?.oversizeText).map {
             AttachmentDataSource.pendingAttachment($0)
         }
-        if !message.shouldBeSaved {
+        // TODO: Split these methods once TSOutgoingMessage is no longer the superclass.
+        if let message = message as? TransientOutgoingMessage {
             owsAssertDebug(
                 unsavedBodyMediaAttachments.isEmpty
                     && oversizeTextDataSource == nil
@@ -39,6 +40,7 @@ public class UnpreparedOutgoingMessage {
             Self.assertIsAllowedTransientMessage(message)
             return .init(messageType: .transient(message))
         } else {
+            owsPrecondition(message.shouldBeSaved)
             return .init(messageType: .persistable(.init(
                 message: message,
                 unsavedBodyMediaAttachments: unsavedBodyMediaAttachments,
@@ -121,7 +123,7 @@ public class UnpreparedOutgoingMessage {
         /// Catch-all for messages not persisted to the Interactions table. The
         /// MessageSender will not upload any attachments contained within these
         /// messages; callers are responsible for uploading them.
-        case transient(TSOutgoingMessage)
+        case transient(TransientOutgoingMessage)
 
         struct Persistable {
             let message: TSOutgoingMessage
@@ -160,14 +162,7 @@ public class UnpreparedOutgoingMessage {
         let preparedMessageType: PreparedOutgoingMessage.MessageType
         switch messageType {
         case .persistable(let message):
-            if message.message.shouldBeSaved {
-                preparedMessageType = try preparePersistableMessage(message, tx: tx)
-            } else {
-                owsFailDebug("Unknown unsaved message type!")
-                // As a last resort, still send the message. But don't bother with
-                // attachments, those are dropped if we don't know how to handle them.
-                preparedMessageType = prepareTransientMessage(message.message)
-            }
+            preparedMessageType = try preparePersistableMessage(message, tx: tx)
         case .editMessage(let message):
             preparedMessageType = try prepareEditMessage(message, tx: tx)
         case .story(let story):
@@ -405,7 +400,7 @@ public class UnpreparedOutgoingMessage {
     }
 
     private func prepareTransientMessage(
-        _ message: TSOutgoingMessage,
+        _ message: TransientOutgoingMessage,
     ) -> PreparedOutgoingMessage.MessageType {
         return .transient(message)
     }

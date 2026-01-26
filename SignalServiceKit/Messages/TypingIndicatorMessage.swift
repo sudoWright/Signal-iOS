@@ -10,7 +10,7 @@ public enum TypingIndicatorAction {
     case stopped
 }
 
-public final class TypingIndicatorMessage: TSOutgoingMessage {
+public final class TypingIndicatorMessage: TransientOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -102,11 +102,6 @@ public final class TypingIndicatorMessage: TSOutgoingMessage {
     }
 
     // MARK: TSYapDatabaseObject overrides
-
-    @objc
-    override public var shouldBeSaved: Bool {
-        return false
-    }
 
     @objc
     override public var debugDescription: String {

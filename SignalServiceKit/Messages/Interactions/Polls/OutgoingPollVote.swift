@@ -6,7 +6,7 @@
 import Foundation
 public import LibSignalClient
 
-public class OutgoingPollVoteMessage: TSOutgoingMessage {
+public class OutgoingPollVoteMessage: TransientOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -86,8 +86,6 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
             transaction: tx,
         )
     }
-
-    override public var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { .implicit }
 

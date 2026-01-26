@@ -6,7 +6,7 @@
 import Foundation
 
 @objc(OWSEndSessionMessage)
-final class OutgoingEndSessionMessage: TSOutgoingMessage {
+final class OutgoingEndSessionMessage: TransientOutgoingMessage {
     override class var supportsSecureCoding: Bool { true }
 
     required init?(coder: NSCoder) {
@@ -23,8 +23,6 @@ final class OutgoingEndSessionMessage: TSOutgoingMessage {
             transaction: tx,
         )
     }
-
-    override var shouldBeSaved: Bool { false }
 
     override func dataMessageBuilder(with thread: TSThread, transaction: DBReadTransaction) -> SSKProtoDataMessageBuilder? {
         guard let builder = super.dataMessageBuilder(with: thread, transaction: transaction) else {

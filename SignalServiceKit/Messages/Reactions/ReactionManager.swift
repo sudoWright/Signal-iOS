@@ -34,7 +34,7 @@ public class ReactionManager: NSObject {
         isHighPriority: Bool = false,
         tx: DBWriteTransaction,
     ) -> Promise<Void> {
-        let outgoingMessage: TSOutgoingMessage
+        let outgoingMessage: OutgoingReactionMessage
         do {
             outgoingMessage = try _localUserReacted(to: messageUniqueId, emoji: emoji, isRemoving: isRemoving, tx: tx)
         } catch {

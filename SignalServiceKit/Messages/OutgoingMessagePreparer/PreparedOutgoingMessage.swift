@@ -53,7 +53,7 @@ public class PreparedOutgoingMessage {
     /// (2) don't have any attachments associated with them
     /// Instantly prepares because...these messages don't need any preparing.
     public static func preprepared(
-        transientMessageWithoutAttachments: TSOutgoingMessage,
+        transientMessageWithoutAttachments: TransientOutgoingMessage,
     ) -> PreparedOutgoingMessage {
         UnpreparedOutgoingMessage.assertIsAllowedTransientMessage(transientMessageWithoutAttachments)
         return _preprepared(transientMessage: transientMessageWithoutAttachments)
@@ -64,7 +64,7 @@ public class PreparedOutgoingMessage {
     /// (2) don't have any attachments that need to be uploaded
     /// Instantly prepares because...these messages don't need any preparing.
     private static func _preprepared(
-        transientMessage: TSOutgoingMessage,
+        transientMessage: TransientOutgoingMessage,
     ) -> PreparedOutgoingMessage {
         let messageType = MessageType.transient(transientMessage)
         return PreparedOutgoingMessage(messageType: messageType)
@@ -127,7 +127,7 @@ public class PreparedOutgoingMessage {
         /// Catch-all for messages not persisted to the Interactions table. The
         /// MessageSender will not upload any attachments contained within these
         /// messages; callers are responsible for uploading them.
-        case transient(TSOutgoingMessage)
+        case transient(TransientOutgoingMessage)
 
         public struct Persisted {
             public let rowId: Int64

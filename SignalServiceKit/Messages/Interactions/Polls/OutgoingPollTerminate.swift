@@ -5,7 +5,7 @@
 
 import Foundation
 
-class OutgoingPollTerminateMessage: TSOutgoingMessage {
+class OutgoingPollTerminateMessage: TransientOutgoingMessage {
     override class var supportsSecureCoding: Bool { true }
 
     required init?(coder: NSCoder) {
@@ -57,8 +57,6 @@ class OutgoingPollTerminateMessage: TSOutgoingMessage {
             transaction: tx,
         )
     }
-
-    override var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { .implicit }
 

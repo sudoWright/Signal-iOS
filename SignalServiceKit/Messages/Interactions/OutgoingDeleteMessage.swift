@@ -7,7 +7,7 @@ import Foundation
 public import LibSignalClient
 
 @objc(TSOutgoingDeleteMessage)
-public final class OutgoingDeleteMessage: TSOutgoingMessage {
+public final class OutgoingDeleteMessage: TransientOutgoingMessage {
     let messageTimestamp: UInt64
     let messageUniqueId: String?
     let isDeletingStoryMessage: Bool
@@ -89,8 +89,6 @@ public final class OutgoingDeleteMessage: TSOutgoingMessage {
             transaction: tx,
         )
     }
-
-    override public var shouldBeSaved: Bool { false }
 
     override public var isStorySend: Bool {
         return self.isDeletingStoryMessage

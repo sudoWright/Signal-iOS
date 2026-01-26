@@ -10,7 +10,7 @@ public import LibSignalClient
 /// payload out-of-band.
 ///
 /// Not to be confused with a ``TSCall``.
-public final class OutgoingCallMessage: TSOutgoingMessage {
+public final class OutgoingCallMessage: TransientOutgoingMessage {
     public enum MessageType: Hashable {
         case offerMessage(SSKProtoCallMessageOffer)
         case answerMessage(SSKProtoCallMessageAnswer)
@@ -109,8 +109,6 @@ public final class OutgoingCallMessage: TSOutgoingMessage {
             return nil
         }
     }
-
-    override public var shouldBeSaved: Bool { false }
 
     override public var isUrgent: Bool {
         switch self.messageType {

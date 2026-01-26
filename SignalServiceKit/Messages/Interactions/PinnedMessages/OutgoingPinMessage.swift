@@ -6,7 +6,7 @@
 import Foundation
 public import LibSignalClient
 
-public class OutgoingPinMessage: TSOutgoingMessage {
+public class OutgoingPinMessage: TransientOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -92,8 +92,6 @@ public class OutgoingPinMessage: TSOutgoingMessage {
             transaction: tx,
         )
     }
-
-    override public var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { .implicit }
 

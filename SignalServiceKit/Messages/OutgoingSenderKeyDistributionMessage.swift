@@ -6,7 +6,7 @@
 import Foundation
 import LibSignalClient
 
-final class OutgoingSenderKeyDistributionMessage: TSOutgoingMessage {
+final class OutgoingSenderKeyDistributionMessage: TransientOutgoingMessage {
 
     /// True if this message is being sent as a precondition to sending an
     /// online-only message. Typing indicators are only delivered to online
@@ -69,8 +69,6 @@ final class OutgoingSenderKeyDistributionMessage: TSOutgoingMessage {
         guard self.senderKeyDistributionMessage.serialize() == object.senderKeyDistributionMessage.serialize() else { return false }
         return true
     }
-
-    override var shouldBeSaved: Bool { false }
 
     override var shouldRecordSendLog: Bool { false }
 

@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 
 @objc(OWSOutgoingResendResponse)
-final class OWSOutgoingResendResponse: TSOutgoingMessage {
+final class OWSOutgoingResendResponse: TransientOutgoingMessage {
     override class var supportsSecureCoding: Bool { true }
 
     required init?(coder: NSCoder) {
@@ -143,8 +143,6 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
     override var shouldRecordSendLog: Bool { false }
 
     override func shouldSyncTranscript() -> Bool { false }
-
-    override var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { self.derivedContentHint }
 

@@ -714,6 +714,7 @@
 		505CC1692F22C2EC00D311CD /* OutgoingPaymentActivationRequestFinishedMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CC1682F22C2EC00D311CD /* OutgoingPaymentActivationRequestFinishedMessage.swift */; };
 		505F76332BC45C0700B1B51C /* BuildFlags+Generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505F76322BC45C0700B1B51C /* BuildFlags+Generated.swift */; };
 		5060EBBA2C7D211A00DF77AD /* OutgoingCallLinkUpdateMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5060EBB92C7D211A00DF77AD /* OutgoingCallLinkUpdateMessage.swift */; };
+		506395812F2403BE00B2F772 /* TransientOutgoingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506395802F2403BE00B2F772 /* TransientOutgoingMessage.swift */; };
 		5063B41E2C5432A30041CA51 /* ResolvableValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5063B41D2C5432A30041CA51 /* ResolvableValue.swift */; };
 		506695E129C296D500B6D8D0 /* RecipientMergerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506695E029C296D500B6D8D0 /* RecipientMergerTest.swift */; };
 		506695E329C29BCE00B6D8D0 /* RecipientMerger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506695E229C29BCE00B6D8D0 /* RecipientMerger.swift */; };
@@ -4870,6 +4871,7 @@
 		505CC1682F22C2EC00D311CD /* OutgoingPaymentActivationRequestFinishedMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingPaymentActivationRequestFinishedMessage.swift; sourceTree = "<group>"; };
 		505F76322BC45C0700B1B51C /* BuildFlags+Generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BuildFlags+Generated.swift"; sourceTree = "<group>"; };
 		5060EBB92C7D211A00DF77AD /* OutgoingCallLinkUpdateMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingCallLinkUpdateMessage.swift; sourceTree = "<group>"; };
+		506395802F2403BE00B2F772 /* TransientOutgoingMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransientOutgoingMessage.swift; sourceTree = "<group>"; };
 		5063B41D2C5432A30041CA51 /* ResolvableValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResolvableValue.swift; sourceTree = "<group>"; };
 		506695E029C296D500B6D8D0 /* RecipientMergerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipientMergerTest.swift; sourceTree = "<group>"; };
 		506695E229C29BCE00B6D8D0 /* RecipientMerger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipientMerger.swift; sourceTree = "<group>"; };
@@ -14393,6 +14395,7 @@
 				50B0E9472AC73C3B005D46AB /* RecipientStateMerger.swift */,
 				504F98B22EB0270A00DF465B /* SendMessageFailure.swift */,
 				50A5AA9A2A7449D000CF2ECC /* ServerReceiptEnvelope.swift */,
+				506395802F2403BE00B2F772 /* TransientOutgoingMessage.swift */,
 				F9C5C947289453B100548EEE /* TypingIndicatorMessage.swift */,
 				504F397B29D23B1700E849A6 /* ValidatedIncomingEnvelope.swift */,
 			);
@@ -19469,6 +19472,7 @@
 				7203F5352D53B83500639949 /* TimeInterval+SSK.swift in Sources */,
 				C14EC1A22BA891D200A4D064 /* TransformingInputStream.swift in Sources */,
 				C1CF83D42B9A207800CDC9C4 /* TransformingOutputStream.swift in Sources */,
+				506395812F2403BE00B2F772 /* TransientOutgoingMessage.swift in Sources */,
 				661170C42ABA4D9900A1B16D /* TSAccountManager.swift in Sources */,
 				661170C82ABA4F3A00A1B16D /* TSAccountManagerImpl.swift in Sources */,
 				664657472ACB66630099DE1C /* TSAccountManagerObjcBridge.swift in Sources */,

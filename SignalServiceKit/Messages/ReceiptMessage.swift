@@ -5,7 +5,7 @@
 
 import Foundation
 
-final class ReceiptMessage: TSOutgoingMessage {
+final class ReceiptMessage: TransientOutgoingMessage {
     private let messageUniqueIds: Set<String>
     private let messageTimestamps: Set<UInt64>
     private let receiptType: SSKProtoReceiptMessageType
@@ -83,8 +83,6 @@ final class ReceiptMessage: TSOutgoingMessage {
         }
         return builder.buildInfallibly()
     }
-
-    override var shouldBeSaved: Bool { false }
 
     override var debugDescription: String {
         return "[\(type(of: self))] with message timestamps: \(self.messageTimestamps.count)"

@@ -8,7 +8,7 @@ import Foundation
 // A generic, serializable message that can be used to
 // send fixed plaintextData payloads.
 @objc(OWSStaticOutgoingMessage)
-final class OutgoingStaticMessage: TSOutgoingMessage {
+final class OutgoingStaticMessage: TransientOutgoingMessage {
 
     let plaintextData: Data
 
@@ -58,8 +58,6 @@ final class OutgoingStaticMessage: TSOutgoingMessage {
         guard self.plaintextData == object.plaintextData else { return false }
         return true
     }
-
-    override var shouldBeSaved: Bool { false }
 
     override func shouldSyncTranscript() -> Bool { false }
 

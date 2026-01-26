@@ -6,7 +6,7 @@
 import Foundation
 
 @objc(OWSOutgoingNullMessage)
-final class OutgoingNullMessage: TSOutgoingMessage {
+final class OutgoingNullMessage: TransientOutgoingMessage {
 
     let verificationStateSyncMessage: OutgoingVerificationStateSyncMessage?
 
@@ -81,8 +81,6 @@ final class OutgoingNullMessage: TSOutgoingMessage {
     }
 
     override func shouldSyncTranscript() -> Bool { false }
-
-    override var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { .implicit }
 }

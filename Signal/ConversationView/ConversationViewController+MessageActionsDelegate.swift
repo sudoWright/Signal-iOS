@@ -289,7 +289,7 @@ extension ConversationViewController: MessageActionsDelegate {
         }
     }
 
-    func sendPinMessageChange(pinMessage: TSOutgoingMessage) async throws {
+    func sendPinMessageChange(pinMessage: TransientOutgoingMessage) async throws {
         let db = DependenciesBridge.shared.db
         let messageSenderJobQueue = SSKEnvironment.shared.messageSenderJobQueueRef
         let pinnedMessageManager = DependenciesBridge.shared.pinnedMessageManager
@@ -341,7 +341,7 @@ extension ConversationViewController: MessageActionsDelegate {
 
     func queuePinMessageChangeWithModal(
         message: TSMessage,
-        pinMessage: TSOutgoingMessage,
+        pinMessage: TransientOutgoingMessage,
         modalDelegate: UIViewController,
         completion: (() -> Void)?,
     ) async {

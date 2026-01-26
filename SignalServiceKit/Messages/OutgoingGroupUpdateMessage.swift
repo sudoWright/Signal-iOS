@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 
 /// An outgoing group v2 update.
-final class OutgoingGroupUpdateMessage: TSOutgoingMessage {
+final class OutgoingGroupUpdateMessage: TransientOutgoingMessage {
     override class var supportsSecureCoding: Bool { true }
 
     required init?(coder: NSCoder) {
@@ -67,6 +67,4 @@ final class OutgoingGroupUpdateMessage: TSOutgoingMessage {
     }
 
     override var isUrgent: Bool { self.isUpdateUrgent }
-
-    override var shouldBeSaved: Bool { false }
 }

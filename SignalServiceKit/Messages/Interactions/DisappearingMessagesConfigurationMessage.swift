@@ -6,11 +6,9 @@
 import Foundation
 
 @objc(OWSDisappearingMessagesConfigurationMessage)
-final class DisappearingMessagesConfigurationMessage: TSOutgoingMessage {
+final class DisappearingMessagesConfigurationMessage: TransientOutgoingMessage {
 
     private let configuration: OWSDisappearingMessagesConfiguration
-
-    override var shouldBeSaved: Bool { false }
 
     override var isUrgent: Bool { false }
 

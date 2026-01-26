@@ -6,7 +6,7 @@
 import LibSignalClient
 
 @objc(OWSOutgoingResendRequest)
-final class OutgoingResendRequest: TSOutgoingMessage {
+final class OutgoingResendRequest: TransientOutgoingMessage {
     let decryptionErrorData: Data
     private let failedEnvelopeGroupId: Data?
 
@@ -85,8 +85,6 @@ final class OutgoingResendRequest: TSOutgoingMessage {
     }
 
     override func shouldSyncTranscript() -> Bool { false }
-
-    override var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { .default }
 

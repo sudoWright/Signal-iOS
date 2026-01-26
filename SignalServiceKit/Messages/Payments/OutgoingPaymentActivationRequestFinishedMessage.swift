@@ -8,7 +8,7 @@ import Foundation
 /// Outgoing message we send to the contact who requested we activate payments.
 /// NOT rendered in chat; a separate TSInfoMessage is created for that purpose.
 @objc(OWSPaymentActivationRequestFinishedMessage)
-final class OutgoingPaymentActivationRequestFinishedMessage: TSOutgoingMessage {
+final class OutgoingPaymentActivationRequestFinishedMessage: TransientOutgoingMessage {
 
     override class var supportsSecureCoding: Bool { true }
 
@@ -41,6 +41,4 @@ final class OutgoingPaymentActivationRequestFinishedMessage: TSOutgoingMessage {
     }
 
     override var contentHint: SealedSenderContentHint { .implicit }
-
-    override var shouldBeSaved: Bool { false }
 }

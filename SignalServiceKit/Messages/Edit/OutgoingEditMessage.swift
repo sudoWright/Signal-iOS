@@ -7,7 +7,7 @@ import Foundation
 
 // This needs to reflect the edit as represented (and sourced) from the db.
 @objc
-public final class OutgoingEditMessage: TSOutgoingMessage {
+public final class OutgoingEditMessage: TransientOutgoingMessage {
     override public class var supportsSecureCoding: Bool { true }
 
     public required init?(coder: NSCoder) {
@@ -50,9 +50,6 @@ public final class OutgoingEditMessage: TSOutgoingMessage {
     let targetMessageTimestamp: UInt64
 
     // MARK: - Overrides
-
-    @objc
-    override public var shouldBeSaved: Bool { false }
 
     @objc
     override public var debugDescription: String { "editMessage" }

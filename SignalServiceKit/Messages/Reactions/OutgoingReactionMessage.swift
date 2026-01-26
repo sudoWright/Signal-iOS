@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 
 @objc(OWSOutgoingReactionMessage)
-final class OutgoingReactionMessage: TSOutgoingMessage {
+final class OutgoingReactionMessage: TransientOutgoingMessage {
 
     let messageUniqueId: String
     let emoji: String
@@ -103,8 +103,6 @@ final class OutgoingReactionMessage: TSOutgoingMessage {
         guard self.previousReaction == object.previousReaction else { return false }
         return true
     }
-
-    override var shouldBeSaved: Bool { false }
 
     override func dataMessageBuilder(with thread: TSThread, transaction tx: DBReadTransaction) -> SSKProtoDataMessageBuilder? {
         guard let reactionProto = self.buildDataMessageReactionProto(tx: tx) else {

@@ -21,7 +21,7 @@ public final class MessageSenderJobRecord: JobRecord, FactoryInitializableFromRe
 
     /// A message we send but which is never inserted into the Interactions table;
     /// its only used for sending.
-    private let transientMessage: TSOutgoingMessage?
+    private let transientMessage: TransientOutgoingMessage?
 
     // exposed for tests
     let removeMessageAfterSending: Bool
@@ -33,7 +33,7 @@ public final class MessageSenderJobRecord: JobRecord, FactoryInitializableFromRe
             messageForSending: OutgoingEditMessage,
             useMediaQueue: Bool,
         )
-        case transient(TSOutgoingMessage)
+        case transient(TransientOutgoingMessage)
         /// Generally considered invalid, but failed at processing time not deserialization time.
         case none
     }
@@ -145,7 +145,7 @@ public final class MessageSenderJobRecord: JobRecord, FactoryInitializableFromRe
     }
 
     convenience init(
-        transientMessage: TSOutgoingMessage,
+        transientMessage: TransientOutgoingMessage,
         isHighPriority: Bool,
     ) {
         owsPrecondition(
@@ -183,9 +183,9 @@ public final class MessageSenderJobRecord: JobRecord, FactoryInitializableFromRe
         transientMessage = try container.decodeIfPresent(
             Data.self,
             forKey: .transientMessage,
-        ).flatMap { invisibleMessageData -> TSOutgoingMessage? in
+        ).flatMap { invisibleMessageData -> TransientOutgoingMessage? in
             do {
-                return try LegacySDSSerializer().deserializeLegacySDSData(invisibleMessageData, ofClass: TSOutgoingMessage.self)
+                return try LegacySDSSerializer().deserializeLegacySDSData(invisibleMessageData, ofClass: TransientOutgoingMessage.self)
             } catch {
                 owsFailDebug("couldn't decode transient message: \(error)")
                 return nil
