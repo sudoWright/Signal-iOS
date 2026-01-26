@@ -14,8 +14,8 @@ public enum Upload {
         public static let uploadAttachmentIDKey = "UploadAttachmentIDKey"
 
         /// If within this window, we can reause existing attachment transit tier uploads for resending.
-        public static let uploadReuseWindow: TimeInterval = 60 * 60 * 24 * 3 // 3 days
-        public static let uploadFormReuseWindow: TimeInterval = 60 * 60 * 24 * 6 // 6 days
+        public static let uploadReuseWindow: TimeInterval = 3 * .day
+        public static let uploadFormReuseWindow: TimeInterval = 6 * .day
 
         public static let maxUploadAttempts = 5
     }
