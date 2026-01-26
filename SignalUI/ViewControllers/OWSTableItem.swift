@@ -202,28 +202,6 @@ public class OWSTableItem {
         })
     }
 
-    public static func longDisclosure(
-        withText text: String,
-        actionBlock: (() -> Void)? = nil,
-    ) -> OWSTableItem {
-        return OWSTableItem(
-            customCellBlock: {
-                let cell = OWSTableItem.newCell()
-                cell.accessoryType = .disclosureIndicator
-
-                let textLabel = UILabel()
-                textLabel.text = text
-                textLabel.numberOfLines = 0
-                textLabel.lineBreakMode = .byWordWrapping
-                cell.contentView.addSubview(textLabel)
-                textLabel.autoPinEdgesToSuperviewMargins()
-
-                return cell
-            },
-            actionBlock: actionBlock,
-        )
-    }
-
     public static func `switch`(
         withText text: String,
         accessibilityIdentifier: String? = nil,
