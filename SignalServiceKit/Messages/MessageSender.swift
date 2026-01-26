@@ -568,29 +568,7 @@ public class MessageSender {
         )
     }
 
-    private func areAttachmentsUploadedWithSneakyTransaction(for message: any SendableMessage) -> Bool {
-        if message.shouldBeSaved == false {
-            // Unsaved attachments come in two types:
-            // * no attachments
-            // * contact sync, already-uploaded attachment required on init
-            // So checking for upload state for unsaved attachments is pointless
-            // (and will, in fact, fail, because of foreign key constraints).
-            return true
-        }
-        return SSKEnvironment.shared.databaseStorageRef.read { tx in
-            for referencedAttachment in message.allAttachments(transaction: tx) {
-                guard referencedAttachment.attachment.isUploadedToTransitTier else {
-                    return false
-                }
-            }
-            return true
-        }
-    }
-
     private func sendPreparedMessage(_ message: any SendableMessage) async throws -> SendMessageFailure? {
-        if !areAttachmentsUploadedWithSneakyTransaction(for: message) {
-            throw OWSGenericError("attachments aren't uploaded")
-        }
         if DependenciesBridge.shared.appExpiry.isExpired(now: Date()) {
             throw AppExpiredError()
         }

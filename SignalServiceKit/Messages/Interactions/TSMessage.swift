@@ -48,7 +48,7 @@ public extension TSMessage {
             .attachment
     }
 
-    func allAttachments(transaction tx: DBReadTransaction) -> [ReferencedAttachment] {
+    private func allAttachments(transaction tx: DBReadTransaction) -> [ReferencedAttachment] {
         guard let sqliteRowId else { return [] }
         return DependenciesBridge.shared.attachmentStore.fetchReferencedAttachmentsOwnedByMessage(
             messageRowId: sqliteRowId,

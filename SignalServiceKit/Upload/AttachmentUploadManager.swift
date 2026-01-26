@@ -379,7 +379,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
 
         // Update the attachment and associated messages with the success
         // and clean up and left over upload state
-        try await db.awaitableWrite { tx in
+        await db.awaitableWrite { tx in
             // Read the attachment fresh from the DB
             guard
                 let attachmentStream = try? self.fetchAttachment(
@@ -392,7 +392,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 return
             }
 
-            try self.updateTransitTier(
+            self.updateTransitTier(
                 attachmentStream: attachmentStream,
                 with: result,
                 logger: logger,
@@ -1139,7 +1139,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         with result: Upload.AttachmentResult,
         logger: PrefixedLogger,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
 
         let transitTierInfo = Attachment.TransitTierInfo(
             cdnNumber: result.cdnNumber,

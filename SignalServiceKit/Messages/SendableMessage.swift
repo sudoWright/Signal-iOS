@@ -91,8 +91,6 @@ protocol SendableMessage {
     var isViewOnceMessage: Bool { get }
 
     func update(withHasSyncedTranscript: Bool, transaction: DBWriteTransaction)
-
-    func allAttachments(transaction: DBReadTransaction) -> [ReferencedAttachment]
 }
 
 extension TSOutgoingMessage: SendableMessage {
