@@ -686,55 +686,22 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
     }
 
     private func sendVerificationStateSyncMessage(for recipientUniqueId: RecipientUniqueId, message: OutgoingVerificationStateSyncMessage) {
-        let address = message.verificationForRecipientAddress
-        let contactThread = TSContactThread.getOrCreateThread(contactAddress: address)
-
-        // DURABLE CLEANUP - we could replace the custom durability logic in this
-        // class with a durable JobQueue.
-        let nullMessagePromise = db.write { tx in
-            // Send null message to appear as though we're sending a normal message to
-            // cover the sync message sent subsequently
-            let nullMessage = OutgoingNullMessage(
-                contactThread: contactThread,
-                verificationStateSyncMessage: message,
-                tx: tx,
-            )
+        let syncMessagePromise = self.db.write { tx in
             let preparedMessage = PreparedOutgoingMessage.preprepared(
-                transientMessageWithoutAttachments: nullMessage,
+                transientMessageWithoutAttachments: message,
             )
-            return messageSenderJobQueue.add(
+            return self.messageSenderJobQueue.add(
                 .promise,
                 message: preparedMessage,
                 limitToCurrentProcessLifetime: true,
                 transaction: tx,
             )
         }
-
-        nullMessagePromise.done(on: DispatchQueue.global()) {
-            Logger.info("Successfully sent verification state NullMessage")
-            let syncMessagePromise = self.db.write { tx in
-                let preparedMessage = PreparedOutgoingMessage.preprepared(
-                    transientMessageWithoutAttachments: message,
-                )
-                return self.messageSenderJobQueue.add(
-                    .promise,
-                    message: preparedMessage,
-                    limitToCurrentProcessLifetime: true,
-                    transaction: tx,
-                )
-            }
-            syncMessagePromise.done(on: DispatchQueue.global()) {
-                Logger.info("Successfully sent verification state sync message")
-                self.db.write { tx in self.clearSyncMessage(for: recipientUniqueId, tx: tx) }
-            }.catch(on: DispatchQueue.global()) { error in
-                Logger.error("Failed to send verification state sync message: \(error)")
-            }
+        syncMessagePromise.done(on: DispatchQueue.global()) {
+            Logger.info("Successfully sent verification state sync message")
+            self.db.write { tx in self.clearSyncMessage(for: recipientUniqueId, tx: tx) }
         }.catch(on: DispatchQueue.global()) { error in
-            Logger.error("Failed to send verification state NullMessage: \(error)")
-            if error is MessageSenderNoSuchSignalRecipientError {
-                Logger.info("Removing retries for syncing verification for unregistered user: \(address)")
-                self.db.write { tx in self.clearSyncMessage(for: recipientUniqueId, tx: tx) }
-            }
+            Logger.error("Failed to send verification state sync message: \(error)")
         }
     }
 

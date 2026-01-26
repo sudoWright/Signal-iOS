@@ -46,36 +46,12 @@ final class OutgoingVerificationStateSyncMessage: OutgoingSyncMessage {
     override class var supportsSecureCoding: Bool { true }
 
     override func encode(with coder: NSCoder) {
-        super.encode(with: coder)
-        coder.encode(self.identityKey, forKey: "identityKey")
-        coder.encode(NSNumber(value: self.paddingBytesLength), forKey: "paddingBytesLength")
-        coder.encode(self.verificationForRecipientAddress, forKey: "verificationForRecipientAddress")
-        coder.encode(NSNumber(value: self.verificationState.rawValue), forKey: "verificationState")
+        owsFail("Doesn't support serialization.")
     }
 
     required init?(coder: NSCoder) {
-        guard let identityKey = coder.decodeObject(of: NSData.self, forKey: "identityKey") as Data? else {
-            return nil
-        }
-        self.identityKey = identityKey
-        guard let paddingBytesLength = coder.decodeObject(of: NSNumber.self, forKey: "paddingBytesLength") else {
-            return nil
-        }
-        self.paddingBytesLength = paddingBytesLength.uintValue
-        let modernAddress = coder.decodeObject(of: SignalServiceAddress.self, forKey: "verificationForRecipientAddress")
-        self.verificationForRecipientAddress = modernAddress ?? SignalServiceAddress.legacyAddress(
-            serviceIdString: nil,
-            phoneNumber: coder.decodeObject(of: NSString.self, forKey: "verificationForRecipientId") as String?,
-        )
-        owsAssertDebug(self.verificationForRecipientAddress.isValid)
-        guard
-            let rawVerificationState = coder.decodeObject(of: NSNumber.self, forKey: "verificationState"),
-            let verificationState = OWSVerificationState(rawValue: rawVerificationState.uint64Value)
-        else {
-            return nil
-        }
-        self.verificationState = verificationState
-        super.init(coder: coder)
+        // Doesn't support serialization.
+        return nil
     }
 
     override var hash: Int {
@@ -120,25 +96,6 @@ final class OutgoingVerificationStateSyncMessage: OutgoingSyncMessage {
         let syncMessageBuilder = SSKProtoSyncMessage.builder()
         syncMessageBuilder.setVerified(verifiedProto)
         return syncMessageBuilder
-    }
-
-    func unpaddedVerifiedLength() -> UInt {
-        guard let verificationForRecipientAci = self.verificationForRecipientAddress.aci else {
-            return 0
-        }
-
-        let verifiedProto = OWSRecipientIdentity.buildVerifiedProto(
-            destinationAci: verificationForRecipientAci,
-            identityKey: self.identityKey,
-            verificationState: self.verificationState,
-            paddingBytesLength: 0,
-        )
-        do {
-            return UInt(try verifiedProto.serializedData().count)
-        } catch {
-            owsFailDebug("could not serialize protobuf.")
-            return 0
-        }
     }
 
     override var isUrgent: Bool { false }
