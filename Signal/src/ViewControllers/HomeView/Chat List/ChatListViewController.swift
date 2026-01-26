@@ -293,7 +293,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
     override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        let bottomInset = if let getStartedBanner, getStartedBanner.isViewLoaded, !getStartedBanner.view.isHidden {
+        let bottomInset = if let getStartedBanner, getStartedBanner.isViewLoaded, getStartedBanner.view.alpha > 0 {
             getStartedBanner.opaqueHeight
         } else {
             CGFloat(0.0)
