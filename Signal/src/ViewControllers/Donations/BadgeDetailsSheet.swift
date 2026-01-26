@@ -59,14 +59,6 @@ class BadgeDetailsSheet: OWSTableSheetViewController {
         }
     }
 
-    private func localProfileHasBadges() -> Bool {
-        return SSKEnvironment.shared.databaseStorageRef.read { tx in SSKEnvironment.shared.profileManagerRef.localUserProfile(tx: tx)?.hasBadge == true }
-    }
-
-    private func shouldShowDonateButton() -> Bool {
-        !owner.isLocal && !localProfileHasBadges()
-    }
-
     override func tableContents() -> OWSTableContents {
         let contents = OWSTableContents()
 
@@ -125,7 +117,7 @@ class BadgeDetailsSheet: OWSTableSheetViewController {
             return cell
         }, actionBlock: nil))
 
-        if shouldShowDonateButton() {
+        if !owner.isLocal {
             let buttonSection = OWSTableSection(items: [.init(customCellBlock: { [weak self] in
                 let cell = OWSTableItem.newCell()
                 cell.selectionStyle = .none

@@ -78,8 +78,8 @@ final class HelpViewController: OWSTableViewController2 {
         let aboutSection = OWSTableSection()
         aboutSection.headerTitle = OWSLocalizedString("ABOUT_SECTION_TITLE", comment: "Title for the 'about' help section")
         aboutSection.footerTitle = OWSLocalizedString(
-            "SETTINGS_COPYRIGHT",
-            comment: "Footer for the 'about' help section",
+            "ABOUT_SECTION_FOOTER",
+            comment: "Footer for the 'about' help section. For non-English languages, exclude the word '501c3'.",
         )
         aboutSection.add(.copyableItem(
             label: OWSLocalizedString("SETTINGS_VERSION", comment: ""),
@@ -98,3 +98,14 @@ final class HelpViewController: OWSTableViewController2 {
         self.contents = contents
     }
 }
+
+// MARK: -
+
+#if DEBUG
+
+@available(iOS 17, *)
+#Preview {
+    return HelpViewController()
+}
+
+#endif

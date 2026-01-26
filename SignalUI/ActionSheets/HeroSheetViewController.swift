@@ -21,6 +21,35 @@ open class HeroSheetViewController: StackSheetViewController {
         )
     }
 
+    public struct Body {
+        public struct BulletPoint {
+            public let icon: UIImage
+            public let text: String
+
+            public init(icon: UIImage, text: String) {
+                self.icon = icon
+                self.text = text
+            }
+        }
+
+        public let text: String
+        public let textAlignment: NSTextAlignment
+        public let textColor: UIColor
+        public let bulletPoints: [BulletPoint]
+
+        public init(
+            text: String,
+            textAlignment: NSTextAlignment = .center,
+            textColor: UIColor = .Signal.secondaryLabel,
+            bulletPoints: [BulletPoint] = [],
+        ) {
+            self.text = text
+            self.textAlignment = textAlignment
+            self.textColor = textColor
+            self.bulletPoints = bulletPoints
+        }
+    }
+
     public enum Element {
         case button(Button)
         case hero(Hero)
@@ -56,7 +85,7 @@ open class HeroSheetViewController: StackSheetViewController {
             Button(title: title, style: style, action: .dismiss)
         }
 
-        public var configuration: UIButton.Configuration {
+        fileprivate var configuration: UIButton.Configuration {
             switch style {
             case .primary:
                 return .largePrimary(title: title)
@@ -72,49 +101,45 @@ open class HeroSheetViewController: StackSheetViewController {
         }
     }
 
+    // MARK: -
+
     private let hero: Hero
-    private let titleText: String
-    private let bodyText: String
-    private let primary: Element
+    private let titleText: String?
+    private let body: Body
+    private let primary: Element?
     private let secondary: Element?
 
-    /// Creates a hero image sheet with a CTA button.
-    /// - Parameters:
-    ///   - hero: The main content to display at the top of the sheet
-    ///   - title: Localized title text
-    ///   - body: Localized body text
-    ///   - primaryButton: The title and action for the CTA button
-    ///   - secondaryButton: The title and action for an optional secondary button
-    ///   If `nil`, the button will dismiss the sheet.
     public init(
         hero: Hero,
-        title: String,
+        title: String?,
         body: String,
-        primaryButton: Button,
+        primaryButton: Button?,
         secondaryButton: Button? = nil,
     ) {
         self.hero = hero
         self.titleText = title
-        self.bodyText = body
-        self.primary = .button(primaryButton)
+        self.body = Body(text: body)
+        self.primary = primaryButton.map { .button($0) }
         self.secondary = secondaryButton.map { .button($0) }
         super.init()
     }
 
     public init(
         hero: Hero,
-        title: String,
-        body: String,
-        primary: Element,
-        secondary: Element? = nil,
+        title: String?,
+        body: Body,
+        primary: Element?,
+        secondary: Element?,
     ) {
         self.hero = hero
         self.titleText = title
-        self.bodyText = body
+        self.body = body
         self.primary = primary
         self.secondary = secondary
         super.init()
     }
+
+    // MARK: -
 
     // .formSheet makes a blank sheet appear behind it
     override public var modalPresentationStyle: UIModalPresentationStyle {
@@ -136,26 +161,39 @@ open class HeroSheetViewController: StackSheetViewController {
         self.stackView.addArrangedSubview(heroView)
         self.stackView.setCustomSpacing(16, after: heroView)
 
-        let titleLabel = UILabel()
-        self.stackView.addArrangedSubview(titleLabel)
-        self.stackView.setCustomSpacing(12, after: titleLabel)
-        titleLabel.text = self.titleText
-        titleLabel.font = .dynamicTypeTitle2.bold()
-        titleLabel.numberOfLines = 0
-        titleLabel.textAlignment = .center
+        if let titleText {
+            let titleLabel = UILabel()
+            self.stackView.addArrangedSubview(titleLabel)
+            self.stackView.setCustomSpacing(12, after: titleLabel)
+            titleLabel.text = titleText
+            titleLabel.font = .dynamicTypeTitle2.bold()
+            titleLabel.numberOfLines = 0
+            titleLabel.textAlignment = .center
+        }
 
         let bodyLabel = UILabel()
         self.stackView.addArrangedSubview(bodyLabel)
         self.stackView.setCustomSpacing(32, after: bodyLabel)
-        bodyLabel.text = self.bodyText
+        bodyLabel.text = body.text
+        bodyLabel.textColor = body.textColor
+        bodyLabel.textAlignment = body.textAlignment
         bodyLabel.font = .dynamicTypeSubheadline
-        bodyLabel.textColor = UIColor.Signal.secondaryLabel
         bodyLabel.numberOfLines = 0
-        bodyLabel.textAlignment = .center
 
-        let primaryButtonView = viewForElement(primary)
-        self.stackView.addArrangedSubview(primaryButtonView)
-        self.stackView.setCustomSpacing(20, after: primaryButtonView)
+        for bodyBullet in body.bulletPoints {
+            let bulletView = viewForBulletPoint(
+                bodyBullet,
+                textColor: body.textColor,
+            )
+            self.stackView.addArrangedSubview(bulletView)
+            self.stackView.setCustomSpacing(32, after: bulletView)
+        }
+
+        if let primary {
+            let primaryButtonView = viewForElement(primary)
+            self.stackView.addArrangedSubview(primaryButtonView)
+            self.stackView.setCustomSpacing(20, after: primaryButtonView)
+        }
 
         if let secondary {
             let secondaryButtonView = viewForElement(secondary)
@@ -196,6 +234,37 @@ open class HeroSheetViewController: StackSheetViewController {
         return heroView
     }
 
+    private func viewForBulletPoint(
+        _ bulletPoint: Body.BulletPoint,
+        textColor: UIColor,
+    ) -> UIView {
+        let bulletContainer = UIView()
+        bulletContainer.layoutMargins = UIEdgeInsets(hMargin: 24, vMargin: 0)
+
+        let iconImageView = UIImageView()
+        bulletContainer.addSubview(iconImageView)
+        iconImageView.image = bulletPoint.icon
+        iconImageView.tintColor = .Signal.secondaryLabel
+
+        let bulletLabel = UILabel()
+        bulletContainer.addSubview(bulletLabel)
+        bulletLabel.font = .dynamicTypeSubheadline
+        bulletLabel.textColor = textColor
+        bulletLabel.numberOfLines = 0
+        bulletLabel.textAlignment = .left
+        bulletLabel.text = bulletPoint.text
+
+        iconImageView.autoSetDimensions(to: .square(24))
+        iconImageView.autoPinEdge(toSuperviewMargin: .leading)
+        iconImageView.autoVCenterInSuperview()
+
+        iconImageView.autoPinEdge(.trailing, to: .leading, of: bulletLabel, withOffset: -12)
+
+        bulletLabel.autoPinEdges(toSuperviewMarginsExcludingEdge: .leading)
+
+        return bulletContainer
+    }
+
     private func viewForElement(_ element: Element) -> UIView {
         switch element {
         case .button(let button):
@@ -223,7 +292,10 @@ open class HeroSheetViewController: StackSheetViewController {
     }
 }
 
+// MARK: -
+
 #if DEBUG
+
 @available(iOS 17, *)
 #Preview("Image") {
     SheetPreviewViewController(sheet: HeroSheetViewController(
@@ -231,6 +303,35 @@ open class HeroSheetViewController: StackSheetViewController {
         title: LocalizationNotNeeded("Finish linking on your other device"),
         body: LocalizationNotNeeded("Finish linking Signal on your other device."),
         primaryButton: .dismissing(title: CommonStrings.continueButton),
+    ))
+}
+
+@available(iOS 17, *)
+#Preview("Body w/ bullets") {
+    SheetPreviewViewController(sheet: HeroSheetViewController(
+        hero: .image(UIImage(named: "sustainer-heart")!),
+        title: nil,
+        body: HeroSheetViewController.Body(
+            text: "As an independent nonprofit, Signal is committed to private messaging and calls. No ads, no trackers, no surveillance. Donate today to support Signal.",
+            textAlignment: .left,
+            textColor: .Signal.label,
+            bulletPoints: [
+                HeroSheetViewController.Body.BulletPoint(
+                    icon: UIImage(named: "badge-multi")!,
+                    text: "Get an optional badge on your profile when you donate",
+                ),
+                HeroSheetViewController.Body.BulletPoint(
+                    icon: UIImage(named: "lock")!,
+                    text: "Your privacy is our mission",
+                ),
+                HeroSheetViewController.Body.BulletPoint(
+                    icon: UIImage(named: "heart")!,
+                    text: "Signal is a 501c3 nonprofit. US donations are tax deductible.",
+                ),
+            ],
+        ),
+        primary: nil,
+        secondary: nil,
     ))
 }
 
@@ -265,8 +366,10 @@ open class HeroSheetViewController: StackSheetViewController {
     SheetPreviewViewController(sheet: HeroSheetViewController(
         hero: .image(UIImage(named: "transfer_complete")!),
         title: LocalizationNotNeeded("Continue on your other device"),
-        body: LocalizationNotNeeded("Continue transferring your account on your other device."),
+        body: HeroSheetViewController.Body(text: LocalizationNotNeeded("Continue transferring your account on your other device.")),
         primary: .hero(.animation(named: "circular_indeterminate", height: 60)),
+        secondary: nil,
     ))
 }
+
 #endif

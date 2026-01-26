@@ -47,7 +47,6 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
             )
             modeSwitchButton.configuration?.image = .init(named: UIDevice.current.isIPad ? "link" : "link-slash")
             modeSwitchButton.tintColor = .ows_gray25
-            modeSwitchButton.accessibilityIdentifier = "registration.splash.modeSwitch"
 
             view.addSubview(modeSwitchButton)
             modeSwitchButton.translatesAutoresizingMaskIntoConstraints = false
@@ -66,7 +65,6 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
         imageView.layer.magnificationFilter = .trilinear
         imageView.setCompressionResistanceLow()
         imageView.setContentHuggingVerticalLow()
-        imageView.accessibilityIdentifier = "registration.splash.heroImageView"
         let heroImageContainer = UIView.container()
         heroImageContainer.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -90,7 +88,14 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
             }
         }()
         let titleLabel = UILabel.titleLabelForRegistration(text: titleText)
-        titleLabel.accessibilityIdentifier = "registration.splash.titleLabel"
+
+        // Nonprofit label
+        let nonprofitAwarenessLabel = UILabel.explanationLabelForRegistration(
+            text: OWSLocalizedString(
+                "ONBOARDING_SPLASH_NONPROFIT",
+                comment: "Text indicating Signal is a nonprofit on the 'onboarding splash' view. For non-English languages, exclude the word '501c3'.",
+            ),
+        )
 
         // Terms of service and privacy policy.
         let tosPPButton = UIButton(
@@ -104,7 +109,6 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
         )
         tosPPButton.configuration?.baseForegroundColor = .Signal.secondaryLabel
         tosPPButton.enableMultilineLabel()
-        tosPPButton.accessibilityIdentifier = "registration.splash.explanationLabel"
 
         // Large buttons enclosed in a container with some extra horizontal padding.
         let continueButton = UIButton(
@@ -113,7 +117,6 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
                 self?.continuePressed()
             },
         )
-        continueButton.accessibilityIdentifier = "registration.splash.continueButton"
 
         let restoreOrTransferButton = UIButton(
             configuration: .largeSecondary(title: OWSLocalizedString(
@@ -125,7 +128,6 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
             },
         )
         restoreOrTransferButton.enableMultilineLabel()
-        restoreOrTransferButton.accessibilityIdentifier = "registration.splash.continueButton"
 
         let largeButtonsContainer = UIStackView.verticalButtonStack(buttons: [continueButton, restoreOrTransferButton])
 
@@ -133,11 +135,14 @@ public class RegistrationSplashViewController: OWSViewController, OWSNavigationC
         let stackView = addStaticContentStackView(arrangedSubviews: [
             heroImageContainer,
             titleLabel,
+            nonprofitAwarenessLabel,
             tosPPButton,
             largeButtonsContainer,
         ])
         stackView.setCustomSpacing(44, after: imageView)
-        stackView.setCustomSpacing(82, after: tosPPButton)
+        stackView.setCustomSpacing(24, after: titleLabel)
+        stackView.setCustomSpacing(0, after: nonprofitAwarenessLabel)
+        stackView.setCustomSpacing(80, after: tosPPButton)
 
         view.sendSubviewToBack(stackView)
     }

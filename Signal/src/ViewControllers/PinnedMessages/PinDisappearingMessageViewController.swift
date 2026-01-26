@@ -23,14 +23,14 @@ class PinDisappearingMessageViewController: HeroSheetViewController {
                 "PINNING_DISAPPEARING_MESSAGE_WARNING_BODY",
                 comment: "Body for a sheet warning users they are pinning a disappearing message.",
             ),
-            primary: .button(HeroSheetViewController.Button(
+            primaryButton: HeroSheetViewController.Button(
                 title: CommonStrings.okButton,
                 action: { sheet in
                     sheet.dismiss(animated: true)
                     completion()
                 },
-            )),
-            secondary: .button(HeroSheetViewController.Button(
+            ),
+            secondaryButton: HeroSheetViewController.Button(
                 title: CommonStrings.dontShowAgainButton,
                 style: .secondary,
                 action: .custom({ sheet in
@@ -40,7 +40,7 @@ class PinDisappearingMessageViewController: HeroSheetViewController {
                     }
                     completion()
                 }),
-            )),
+            ),
         )
     }
 }

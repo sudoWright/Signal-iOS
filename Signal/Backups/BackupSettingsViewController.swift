@@ -1267,7 +1267,7 @@ class BackupSettingsViewController:
                 "BACKUP_SETTINGS_CREATE_NEW_KEY_WARNING_SHEET_BODY",
                 comment: "Body for a sheet warning users about creating a new Recovery Key.",
             ),
-            primary: .button(HeroSheetViewController.Button(
+            primaryButton: HeroSheetViewController.Button(
                 title: primaryButtonTitle,
                 action: { sheet in
                     sheet.dismiss(animated: true) { [weak self] in
@@ -1275,11 +1275,11 @@ class BackupSettingsViewController:
                         showRecordNewRecoveryKey()
                     }
                 },
-            )),
-            secondary: .button(.dismissing(
+            ),
+            secondaryButton: .dismissing(
                 title: CommonStrings.cancelButton,
                 style: .secondary,
-            )),
+            ),
         )
         fromViewController.present(warningSheet, animated: true)
     }

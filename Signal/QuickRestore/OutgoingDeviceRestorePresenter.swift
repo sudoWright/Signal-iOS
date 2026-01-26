@@ -73,11 +73,12 @@ class OutgoingDeviceRestorePresenter: OutgoingDeviceRestoreInitialPresenter {
                 "OUTGOING_DEVICE_RESTORE_CONTINUE_ON_OTHER_DEVICE_TITLE",
                 comment: "Title of prompt notifying that action is necessary on the other device.",
             ),
-            body: OWSLocalizedString(
+            body: HeroSheetViewController.Body(text: OWSLocalizedString(
                 "OUTGOING_DEVICE_RESTORE_CONTINUE_ON_OTHER_DEVICE_BODY",
                 comment: "Body of prompt notifying that action is necessary on the other device.",
-            ),
+            )),
             primary: .hero(.animation(named: "circular_indeterminate", height: 60)),
+            secondary: nil,
         )
         internalNavigationController.present(sheet, animated: true)
     }
@@ -350,7 +351,7 @@ class OutgoingDeviceRestorePresenter: OutgoingDeviceRestoreInitialPresenter {
                 "BACKUP_SETTINGS_BACKUP_EXPORT_SUCCEEDED_READY_TO_RESTORE_BODY",
                 comment: "Body for an action sheet explaining the backup succeeded and a restore can continue.",
             ),
-            primary: .button(HeroSheetViewController.Button(
+            primaryButton: HeroSheetViewController.Button(
                 title: OWSLocalizedString(
                     "BACKUP_SETTINGS_BACKUP_EXPORT_SUCCEEDED_READY_TO_RESTORE_ACTION_TITLE",
                     comment: "Title for an action sheet action explaining the user can now scan a QR code to continue the restore.",
@@ -362,11 +363,11 @@ class OutgoingDeviceRestorePresenter: OutgoingDeviceRestoreInitialPresenter {
                         }
                     }
                 },
-            )),
-            secondary: .button(.dismissing(
+            ),
+            secondaryButton: .dismissing(
                 title: CommonStrings.cancelButton,
                 style: .secondary,
-            )),
+            ),
         )
 
         presentingViewController?.present(returnSheet, animated: true)

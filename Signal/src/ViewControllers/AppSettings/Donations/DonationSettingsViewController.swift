@@ -316,7 +316,7 @@ class DonationSettingsViewController: OWSTableViewController2 {
             button.widthAnchor.constraint(equalTo: heroStack.layoutMarginsGuide.widthAnchor).isActive = true
 
             cell.contentView.addSubview(heroStack)
-            heroStack.autoPinEdgesToSuperviewMargins(with: UIEdgeInsets(hMargin: 0, vMargin: 6))
+            heroStack.autoPinEdgesToSuperviewMargins(with: UIEdgeInsets(hMargin: 24, vMargin: 6))
 
             return cell
         })])
@@ -345,59 +345,18 @@ class DonationSettingsViewController: OWSTableViewController2 {
                 pendingOneTimeDonation: pendingOneTimeDonation,
                 hasAnyBadges: hasAnyBadges,
             ),
-            otherWaysToDonateSection(),
             moreSection(
-                subscriptionStatus: subscriptionStatus,
                 profileBadgeLookup: profileBadgeLookup,
                 hasAnyDonationReceipts: hasAnyDonationReceipts,
             ),
         ].compacted()
     }
 
-    private func otherWaysToDonateSection() -> OWSTableSection? {
-        guard Self.canSendGiftBadges else { return nil }
-
-        let title = OWSLocalizedString(
-            "DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE",
-            comment: "Title for the \"other ways to donate\" section on the donation view.",
-        )
-        let section = OWSTableSection(title: title)
-
-        section.add(.disclosureItem(
-            icon: .donateGift,
-            withText: OWSLocalizedString(
-                "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND",
-                comment: "Title for the \"donate for a friend\" button on the donation view.",
-            ),
-            actionBlock: { [weak self] in
-                guard let self else { return }
-
-                // It's possible (but unlikely) to lose the ability to send gifts while this button is
-                // visible. For example, Apple Pay could be disabled in parental controls after this
-                // screen is opened.
-                guard Self.canSendGiftBadges else {
-                    // We might want to show a better UI here, but making the button a no-op is
-                    // preferable to launching the view controller.
-                    return
-                }
-
-                let vc = BadgeGiftingChooseBadgeViewController()
-                self.navigationController?.pushViewController(vc, animated: true)
-            },
-        ))
-
-        return section
-    }
-
     private func moreSection(
-        subscriptionStatus: State.SubscriptionStatus,
         profileBadgeLookup: ProfileBadgeLookup,
         hasAnyDonationReceipts: Bool,
     ) -> OWSTableSection? {
-        let section = OWSTableSection(title: OWSLocalizedString(
-            "DONATION_VIEW_MORE_SECTION_TITLE",
-            comment: "Title for the 'more' section on the donation screen",
-        ))
+        let section = OWSTableSection()
 
         // It should be unusual to hit this case—having a subscription but no receipts—
         // but it is possible. For example, it can happen if someone started a subscription
@@ -406,26 +365,33 @@ class DonationSettingsViewController: OWSTableViewController2 {
             section.add(donationReceiptsItem(profileBadgeLookup: profileBadgeLookup))
         }
 
-        let shouldShowSubscriptionFaqLink: Bool = {
-            if hasAnyDonationReceipts { return true }
-            switch subscriptionStatus {
-            case .loadFailed, .hasSubscription, .pendingSubscription: return true
-            case .noSubscription: return false
-            }
-        }()
-        if shouldShowSubscriptionFaqLink {
+        if Self.canSendGiftBadges {
             section.add(.disclosureItem(
-                icon: .settingsHelp,
+                icon: .donateGift,
                 withText: OWSLocalizedString(
-                    "DONATION_VIEW_DONOR_FAQ",
-                    comment: "Title for the 'Donor FAQ' button on the donation screen",
+                    "DONATION_VIEW_DONATE_ON_BEHALF_OF_A_FRIEND",
+                    comment: "Title for the \"donate for a friend\" button on the donation view.",
                 ),
                 actionBlock: { [weak self] in
-                    let vc = SFSafariViewController(url: URL.Support.Donations.donorFAQ)
-                    self?.present(vc, animated: true, completion: nil)
+                    guard let self else { return }
+
+                    let vc = BadgeGiftingChooseBadgeViewController()
+                    self.navigationController?.pushViewController(vc, animated: true)
                 },
             ))
         }
+
+        section.add(.disclosureItem(
+            icon: .settingsHelp,
+            withText: OWSLocalizedString(
+                "DONATION_VIEW_DONOR_FAQ",
+                comment: "Title for the 'Donor FAQ' button on the donation screen",
+            ),
+            actionBlock: { [weak self] in
+                let vc = SFSafariViewController(url: URL.Support.Donations.donorFAQ)
+                self?.present(vc, animated: true, completion: nil)
+            },
+        ))
 
         guard section.itemCount > 0 else {
             return nil
