@@ -994,6 +994,7 @@ class EditDeviceNameViewController: NameEditorViewController {
     override class var nameByteLimit: Int { 225 }
     override class var nameGlyphLimit: Int { 50 }
 
+    override var allowEmptyName: Bool { false }
     override var placeholderText: String? {
         OWSLocalizedString(
             "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER",

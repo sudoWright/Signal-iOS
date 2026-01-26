@@ -154,9 +154,11 @@ struct OWSDeviceServiceImpl: OWSDeviceService {
                     base64String: nameCiphertext,
                     identityKeyPair: identityKeyPair,
                 )
+            } catch OWSDeviceNameError.emptyName {
+                name = nil
             } catch {
                 owsFailDebug("Failed to decrypt device name! Is this a legacy device name? \(error)")
-                name = nameCiphertext
+                name = nil
             }
         } else {
             name = nil
