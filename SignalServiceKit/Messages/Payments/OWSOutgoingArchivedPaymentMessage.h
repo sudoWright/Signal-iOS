@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
                     storyTimestamp:(nullable NSNumber *)storyTimestamp
                 wasRemotelyDeleted:(BOOL)wasRemotelyDeleted
                      customMessage:(nullable NSString *)customMessage
-                  groupMetaMessage:(TSGroupMetaMessage)groupMetaMessage
+                  groupMetaMessage:(NSInteger)groupMetaMessage
              hasLegacyMessageState:(BOOL)hasLegacyMessageState
                hasSyncedTranscript:(BOOL)hasSyncedTranscript
                     isVoiceMessage:(BOOL)isVoiceMessage
@@ -121,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
                   storyTimestamp:(nullable NSNumber *)storyTimestamp
               wasRemotelyDeleted:(BOOL)wasRemotelyDeleted
                    customMessage:(nullable NSString *)customMessage
-                groupMetaMessage:(TSGroupMetaMessage)groupMetaMessage
+                groupMetaMessage:(NSInteger)groupMetaMessage
            hasLegacyMessageState:(BOOL)hasLegacyMessageState
              hasSyncedTranscript:(BOOL)hasSyncedTranscript
                   isVoiceMessage:(BOOL)isVoiceMessage

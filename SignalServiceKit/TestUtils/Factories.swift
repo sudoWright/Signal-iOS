@@ -132,7 +132,6 @@ public class OutgoingMessageFactory: Factory {
             expireTimerVersion: expireTimerVersionBuilder(),
             expireStartedAt: expireStartedAtBuilder(),
             isVoiceMessage: isVoiceMessageBuilder(),
-            groupMetaMessage: groupMetaMessageBuilder(),
             isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackupBuilder(),
             isViewOnceMessage: isViewOnceMessageBuilder(),
             isViewOnceComplete: false,
@@ -208,10 +207,6 @@ public class OutgoingMessageFactory: Factory {
 
     public var isVoiceMessageBuilder: () -> Bool = {
         return false
-    }
-
-    public var groupMetaMessageBuilder: () -> TSGroupMetaMessage = {
-        return .unspecified
     }
 
     public var isSmsMessageRestoredFromBackupBuilder: () -> Bool = {

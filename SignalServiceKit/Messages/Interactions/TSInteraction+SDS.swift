@@ -50,7 +50,7 @@ public struct InteractionRecord: SDSRecord {
     public let expireStartedAt: UInt64?
     public let expiresAt: UInt64?
     public let expiresInSeconds: UInt32?
-    public let groupMetaMessage: TSGroupMetaMessage?
+    public let groupMetaMessage: Int?
     public let hasLegacyMessageState: Bool?
     public let hasSyncedTranscript: Bool?
     public let wasNotCreatedLocally: Bool?
@@ -229,7 +229,7 @@ public extension InteractionRecord {
         expireStartedAt = row[20]
         expiresAt = row[21]
         expiresInSeconds = row[22]
-        groupMetaMessage = row[23].flatMap { TSGroupMetaMessage(rawValue: $0) }
+        groupMetaMessage = row[23]
         hasLegacyMessageState = row[24]
         hasSyncedTranscript = row[25]
         wasNotCreatedLocally = row[26]
@@ -827,9 +827,7 @@ extension TSInteraction {
             let storyTimestamp: NSNumber? = SDSDeserialization.optionalNumericAsNSNumber(record.storyTimestamp, name: "storyTimestamp", conversion: { NSNumber(value: $0) })
             let wasRemotelyDeleted: Bool = try SDSDeserialization.required(record.wasRemotelyDeleted, name: "wasRemotelyDeleted")
             let customMessage: String? = record.customMessage
-            guard let groupMetaMessage: TSGroupMetaMessage = record.groupMetaMessage else {
-               throw SDSError.missingRequiredField()
-            }
+            let groupMetaMessage: Int = try SDSDeserialization.required(record.groupMetaMessage, name: "groupMetaMessage")
             let hasLegacyMessageState: Bool = try SDSDeserialization.required(record.hasLegacyMessageState, name: "hasLegacyMessageState")
             let hasSyncedTranscript: Bool = try SDSDeserialization.required(record.hasSyncedTranscript, name: "hasSyncedTranscript")
             let isVoiceMessage: Bool = try SDSDeserialization.required(record.isVoiceMessage, name: "isVoiceMessage")
@@ -929,9 +927,7 @@ extension TSInteraction {
             let storyTimestamp: NSNumber? = SDSDeserialization.optionalNumericAsNSNumber(record.storyTimestamp, name: "storyTimestamp", conversion: { NSNumber(value: $0) })
             let wasRemotelyDeleted: Bool = try SDSDeserialization.required(record.wasRemotelyDeleted, name: "wasRemotelyDeleted")
             let customMessage: String? = record.customMessage
-            guard let groupMetaMessage: TSGroupMetaMessage = record.groupMetaMessage else {
-               throw SDSError.missingRequiredField()
-            }
+            let groupMetaMessage: Int = try SDSDeserialization.required(record.groupMetaMessage, name: "groupMetaMessage")
             let hasLegacyMessageState: Bool = try SDSDeserialization.required(record.hasLegacyMessageState, name: "hasLegacyMessageState")
             let hasSyncedTranscript: Bool = try SDSDeserialization.required(record.hasSyncedTranscript, name: "hasSyncedTranscript")
             let isVoiceMessage: Bool = try SDSDeserialization.required(record.isVoiceMessage, name: "isVoiceMessage")
@@ -2017,9 +2013,7 @@ extension TSInteraction {
             let storyTimestamp: NSNumber? = SDSDeserialization.optionalNumericAsNSNumber(record.storyTimestamp, name: "storyTimestamp", conversion: { NSNumber(value: $0) })
             let wasRemotelyDeleted: Bool = try SDSDeserialization.required(record.wasRemotelyDeleted, name: "wasRemotelyDeleted")
             let customMessage: String? = record.customMessage
-            guard let groupMetaMessage: TSGroupMetaMessage = record.groupMetaMessage else {
-               throw SDSError.missingRequiredField()
-            }
+            let groupMetaMessage: Int = try SDSDeserialization.required(record.groupMetaMessage, name: "groupMetaMessage")
             let hasLegacyMessageState: Bool = try SDSDeserialization.required(record.hasLegacyMessageState, name: "hasLegacyMessageState")
             let hasSyncedTranscript: Bool = try SDSDeserialization.required(record.hasSyncedTranscript, name: "hasSyncedTranscript")
             let isVoiceMessage: Bool = try SDSDeserialization.required(record.isVoiceMessage, name: "isVoiceMessage")
@@ -2284,7 +2278,7 @@ extension TSInteraction: DeepCopyable {
             let storyTimestamp: NSNumber? = modelToCopy.storyTimestamp
             let wasRemotelyDeleted: Bool = modelToCopy.wasRemotelyDeleted
             let customMessage: String? = modelToCopy.customMessage
-            let groupMetaMessage: TSGroupMetaMessage = modelToCopy.groupMetaMessage
+            let groupMetaMessage: Int = modelToCopy.groupMetaMessage
             let hasLegacyMessageState: Bool = modelToCopy.hasLegacyMessageState
             let hasSyncedTranscript: Bool = modelToCopy.hasSyncedTranscript
             let isVoiceMessage: Bool = modelToCopy.isVoiceMessage
@@ -2419,7 +2413,7 @@ extension TSInteraction: DeepCopyable {
             let storyTimestamp: NSNumber? = modelToCopy.storyTimestamp
             let wasRemotelyDeleted: Bool = modelToCopy.wasRemotelyDeleted
             let customMessage: String? = modelToCopy.customMessage
-            let groupMetaMessage: TSGroupMetaMessage = modelToCopy.groupMetaMessage
+            let groupMetaMessage: Int = modelToCopy.groupMetaMessage
             let hasLegacyMessageState: Bool = modelToCopy.hasLegacyMessageState
             let hasSyncedTranscript: Bool = modelToCopy.hasSyncedTranscript
             let isVoiceMessage: Bool = modelToCopy.isVoiceMessage
@@ -2545,7 +2539,7 @@ extension TSInteraction: DeepCopyable {
             let storyTimestamp: NSNumber? = modelToCopy.storyTimestamp
             let wasRemotelyDeleted: Bool = modelToCopy.wasRemotelyDeleted
             let customMessage: String? = modelToCopy.customMessage
-            let groupMetaMessage: TSGroupMetaMessage = modelToCopy.groupMetaMessage
+            let groupMetaMessage: Int = modelToCopy.groupMetaMessage
             let hasLegacyMessageState: Bool = modelToCopy.hasLegacyMessageState
             let hasSyncedTranscript: Bool = modelToCopy.hasSyncedTranscript
             let isVoiceMessage: Bool = modelToCopy.isVoiceMessage
@@ -4608,7 +4602,7 @@ extension InteractionRecord {
                             expireStartedAt,
                             expiresAt,
                             expiresInSeconds,
-                            groupMetaMessage?.rawValue,
+                            groupMetaMessage,
                             hasLegacyMessageState,
                             hasSyncedTranscript,
                             wasNotCreatedLocally,
@@ -4701,7 +4695,7 @@ extension TSInteractionSerializer {
     static var expireStartedAtColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "expireStartedAt", columnType: .int64, isOptional: true) }
     static var expiresAtColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "expiresAt", columnType: .int64, isOptional: true) }
     static var expiresInSecondsColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "expiresInSeconds", columnType: .int64, isOptional: true) }
-    static var groupMetaMessageColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "groupMetaMessage", columnType: .int, isOptional: true) }
+    static var groupMetaMessageColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "groupMetaMessage", columnType: .int64, isOptional: true) }
     static var hasLegacyMessageStateColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "hasLegacyMessageState", columnType: .int, isOptional: true) }
     static var hasSyncedTranscriptColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "hasSyncedTranscript", columnType: .int, isOptional: true) }
     static var wasNotCreatedLocallyColumn: SDSColumnMetadata { SDSColumnMetadata(columnName: "wasNotCreatedLocally", columnType: .int, isOptional: true) }
@@ -5131,7 +5125,7 @@ class TSInteractionSerializer: SDSSerializer {
         let expireStartedAt: UInt64? = nil
         let expiresAt: UInt64? = nil
         let expiresInSeconds: UInt32? = nil
-        let groupMetaMessage: TSGroupMetaMessage? = nil
+        let groupMetaMessage: Int? = nil
         let hasLegacyMessageState: Bool? = nil
         let hasSyncedTranscript: Bool? = nil
         let wasNotCreatedLocally: Bool? = nil

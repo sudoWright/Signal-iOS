@@ -39,15 +39,6 @@ typedef NS_CLOSED_ENUM(NSInteger, TSOutgoingMessageState) {
 
 NSString *NSStringForOutgoingMessageState(TSOutgoingMessageState value);
 
-typedef NS_ENUM(NSInteger, TSGroupMetaMessage) {
-    TSGroupMetaMessageUnspecified,
-    TSGroupMetaMessageNew,
-    TSGroupMetaMessageUpdate,
-    TSGroupMetaMessageDeliver,
-    TSGroupMetaMessageQuit,
-    TSGroupMetaMessageRequestInfo,
-};
-
 typedef NS_ENUM(NSInteger, EncryptionStyle) {
     EncryptionStyleWhisper,
     EncryptionStylePlaintext
@@ -156,7 +147,7 @@ typedef NS_ENUM(NSInteger, EncryptionStyle) {
                   storyTimestamp:(nullable NSNumber *)storyTimestamp
               wasRemotelyDeleted:(BOOL)wasRemotelyDeleted
                    customMessage:(nullable NSString *)customMessage
-                groupMetaMessage:(TSGroupMetaMessage)groupMetaMessage
+                groupMetaMessage:(NSInteger)groupMetaMessage
            hasLegacyMessageState:(BOOL)hasLegacyMessageState
              hasSyncedTranscript:(BOOL)hasSyncedTranscript
                   isVoiceMessage:(BOOL)isVoiceMessage
@@ -185,7 +176,7 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
 @property (atomic, readonly, nullable) NSString *customMessage;
 @property (atomic, nullable) NSString *mostRecentFailureText;
 
-@property (atomic, readonly) TSGroupMetaMessage groupMetaMessage;
+@property (atomic, readonly) NSInteger groupMetaMessage;
 
 @property (nonatomic, readonly) BOOL isVoiceMessage;
 

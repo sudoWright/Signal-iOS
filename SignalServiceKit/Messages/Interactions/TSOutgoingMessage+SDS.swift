@@ -83,7 +83,7 @@ class TSOutgoingMessageSerializer: SDSSerializer {
         let expireStartedAt: UInt64? = model.expireStartedAt
         let expiresAt: UInt64? = model.expiresAt
         let expiresInSeconds: UInt32? = model.expiresInSeconds
-        let groupMetaMessage: TSGroupMetaMessage? = model.groupMetaMessage
+        let groupMetaMessage: Int? = model.groupMetaMessage
         let hasLegacyMessageState: Bool? = model.hasLegacyMessageState
         let hasSyncedTranscript: Bool? = model.hasSyncedTranscript
         let wasNotCreatedLocally: Bool? = model.wasNotCreatedLocally

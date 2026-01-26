@@ -83,7 +83,7 @@ class OWSAddToProfileWhitelistOfferMessageSerializer: SDSSerializer {
         let expireStartedAt: UInt64? = model.expireStartedAt
         let expiresAt: UInt64? = model.expiresAt
         let expiresInSeconds: UInt32? = model.expiresInSeconds
-        let groupMetaMessage: TSGroupMetaMessage? = nil
+        let groupMetaMessage: Int? = nil
         let hasLegacyMessageState: Bool? = nil
         let hasSyncedTranscript: Bool? = nil
         let wasNotCreatedLocally: Bool? = nil

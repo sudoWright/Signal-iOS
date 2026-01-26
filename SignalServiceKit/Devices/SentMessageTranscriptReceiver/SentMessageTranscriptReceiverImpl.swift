@@ -192,7 +192,6 @@ public class SentMessageTranscriptReceiverImpl: SentMessageTranscriptReceiver {
             expireTimerVersion: messageParams.expireTimerVersion,
             expireStartedAt: messageParams.expirationStartedAt,
             isVoiceMessage: false,
-            groupMetaMessage: .unspecified,
             isSmsMessageRestoredFromBackup: false,
             isViewOnceMessage: messageParams.isViewOnceMessage,
             isViewOnceComplete: false,

@@ -568,7 +568,6 @@ extension BackupArchiveTSOutgoingMessageArchiver: BackupArchive.TSMessageEditHis
                 expireTimerVersion: nil,
                 expireStartedAt: expireStartDate,
                 isVoiceMessage: false,
-                groupMetaMessage: .unspecified,
                 isSmsMessageRestoredFromBackup: chatItem.sms,
                 isViewOnceMessage: false,
                 isViewOnceComplete: false,

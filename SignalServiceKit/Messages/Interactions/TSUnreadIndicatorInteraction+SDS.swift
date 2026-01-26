@@ -83,7 +83,7 @@ class TSUnreadIndicatorInteractionSerializer: SDSSerializer {
         let expireStartedAt: UInt64? = nil
         let expiresAt: UInt64? = nil
         let expiresInSeconds: UInt32? = nil
-        let groupMetaMessage: TSGroupMetaMessage? = nil
+        let groupMetaMessage: Int? = nil
         let hasLegacyMessageState: Bool? = nil
         let hasSyncedTranscript: Bool? = nil
         let wasNotCreatedLocally: Bool? = nil

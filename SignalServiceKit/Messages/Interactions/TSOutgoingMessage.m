@@ -48,7 +48,7 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
 
 @property (atomic) BOOL hasSyncedTranscript;
 @property (atomic, nullable) NSString *customMessage;
-@property (atomic) TSGroupMetaMessage groupMetaMessage;
+@property (atomic) NSInteger groupMetaMessage;
 @property (nonatomic, readonly) NSUInteger outgoingMessageSchemaVersion;
 
 @property (nonatomic, readonly) TSOutgoingMessageState legacyMessageState;
@@ -101,7 +101,7 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
                   storyTimestamp:(nullable NSNumber *)storyTimestamp
               wasRemotelyDeleted:(BOOL)wasRemotelyDeleted
                    customMessage:(nullable NSString *)customMessage
-                groupMetaMessage:(TSGroupMetaMessage)groupMetaMessage
+                groupMetaMessage:(NSInteger)groupMetaMessage
            hasLegacyMessageState:(BOOL)hasLegacyMessageState
              hasSyncedTranscript:(BOOL)hasSyncedTranscript
                   isVoiceMessage:(BOOL)isVoiceMessage
@@ -372,7 +372,6 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     }
 
     _recipientAddressStates = [recipientAddressStates copy];
-    _groupMetaMessage = [[self class] groupMetaMessageForBuilder:outgoingMessageBuilder];
     _hasSyncedTranscript = NO;
     _outgoingMessageSchemaVersion = TSOutgoingMessageSchemaVersion;
     _changeActionsProtoData = outgoingMessageBuilder.groupChangeProtoData;
@@ -393,40 +392,12 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     }
 
     _recipientAddressStates = [recipientAddressStates copy];
-    _groupMetaMessage = [[self class] groupMetaMessageForBuilder:outgoingMessageBuilder];
     _hasSyncedTranscript = NO;
     _outgoingMessageSchemaVersion = TSOutgoingMessageSchemaVersion;
     _changeActionsProtoData = outgoingMessageBuilder.groupChangeProtoData;
     _isVoiceMessage = outgoingMessageBuilder.isVoiceMessage;
 
     return self;
-}
-
-/// Compute the appropriate "group meta message" for a given message builder.
-///
-/// At the time of writing, the "meta message" property appears to be entirely
-/// unused except for determining if a given `TSOutgoingMessage` should be
-/// saved. It is, however, part of the `TSInteraction` database schema, so will
-/// be non-trivial to do away with entirely.
-///
-/// - SeeAlso ``shouldBeSaved``
-+ (TSGroupMetaMessage)groupMetaMessageForBuilder:(TSOutgoingMessageBuilder *)builder
-{
-    TSThread *thread = builder.thread;
-    TSGroupMetaMessage groupMetaMessage = builder.groupMetaMessage;
-
-    if ([thread isKindOfClass:TSGroupThread.class]) {
-        // Unless specified, we assume group messages are "deliver", or "normal" messages.
-        if (groupMetaMessage == TSGroupMetaMessageUnspecified) {
-            return TSGroupMetaMessageDeliver;
-        } else {
-            return groupMetaMessage;
-        }
-    } else {
-        // Explicit group meta message only makes sense for group threads.
-        OWSAssertDebug(groupMetaMessage == TSGroupMetaMessageUnspecified);
-        return TSGroupMetaMessageUnspecified;
-    }
 }
 
 #pragma mark -
@@ -457,21 +428,6 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
         return YES;
     }
     return (self.hasLegacyMessageState && self.messageState == TSOutgoingMessageStateSent);
-}
-
-- (BOOL)shouldBeSaved
-{
-    if (!super.shouldBeSaved) {
-        return NO;
-    }
-    if (self.groupMetaMessage == TSGroupMetaMessageDeliver || self.groupMetaMessage == TSGroupMetaMessageUnspecified) {
-        return YES;
-    }
-
-    // There's no need to save this message, since it's not displayed to the user.
-    //
-    // Should we find a need to save this in the future, we need to exclude any non-serializable properties.
-    return NO;
 }
 
 - (void)updateStoredMessageState

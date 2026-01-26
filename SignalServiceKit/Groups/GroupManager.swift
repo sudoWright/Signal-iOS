@@ -726,7 +726,6 @@ public class GroupManager: NSObject {
 
             let message = OutgoingGroupUpdateMessage(
                 in: thread,
-                groupMetaMessage: .update,
                 expiresInSeconds: dmConfigurationStore.durationSeconds(for: thread, tx: transaction),
                 groupChangeProtoData: groupChangeProtoData,
                 additionalRecipients: Self.invitedMembers(in: thread),
@@ -753,7 +752,6 @@ public class GroupManager: NSObject {
             let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
             let message = OutgoingGroupUpdateMessage(
                 in: thread,
-                groupMetaMessage: .new,
                 expiresInSeconds: dmConfigurationStore.durationSeconds(for: thread, tx: tx),
                 additionalRecipients: Self.invitedMembers(in: thread),
                 isUrgent: true,
@@ -779,12 +777,7 @@ public class GroupManager: NSObject {
         guard groupThread.groupModel.groupsVersion == .V2 else {
             return false
         }
-        switch message.groupMetaMessage {
-        case .update, .new:
-            return true
-        default:
-            return false
-        }
+        return message is OutgoingGroupUpdateMessage
     }
 
     // MARK: - Group Database

@@ -43,7 +43,6 @@ final class OutgoingGroupUpdateMessage: TSOutgoingMessage {
 
     init(
         in thread: TSGroupThread,
-        groupMetaMessage: TSGroupMetaMessage,
         expiresInSeconds: UInt32 = 0,
         groupChangeProtoData: Data? = nil,
         additionalRecipients: some Sequence<ServiceId>,
@@ -54,7 +53,6 @@ final class OutgoingGroupUpdateMessage: TSOutgoingMessage {
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(
             thread: thread,
             expiresInSeconds: expiresInSeconds,
-            groupMetaMessage: groupMetaMessage,
             groupChangeProtoData: groupChangeProtoData,
         )
         self.isUpdateUrgent = isUrgent

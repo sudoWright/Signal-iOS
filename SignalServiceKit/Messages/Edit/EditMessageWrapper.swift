@@ -241,7 +241,6 @@ public struct OutgoingEditMessageWrapper: EditMessageWrapper {
             expireTimerVersion: isLatestRevision ? message.expireTimerVersion?.uint32Value : 0,
             expireStartedAt: message.expireStartedAt,
             isVoiceMessage: message.isVoiceMessage,
-            groupMetaMessage: message.groupMetaMessage,
             isSmsMessageRestoredFromBackup: message.isSmsMessageRestoredFromBackup,
             isViewOnceMessage: message.isViewOnceMessage,
             isViewOnceComplete: message.isViewOnceComplete,
