@@ -602,7 +602,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
         }
 
         func didFail(record: Store.Record, error: any Error, isRetryable: Bool, tx: DBWriteTransaction) throws {
-            logger.warn("Failed restoring attachment \(record.id), isRetryable: \(isRetryable), isThumbnail: \(record.record.isThumbnail), error: \(error)")
+            logger.warn("Failed restoring attachment \(record.record.attachmentRowId), download \(record.id), isRetryable: \(isRetryable), isThumbnail: \(record.record.isThumbnail), error: \(error)")
 
             if
                 isRetryable,
