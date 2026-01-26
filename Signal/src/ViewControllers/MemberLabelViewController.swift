@@ -271,7 +271,7 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
         {
             stackView.addArrangedSubview(previewContainer)
         }
-        let count = memberLabel?.count ?? 0
+        let count = textField.text?.count ?? 0
         let charsRemaining = Self.maxCharCount - count
         characterCountLabel.text = String(charsRemaining)
         characterCountLabel.isHidden = charsRemaining > Self.showCharacterCountMax
@@ -280,6 +280,7 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
 
     @objc
     func textDidChange(_ textField: UITextField) {
+        textField.text = textField.text?.filter { $0.unicodeScalars.first?.properties.isEmoji != true }
         memberLabel = textField.text == "" ? nil : textField.text?.filterStringForDisplay()
         reloadMessagePreview()
     }

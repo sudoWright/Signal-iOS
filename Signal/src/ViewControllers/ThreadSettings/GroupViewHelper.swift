@@ -90,6 +90,8 @@ class GroupViewHelper {
     // * DM state
     // * Group title (if group)
     // * Group avatar (if group)
+    // * Pinned Messages (if group)
+    // * Member Labels (if group)
     var canEditConversationAttributes: Bool {
         return canLocalUserEditConversation { groupAccess in
             return groupAccess.attributes

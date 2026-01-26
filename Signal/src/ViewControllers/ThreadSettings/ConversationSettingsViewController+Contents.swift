@@ -888,7 +888,7 @@ extension ConversationSettingsViewController {
             ),
         )
 
-        if BuildFlags.MemberLabel.send {
+        if BuildFlags.MemberLabel.send, groupViewHelper.canEditConversationAttributes {
             section.add(
                 OWSTableItem.disclosureItem(
                     icon: .memberLabel,

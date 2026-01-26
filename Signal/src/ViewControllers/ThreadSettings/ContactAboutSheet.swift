@@ -29,18 +29,21 @@ class ContactAboutSheet: StackSheetViewController {
     private let spoilerState: SpoilerRenderState
     private let context: Context
     private let memberLabel: MemberLabel?
+    private let groupViewHelper: GroupViewHelper?
 
     init(
         thread: TSContactThread,
         spoilerState: SpoilerRenderState,
         context: Context = .default,
         memberLabel: MemberLabel? = nil,
+        groupViewHelper: GroupViewHelper? = nil,
     ) {
         self.thread = thread
         self.isLocalUser = thread.isNoteToSelf
         self.spoilerState = spoilerState
         self.context = context
         self.memberLabel = memberLabel
+        self.groupViewHelper = groupViewHelper
         super.init()
         DependenciesBridge.shared.databaseChangeObserver.appendDatabaseChangeDelegate(self)
     }
@@ -194,7 +197,8 @@ class ContactAboutSheet: StackSheetViewController {
             stackView.addArrangedSubview(label)
         }
 
-        if BuildFlags.MemberLabel.send, isLocalUser {
+        let canEditMemberLabel = groupViewHelper?.canEditConversationAttributes ?? false
+        if BuildFlags.MemberLabel.send, isLocalUser, canEditMemberLabel {
             stackView.addArrangedSubview(ProfileDetailLabel.memberLabel(memberLabel?.label))
         }
 

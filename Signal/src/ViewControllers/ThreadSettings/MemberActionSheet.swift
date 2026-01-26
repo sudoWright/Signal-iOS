@@ -32,7 +32,7 @@ struct ProfileSheetSheetCoordinator {
         let thread = threadViewModel.threadRecord
 
         if thread.isNoteToSelf, let contactThread = thread as? TSContactThread {
-            ContactAboutSheet(thread: contactThread, spoilerState: spoilerState, memberLabel: memberLabel)
+            ContactAboutSheet(thread: contactThread, spoilerState: spoilerState, memberLabel: memberLabel, groupViewHelper: groupViewHelper)
                 .present(from: viewController)
             return
         }
