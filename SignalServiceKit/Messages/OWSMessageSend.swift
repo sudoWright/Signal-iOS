@@ -8,13 +8,13 @@ import LibSignalClient
 
 /// Provides parameters required for assembling a Sealed Sender message.
 final class SealedSenderParameters {
-    let message: TSOutgoingMessage
+    let message: any SendableMessage
     let senderCertificate: SenderCertificate
     let accessKey: OWSUDAccess?
     let endorsement: GroupSendFullTokenBuilder?
 
     init?(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         senderCertificate: SenderCertificate,
         accessKey: OWSUDAccess?,
         endorsement: GroupSendFullTokenBuilder?,
@@ -45,7 +45,7 @@ final class SealedSenderParameters {
 // to multiple recipients and therefore require multiple instances of
 // OWSMessageSend.
 final class OWSMessageSend {
-    let message: TSOutgoingMessage
+    let message: any SendableMessage
     let plaintextContent: Data
     let plaintextPayloadId: Int64?
     let thread: TSThread
@@ -53,7 +53,7 @@ final class OWSMessageSend {
     let localIdentifiers: LocalIdentifiers
 
     init(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         plaintextContent: Data,
         plaintextPayloadId: Int64?,
         thread: TSThread,

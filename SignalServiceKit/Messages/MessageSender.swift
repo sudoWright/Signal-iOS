@@ -8,7 +8,7 @@ import LibSignalClient
 
 // MARK: - Message "isXYZ" properties
 
-private extension TSOutgoingMessage {
+extension TSOutgoingMessage {
     var isTransientSKDM: Bool {
         (self as? OutgoingSenderKeyDistributionMessage)?.isSentOnBehalfOfOnlineMessage ?? false
     }
@@ -456,7 +456,7 @@ public class MessageSender {
     // * A recipient is unregistered.
     // * A recipient does not have the required capability.
     private func markSkippedRecipients(
-        of message: TSOutgoingMessage,
+        of message: any SendableMessage,
         sendingRecipients: [ServiceId],
         tx: DBWriteTransaction,
     ) {
@@ -466,7 +466,7 @@ public class MessageSender {
     }
 
     private func unsentRecipients(
-        of message: TSOutgoingMessage,
+        of message: any SendableMessage,
         in thread: TSThread,
         localIdentifiers: LocalIdentifiers,
         tx: DBReadTransaction,
@@ -578,7 +578,7 @@ public class MessageSender {
         )
     }
 
-    private func areAttachmentsUploadedWithSneakyTransaction(for message: TSOutgoingMessage) -> Bool {
+    private func areAttachmentsUploadedWithSneakyTransaction(for message: any SendableMessage) -> Bool {
         if message.shouldBeSaved == false {
             // Unsaved attachments come in two types:
             // * no attachments
@@ -597,7 +597,7 @@ public class MessageSender {
         }
     }
 
-    private func sendPreparedMessage(_ message: TSOutgoingMessage) async throws -> SendMessageFailure? {
+    private func sendPreparedMessage(_ message: any SendableMessage) async throws -> SendMessageFailure? {
         if !areAttachmentsUploadedWithSneakyTransaction(for: message) {
             throw OWSGenericError("attachments aren't uploaded")
         }
@@ -691,12 +691,13 @@ public class MessageSender {
     }
 
     private func sendPreparedMessage(
-        _ message: TSOutgoingMessage,
+        _ message: any SendableMessage,
         recoveryState: OuterRecoveryState,
         senderCertificates: SenderCertificates,
         localIdentifiers: LocalIdentifiers,
     ) async throws -> SendMessageFailure? {
-        let nextAction = try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx -> SendMessageNextAction? in
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+        let nextAction = try await databaseStorage.awaitableWrite { tx -> SendMessageNextAction? in
             guard let thread = message.thread(tx: tx) else {
                 throw MessageSenderError.threadMissing
             }
@@ -906,7 +907,7 @@ public class MessageSender {
     }
 
     private func sendPreparedMessage(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         serializedMessage: SerializedMessage,
         in thread: TSThread,
         viaFanoutTo fanoutRecipients: Set<ServiceId>,
@@ -1005,7 +1006,7 @@ public class MessageSender {
     }
 
     private func handleSendFailure(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         thread: TSThread,
         perRecipientErrors allErrors: [(serviceId: ServiceId, error: any Error)],
     ) async throws -> SendMessageFailure? {
@@ -1057,7 +1058,7 @@ public class MessageSender {
     }
 
     private func normalizeRecipientStatesIfNeeded(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         recipientErrors: some Sequence<(serviceId: ServiceId, error: Error)>,
         tx: DBWriteTransaction,
     ) {
@@ -1090,7 +1091,7 @@ public class MessageSender {
     /// It is important to be conservative about which messages unhide a
     /// recipient. It is far better to not unhide when should than to
     /// unhide when we should not.
-    private func shouldMessageSendUnhideRecipient(_ message: TSOutgoingMessage, tx: DBReadTransaction) -> Bool {
+    private func shouldMessageSendUnhideRecipient(_ message: any SendableMessage, tx: DBReadTransaction) -> Bool {
         if
             message.shouldBeSaved,
             let rowId = message.sqliteRowId,
@@ -1117,7 +1118,7 @@ public class MessageSender {
     }
 
     private func handleMessageSentLocally(
-        _ message: TSOutgoingMessage,
+        _ message: any SendableMessage,
         localIdentifiers: LocalIdentifiers,
     ) async throws {
         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
@@ -1181,7 +1182,7 @@ public class MessageSender {
     }
 
     private func sendSyncTranscriptIfNeeded(
-        forMessage message: TSOutgoingMessage,
+        forMessage message: any SendableMessage,
         localIdentifiers: LocalIdentifiers,
     ) async throws {
         guard message.shouldSyncTranscript() else {
@@ -1195,7 +1196,7 @@ public class MessageSender {
     }
 
     private func sendSyncTranscript(
-        forMessage message: TSOutgoingMessage,
+        forMessage message: any SendableMessage,
         localIdentifiers: LocalIdentifiers,
     ) async throws {
         let databaseStorage = SSKEnvironment.shared.databaseStorageRef
@@ -1228,7 +1229,7 @@ public class MessageSender {
     }
 
     func buildAndRecordMessage(
-        _ message: TSOutgoingMessage,
+        _ message: any SendableMessage,
         in thread: TSThread,
         tx: DBWriteTransaction,
     ) throws -> SerializedMessage {
@@ -1615,7 +1616,7 @@ public class MessageSender {
         messageSend: OWSMessageSend,
         sealedSenderParameters: SealedSenderParameters?,
     ) async throws -> [SentDeviceMessage] {
-        let message: TSOutgoingMessage = messageSend.message
+        let message = messageSend.message
 
         let requestMaker = RequestMaker(
             label: "Message Send",
@@ -1659,7 +1660,7 @@ public class MessageSender {
         deviceMessages: [DeviceMessage],
         wasSentByUD: Bool,
     ) async -> [SentDeviceMessage] {
-        let message: TSOutgoingMessage = messageSend.message
+        let message = messageSend.message
 
         Logger.info("Successfully sent message: \(type(of: message)), serviceId: \(messageSend.serviceId), timestamp: \(message.timestamp), wasSentByUD: \(wasSentByUD)")
 
@@ -1722,7 +1723,7 @@ public class MessageSender {
         responseError: Error,
         sealedSenderParameters: SealedSenderParameters?,
     ) async throws -> [SentDeviceMessage] {
-        let message: TSOutgoingMessage = messageSend.message
+        let message = messageSend.message
 
         Logger.warn("\(type(of: message)) to \(messageSend.serviceId), timestamp: \(message.timestamp), error: \(responseError)")
 

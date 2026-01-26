@@ -770,8 +770,8 @@ public class GroupManager: NSObject {
         thread.groupModel.groupMembership.invitedMembers.compactMap(\.serviceId)
     }
 
-    public static func shouldMessageHaveAdditionalRecipients(
-        _ message: TSOutgoingMessage,
+    static func shouldMessageHaveAdditionalRecipients(
+        _ message: any SendableMessage,
         groupThread: TSGroupThread,
     ) -> Bool {
         guard groupThread.groupModel.groupsVersion == .V2 else {

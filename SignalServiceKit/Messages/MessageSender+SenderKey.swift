@@ -55,7 +55,7 @@ extension MessageSender {
     func prepareSenderKeyMessageSend(
         for recipients: [ServiceId],
         in thread: TSThread,
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         serializedMessage: SerializedMessage,
         endorsements: GroupSendEndorsements?,
         udAccessMap: [Aci: OWSUDAccess],
@@ -219,7 +219,7 @@ extension MessageSender {
     private func sendSenderKeyMessage(
         to eligibleRecipients: Set<ServiceId>,
         in thread: TSThread,
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         serializedMessage: SerializedMessage,
         authBuilder: (_ readyRecipients: [ServiceId]) -> TSRequest.SealedSenderAuth,
         senderCertificate: SenderCertificate,
@@ -275,7 +275,7 @@ extension MessageSender {
     private func sendSenderKeyCiphertext(
         _ ciphertextResult: Result<Data, any Error>,
         to recipients: [Recipient],
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         payloadId: Int64?,
         authBuilder: () -> TSRequest.SealedSenderAuth,
         localIdentifiers: LocalIdentifiers,
@@ -343,7 +343,7 @@ extension MessageSender {
     private func prepareSenderKeyDistributionMessages(
         for recipients: some Sequence<ServiceId>,
         in thread: TSThread,
-        originalMessage: TSOutgoingMessage,
+        originalMessage: any SendableMessage,
         endorsements: GroupSendEndorsements?,
         udAccessMap: [Aci: OWSUDAccess],
         senderCertificate: SenderCertificate,
@@ -475,7 +475,7 @@ extension MessageSender {
     /// *except* those returned as unregistered in the result.
     private func sendSenderKeyRequest(
         to recipients: [Recipient],
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         ciphertextResult: Result<Data, any Error>,
         authBuilder: () -> TSRequest.SealedSenderAuth,
     ) async throws -> SenderKeySendResult {
@@ -585,7 +585,7 @@ extension MessageSender {
 
     private func senderKeyMessageBody(
         plaintext: Data,
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         thread: TSThread,
         recipients: [Recipient],
         senderCertificate: SenderCertificate,

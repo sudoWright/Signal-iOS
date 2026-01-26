@@ -25,7 +25,7 @@ final class OutgoingSenderKeyDistributionMessage: TransientOutgoingMessage {
     init(
         recipientThread: TSContactThread,
         senderKeyDistributionMessage: SenderKeyDistributionMessage,
-        onBehalfOfMessage originalMessage: TSOutgoingMessage,
+        onBehalfOfMessage originalMessage: any SendableMessage,
         inThread originalThread: TSThread,
         tx: DBReadTransaction,
     ) {

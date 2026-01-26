@@ -606,6 +606,7 @@
 		500B25832DD6A08300E9ECAA /* BackgroundMessageFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B25822DD6A08300E9ECAA /* BackgroundMessageFetcher.swift */; };
 		500BAD802C519F2D00B4CD7F /* MessageTimestampGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500BAD7E2C519F2D00B4CD7F /* MessageTimestampGenerator.swift */; };
 		500BAD822C519F3600B4CD7F /* MessageTimestampGeneratorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500BAD7F2C519F2D00B4CD7F /* MessageTimestampGeneratorTest.swift */; };
+		500CC1E52F15661A001A86F7 /* SendableMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500CC1E42F15661A001A86F7 /* SendableMessage.swift */; };
 		500CC1E72F15C20B001A86F7 /* ReceiptMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500CC1E62F15C20B001A86F7 /* ReceiptMessage.swift */; };
 		500CC1E92F15C8A7001A86F7 /* OutgoingCallMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500CC1E82F15C8A7001A86F7 /* OutgoingCallMessage.swift */; };
 		500CC1EB2F15D1E5001A86F7 /* StickerPackSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500CC1EA2F15D1E5001A86F7 /* StickerPackSyncMessage.swift */; };
@@ -4753,6 +4754,7 @@
 		500B25822DD6A08300E9ECAA /* BackgroundMessageFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundMessageFetcher.swift; sourceTree = "<group>"; };
 		500BAD7E2C519F2D00B4CD7F /* MessageTimestampGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTimestampGenerator.swift; sourceTree = "<group>"; };
 		500BAD7F2C519F2D00B4CD7F /* MessageTimestampGeneratorTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTimestampGeneratorTest.swift; sourceTree = "<group>"; };
+		500CC1E42F15661A001A86F7 /* SendableMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendableMessage.swift; sourceTree = "<group>"; };
 		500CC1E62F15C20B001A86F7 /* ReceiptMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptMessage.swift; sourceTree = "<group>"; };
 		500CC1E82F15C8A7001A86F7 /* OutgoingCallMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingCallMessage.swift; sourceTree = "<group>"; };
 		500CC1EA2F15D1E5001A86F7 /* StickerPackSyncMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerPackSyncMessage.swift; sourceTree = "<group>"; };
@@ -14393,6 +14395,7 @@
 				66D13F092A731E590092D47B /* RecipientHidingManager+SignalServiceAddress.swift */,
 				E1A090372A4B909B00F2BE8B /* RecipientHidingManager.swift */,
 				50B0E9472AC73C3B005D46AB /* RecipientStateMerger.swift */,
+				500CC1E42F15661A001A86F7 /* SendableMessage.swift */,
 				504F98B22EB0270A00DF465B /* SendMessageFailure.swift */,
 				50A5AA9A2A7449D000CF2ECC /* ServerReceiptEnvelope.swift */,
 				506395802F2403BE00B2F772 /* TransientOutgoingMessage.swift */,
@@ -19322,6 +19325,7 @@
 				66138FB6298326C7002E0CFE /* SecureValueRecovery.swift in Sources */,
 				662C440B2A156DF7001F83E2 /* SecureValueRecovery2Impl.swift in Sources */,
 				6691E7F72996EAD70032A68A /* SecureValueRecoveryMock.swift in Sources */,
+				500CC1E52F15661A001A86F7 /* SendableMessage.swift in Sources */,
 				725465392BA01FAA00EABFD2 /* SendGiftBadgeJobQueue.swift in Sources */,
 				D9AE0AD5291877600063488B /* SendGiftBadgeJobRecord.swift in Sources */,
 				504F98B32EB0270A00DF465B /* SendMessageFailure.swift in Sources */,

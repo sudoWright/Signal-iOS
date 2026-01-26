@@ -84,7 +84,7 @@ public class MessageSendLog {
         let uniqueId: String
     }
 
-    func recordPayload(_ plaintext: Data, for message: TSOutgoingMessage, tx: DBWriteTransaction) -> Int64? {
+    func recordPayload(_ plaintext: Data, for message: any SendableMessage, tx: DBWriteTransaction) -> Int64? {
         guard !RemoteConfig.current.messageResendKillSwitch else {
             return nil
         }
@@ -134,7 +134,7 @@ public class MessageSendLog {
                 plaintextContent: plaintext,
                 contentHint: message.contentHint,
                 sentTimestamp: message.timestamp,
-                uniqueThreadId: message.uniqueThreadId,
+                uniqueThreadId: message.threadUniqueId,
                 sendComplete: false,
             )
             try payload.insert(tx.database)
@@ -197,7 +197,7 @@ public class MessageSendLog {
         return existingValue.payload
     }
 
-    public func sendComplete(message: TSOutgoingMessage, tx: DBWriteTransaction) {
+    func sendComplete(message: any SendableMessage, tx: DBWriteTransaction) {
         guard !RemoteConfig.current.messageResendKillSwitch else {
             return
         }
@@ -221,10 +221,10 @@ public class MessageSendLog {
     }
 
     private func fetchUniquePayload(
-        for message: TSOutgoingMessage,
+        for message: any SendableMessage,
         tx: DBReadTransaction,
     ) throws -> (Int64, Payload)? {
-        let query = fetchRequest(threadUniqueId: message.uniqueThreadId).filter(Column("sentTimestamp") == message.timestamp)
+        let query = fetchRequest(threadUniqueId: message.threadUniqueId).filter(Column("sentTimestamp") == message.timestamp)
         return try fetchUniquePayload(query: query, tx: tx)
     }
 
@@ -283,7 +283,7 @@ public class MessageSendLog {
         payloadId: Int64,
         recipientAci: Aci,
         recipientDeviceId: DeviceId,
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         tx: DBWriteTransaction,
     ) {
         guard !RemoteConfig.current.messageResendKillSwitch else {
@@ -315,7 +315,7 @@ public class MessageSendLog {
     }
 
     func recordSuccessfulDelivery(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         recipientAci: Aci,
         recipientDeviceId: DeviceId,
         tx: DBWriteTransaction,
