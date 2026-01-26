@@ -794,7 +794,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
 
         /// Check for a cached upload form
         /// This can be up to ~7 days old from the point of upload starting. Just to avoid running into any fuzzieness around the 7 day expiration, expire the form after 6 days
-        /// If the upload hasn't started, the form shouldnt' be cached
+        /// If the upload hasn't started, the form shouldn't be cached
         let uploadForm: Upload.Form
         if
             let form = attachmentUploadRecord.uploadForm,
