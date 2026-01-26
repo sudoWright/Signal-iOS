@@ -190,7 +190,7 @@ struct PollDetailsView: View {
                                 .fontWeight(.medium)
                             Spacer()
                             if option.acis.count > 0 {
-                                if poll.isEnded, option.acis.count == maxVotes {
+                                if option.acis.count == maxVotes {
                                     Image("poll-win")
                                 }
                                 Text(
