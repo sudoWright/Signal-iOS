@@ -6,7 +6,7 @@
 import Foundation
 public import LibSignalClient
 
-public enum MessageSenderError: Error, IsRetryableProvider, UserErrorDescriptionProvider {
+public enum MessageSenderError: Error, UserErrorDescriptionProvider {
     case blockedContactRecipient
     case threadMissing
 
@@ -22,17 +22,6 @@ public enum MessageSenderError: Error, IsRetryableProvider, UserErrorDescription
                 "MESSAGE_STATUS_SEND_FAILED",
                 comment: "Label indicating that a message failed to send.",
             )
-        }
-    }
-
-    // MARK: - IsRetryableProvider
-
-    public var isRetryableProvider: Bool {
-        switch self {
-        case .blockedContactRecipient:
-            return false
-        case .threadMissing:
-            return false
         }
     }
 }
@@ -57,7 +46,7 @@ extension Error {
 
 // MARK: -
 
-public class MessageSenderNoSuchSignalRecipientError: CustomNSError, IsRetryableProvider, UserErrorDescriptionProvider {
+public class MessageSenderNoSuchSignalRecipientError: CustomNSError, UserErrorDescriptionProvider {
     // NSError bridging: the domain of the error.
     public static let errorDomain = OWSError.errorDomain
 
@@ -81,16 +70,11 @@ public class MessageSenderNoSuchSignalRecipientError: CustomNSError, IsRetryable
     }
 
     public init() {}
-
-    // MARK: - IsRetryableProvider
-
-    // No need to retry if the recipient is not registered.
-    public var isRetryableProvider: Bool { false }
 }
 
 // MARK: -
 
-public class MessageSenderErrorNoValidRecipients: CustomNSError, IsRetryableProvider, UserErrorDescriptionProvider {
+public class MessageSenderErrorNoValidRecipients: CustomNSError, UserErrorDescriptionProvider {
     static var asNSError: NSError {
         MessageSenderErrorNoValidRecipients() as Error as NSError
     }
@@ -112,20 +96,16 @@ public class MessageSenderErrorNoValidRecipients: CustomNSError, IsRetryableProv
             comment: "Error indicating that an outgoing message had no valid recipients.",
         )
     }
-
-    public var isRetryableProvider: Bool { false }
 }
 
 // MARK: -
 
-class MessageSenderNoSessionForTransientMessageError: CustomNSError, IsRetryableProvider, UserErrorDescriptionProvider {
+class MessageSenderNoSessionForTransientMessageError: CustomNSError, UserErrorDescriptionProvider {
     // NSError bridging: the domain of the error.
     static let errorDomain = OWSError.errorDomain
 
     // NSError bridging: the error code within the given domain.
     var errorCode: Int { OWSErrorCode.noSessionForTransientMessage.rawValue }
-
-    var isRetryableProvider: Bool { false }
 
     var localizedDescription: String {
         // These messages are never presented to the user, since these errors only
@@ -136,7 +116,7 @@ class MessageSenderNoSessionForTransientMessageError: CustomNSError, IsRetryable
 
 // MARK: -
 
-public class UntrustedIdentityError: CustomNSError, IsRetryableProvider, UserErrorDescriptionProvider {
+public class UntrustedIdentityError: CustomNSError, UserErrorDescriptionProvider {
     public let serviceId: ServiceId
 
     init(serviceId: ServiceId) {
@@ -165,10 +145,6 @@ public class UntrustedIdentityError: CustomNSError, IsRetryableProvider, UserErr
 
     // NSError bridging: the error code within the given domain.
     public var errorCode: Int { Self.errorCode }
-
-    /// Key will continue to be unaccepted, so no need to retry. It'll only
-    /// cause us to hit the Pre-Key request rate limit.
-    public var isRetryableProvider: Bool { false }
 }
 
 public class InvalidKeySignatureError: CustomNSError, IsRetryableProvider, UserErrorDescriptionProvider {
@@ -212,7 +188,7 @@ public class InvalidKeySignatureError: CustomNSError, IsRetryableProvider, UserE
 
 // MARK: -
 
-public class SpamChallengeRequiredError: CustomNSError, IsRetryableProvider, UserErrorDescriptionProvider {
+public class SpamChallengeRequiredError: CustomNSError, UserErrorDescriptionProvider {
     // NSError bridging: the domain of the error.
     public static let errorDomain = OWSError.errorDomain
 
@@ -230,8 +206,6 @@ public class SpamChallengeRequiredError: CustomNSError, IsRetryableProvider, Use
 
     // NSError bridging: the error code within the given domain.
     public var errorCode: Int { OWSErrorCode.serverRejectedSuspectedSpam.rawValue }
-
-    public var isRetryableProvider: Bool { false }
 }
 
 // MARK: -
@@ -272,7 +246,7 @@ class OWSRetryableMessageSenderError: Error, IsRetryableProvider {
 
 // MARK: -
 
-class MessageDeletedBeforeSentError: CustomNSError, IsRetryableProvider {
+class MessageDeletedBeforeSentError: CustomNSError {
     static var asNSError: NSError {
         MessageDeletedBeforeSentError() as Error as NSError
     }
@@ -282,6 +256,4 @@ class MessageDeletedBeforeSentError: CustomNSError, IsRetryableProvider {
 
     // NSError bridging: the error code within the given domain.
     var errorCode: Int { OWSErrorCode.messageDeletedBeforeSent.rawValue }
-
-    var isRetryableProvider: Bool { false }
 }

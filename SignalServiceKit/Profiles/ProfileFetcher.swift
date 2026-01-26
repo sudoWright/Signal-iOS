@@ -47,16 +47,9 @@ extension ProfileFetcher {
     }
 }
 
-public enum ProfileFetcherError: Error, IsRetryableProvider {
+public enum ProfileFetcherError: Error {
     case skippingOpportunisticFetch
     case couldNotFetchCredential
-
-    public var isRetryableProvider: Bool {
-        switch self {
-        case .skippingOpportunisticFetch: false
-        case .couldNotFetchCredential: false
-        }
-    }
 }
 
 public actor ProfileFetcherImpl: ProfileFetcher {

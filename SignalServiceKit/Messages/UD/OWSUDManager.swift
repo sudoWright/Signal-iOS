@@ -13,17 +13,6 @@ public enum OWSUDError: Error {
 
 // MARK: -
 
-extension OWSUDError: IsRetryableProvider {
-    public var isRetryableProvider: Bool {
-        switch self {
-        case .assertionError, .invalidData:
-            return false
-        }
-    }
-}
-
-// MARK: -
-
 public enum UnidentifiedAccessMode: Int {
     case unknown
     case enabled

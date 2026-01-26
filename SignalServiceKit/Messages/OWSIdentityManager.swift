@@ -6,10 +6,8 @@
 import CryptoKit
 public import LibSignalClient
 
-public enum IdentityManagerError: Error, IsRetryableProvider {
+public enum IdentityManagerError: Error {
     case identityKeyMismatchForOutgoingMessage
-
-    public var isRetryableProvider: Bool { false }
 }
 
 public protocol OWSIdentityManager {

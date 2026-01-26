@@ -5,14 +5,8 @@
 
 import Foundation
 
-public enum OWSURLSessionError: Error, IsRetryableProvider {
+public enum OWSURLSessionError: Error {
     case responseTooLarge
-
-    public var isRetryableProvider: Bool {
-        switch self {
-        case .responseTooLarge: return false
-        }
-    }
 }
 
 public class OWSURLSession: OWSURLSessionProtocol {

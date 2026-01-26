@@ -79,7 +79,7 @@ public enum Upload {
         case uploaded(Int)
     }
 
-    public enum Error: Swift.Error, IsRetryableProvider, LocalizedError, Equatable {
+    public enum Error: Swift.Error, LocalizedError, Equatable {
         case invalidUploadURL
         case networkError
         case networkTimeout
@@ -89,13 +89,6 @@ public enum Upload {
         case unexpectedResponseStatusCode(Int)
         case missingFile
         case unknown
-
-        public var isRetryableProvider: Bool {
-            switch self {
-            case .invalidUploadURL, .uploadFailure, .partialUpload, .unsupportedEndpoint, .unexpectedResponseStatusCode, .networkTimeout, .networkError, .missingFile, .unknown:
-                return false
-            }
-        }
 
         public var errorDescription: String? {
             localizedDescription
