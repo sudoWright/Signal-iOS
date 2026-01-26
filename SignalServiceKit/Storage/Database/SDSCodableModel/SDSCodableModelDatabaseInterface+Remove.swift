@@ -10,11 +10,6 @@ extension SDSCodableModelDatabaseInterfaceImpl {
         _ model: Model,
         transaction: DBWriteTransaction,
     ) {
-        guard model.shouldBeSaved else {
-            Logger.warn("Skipping delete of \(Model.self).")
-            return
-        }
-
         model.anyWillRemove(transaction: transaction)
 
         removeModelFromDatabase(model, transaction: transaction)

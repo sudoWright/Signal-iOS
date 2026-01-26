@@ -92,8 +92,6 @@ public protocol SDSCodableModel: Encodable, FetchableRecord, PersistableRecord, 
 
     var uniqueId: String { get }
 
-    var shouldBeSaved: Bool { get }
-
     func anyWillInsert(transaction: DBWriteTransaction)
     func anyDidInsert(transaction: DBWriteTransaction)
     func anyWillUpdate(transaction: DBWriteTransaction)
@@ -107,8 +105,6 @@ public protocol SDSCodableModel: Encodable, FetchableRecord, PersistableRecord, 
 public extension SDSCodableModel {
 
     var grdbId: NSNumber? { id.map { NSNumber(value: $0) } }
-
-    var shouldBeSaved: Bool { true }
 
     var sdsTableName: String { Self.databaseTableName }
 

@@ -136,11 +136,6 @@ private extension SDSCodableModelDatabaseInterface {
         saveMode: SDSSaveMode,
         transaction: DBWriteTransaction,
     ) {
-        guard model.shouldBeSaved else {
-            Logger.warn("Skipping save of: \(Model.self).")
-            return
-        }
-
         switch saveMode {
         case .insert:
             model.anyWillInsert(transaction: transaction)
