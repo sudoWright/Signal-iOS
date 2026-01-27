@@ -8,7 +8,6 @@ import Foundation
 public class AccountAttributesUpdaterImpl: AccountAttributesUpdater {
     private let accountAttributesGenerator: AccountAttributesGenerator
     private let appReadiness: AppReadiness
-    private let appVersion: AppVersion
     private let cronStore: CronStore
     private let dateProvider: DateProvider
     private let db: any DB
@@ -29,7 +28,6 @@ public class AccountAttributesUpdaterImpl: AccountAttributesUpdater {
     public init(
         accountAttributesGenerator: AccountAttributesGenerator,
         appReadiness: AppReadiness,
-        appVersion: AppVersion,
         cron: Cron,
         dateProvider: @escaping DateProvider,
         db: any DB,
@@ -41,7 +39,6 @@ public class AccountAttributesUpdaterImpl: AccountAttributesUpdater {
     ) {
         self.accountAttributesGenerator = accountAttributesGenerator
         self.appReadiness = appReadiness
-        self.appVersion = appVersion
         self.cronStore = CronStore(uniqueKey: .updateAttributes)
         self.dateProvider = dateProvider
         self.db = db

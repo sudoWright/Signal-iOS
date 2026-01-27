@@ -410,7 +410,6 @@ extension AppSetup.GlobalsContinuation {
                 udManager: udManager,
             ),
             appReadiness: appReadiness,
-            appVersion: appVersion,
             cron: cron,
             dateProvider: dateProvider,
             db: db,
