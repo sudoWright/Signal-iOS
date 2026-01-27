@@ -144,12 +144,12 @@ extension SetWallpaperViewController: UIImagePickerControllerDelegate, UINavigat
 
 extension SetWallpaperViewController: PreviewWallpaperDelegate {
     func previewWallpaperDidCancel(_ vc: PreviewWallpaperViewController) {
-        presentedViewController?.dismiss(animated: true)
+        vc.dismiss(animated: true)
     }
 
     func previewWallpaperDidComplete(_ vc: PreviewWallpaperViewController) {
-        presentedViewController?.dismiss(animated: true)
-        navigationController?.popViewController(animated: true)
+        navigationController?.popViewController(animated: false)
+        vc.dismiss(animated: true)
     }
 }
 
