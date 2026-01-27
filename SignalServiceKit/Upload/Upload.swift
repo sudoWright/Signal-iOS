@@ -142,8 +142,6 @@ public enum Upload {
         public let plaintextDataLength: UInt32
 
         public var isReusedTransitTierUpload: Bool { false }
-
-        public static var maxUploadSizeBytes: UInt64 { OWSMediaUtils.kMaxAttachmentUploadSizeBytes }
     }
 
     public struct LinkNSyncUploadMetadata: UploadMetadata {
@@ -226,10 +224,6 @@ extension Upload.LocalUploadMetadata {
             plaintextLength > 0
         else {
             throw OWSAssertionError("Invalid length.")
-        }
-
-        guard encryptedLength <= Self.maxUploadSizeBytes else {
-            throw OWSAssertionError("Data is too large: \(encryptedLength).")
         }
 
         let digest = metadata.digest
