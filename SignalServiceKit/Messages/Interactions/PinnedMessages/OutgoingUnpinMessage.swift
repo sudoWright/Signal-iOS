@@ -81,7 +81,7 @@ public class OutgoingUnpinMessage: TransientOutgoingMessage {
     ) -> SSKProtoDataMessageBuilder? {
         guard
             let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction)?.aci,
-            thread.canUserEditPinnedMessages(aci: localAci)
+            thread.canUserEditPinnedMessages(aci: localAci, tx: transaction)
         else {
             Logger.error("Local user no longer has permission to change pin status")
             return nil
