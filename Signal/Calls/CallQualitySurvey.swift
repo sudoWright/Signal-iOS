@@ -151,11 +151,49 @@ class CallQualitySurveyManager {
         return passedRNGCheck
     }
 
-    func submit(rating: CallQualitySurvey.Rating, shouldSubmitDebugLogs: Bool) {
+    func protoJSONPreview(rating: CallQualitySurvey.Rating) -> String? {
+        var protoJSON: String?
+        do {
+            let proto = buildProto(rating: rating)
+            protoJSON = try proto.jsonString()
+        } catch {
+            owsFailDebug("Error serializing survey proto to JSON", logger: logger)
+            return nil
+        }
+
+        guard
+            let data = protoJSON?.data(using: .utf8),
+            let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []),
+            let rawStatsData = callSummary.rawStatsText?.data(using: .utf8),
+            let rawStatsJSONObject = try? JSONSerialization.jsonObject(with: rawStatsData, options: []),
+            var json = jsonObject as? [String: Any]
+        else { return protoJSON }
+
+        json["callTelemetry"] = rawStatsJSONObject
+
+        if
+            let prettyJSONData = try? JSONSerialization.data(
+                withJSONObject: json,
+                options: [.prettyPrinted],
+            ),
+            let prettyJSONString = String(data: prettyJSONData, encoding: .utf8)
+        {
+            protoJSON = prettyJSONString
+        }
+
+        return protoJSON
+    }
+
+    private func buildProto(rating: CallQualitySurvey.Rating) -> Proto {
         var proto = Proto()
         proto.callType = callType.rawValue
         setCallSummary(proto: &proto, summary: callSummary)
         setRating(proto: &proto, rating: rating)
+        return proto
+    }
+
+    func submit(rating: CallQualitySurvey.Rating, shouldSubmitDebugLogs: Bool) {
+        var proto = buildProto(rating: rating)
 
         Task {
             if shouldSubmitDebugLogs {

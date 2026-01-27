@@ -9,7 +9,7 @@ import SignalUI
 // MARK: - CallQualitySurveyNavigationController
 
 final class CallQualitySurveyNavigationController: UINavigationController {
-    private let callQualitySurveyManager: CallQualitySurveyManager
+    let callQualitySurveyManager: CallQualitySurveyManager
 
     init(callQualitySurveyManager: CallQualitySurveyManager) {
         self.callQualitySurveyManager = callQualitySurveyManager

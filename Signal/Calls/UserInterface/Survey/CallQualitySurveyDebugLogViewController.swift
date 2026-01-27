@@ -37,15 +37,7 @@ final class SurveyDebugLogViewController: CallQualitySurveySheetViewController {
             comment: "Title for the debug log sharing screen in the call quality survey",
         )
 
-        let headerLabel = UILabel()
-        headerLabel.text = OWSLocalizedString(
-            "CALL_QUALITY_SURVEY_DEBUG_LOG_HEADER",
-            comment: "Header text explaining the purpose of sharing debug logs in the call quality survey",
-        )
-        headerLabel.numberOfLines = 0
-        headerLabel.font = .dynamicTypeSubheadline
-        headerLabel.textColor = .Signal.secondaryLabel
-        headerLabel.textAlignment = .center
+        let headerLabel = createHeaderView()
         headerContainer.addSubview(headerLabel)
         headerLabel.autoPinEdgesToSuperviewMargins(with: .init(
             top: 0,
@@ -116,6 +108,23 @@ final class SurveyDebugLogViewController: CallQualitySurveySheetViewController {
         }
     }
 
+    private func createHeaderView() -> UIView {
+        let textView = LinkingTextView { [weak self] in
+            self?.showDiagnosticsPreview()
+        }
+        textView.attributedText = OWSLocalizedString(
+            "CALL_QUALITY_SURVEY_DEBUG_LOG_HEADER",
+            comment: "Header text explaining the purpose of sharing debug logs in the call quality survey. The text inside the <link> tags is tappable for viewing the diagnostic information.",
+        )
+        .styled(
+            with: .font(.dynamicTypeSubheadline),
+            .color(.Signal.secondaryLabel),
+            .alignment(.center),
+            .xmlRules([.style("link", .init(.link(.Support.generic)))]),
+        )
+        return textView
+    }
+
     private func createFooterView() -> UIView {
         let container = UIView()
 
@@ -140,6 +149,48 @@ final class SurveyDebugLogViewController: CallQualitySurveySheetViewController {
         textView.autoPinEdgesToSuperviewEdges(with: .init(top: 12, leading: 20, bottom: 0, trailing: 20))
 
         return container
+    }
+
+    private func showDiagnosticsPreview() {
+        let protoJSON = sheetNav?.callQualitySurveyManager.protoJSONPreview(rating: rating)
+        guard let protoJSON else { return }
+
+        let vc = OWSTableViewController2()
+        let section = OWSTableSection(items: [
+            .init(customCellBlock: {
+                let cell = UITableViewCell()
+
+                let textView = UITextView()
+                textView.backgroundColor = .clear
+                textView.isOpaque = false
+                textView.isEditable = false
+                textView.textContainerInset = .zero
+                textView.contentInset = .zero
+                textView.textContainer.lineFragmentPadding = 0
+                textView.isScrollEnabled = false
+                textView.isSelectable = false
+
+                textView.font = .dynamicTypeSubheadline
+                textView.textColor = .Signal.secondaryLabel
+                textView.text = protoJSON
+
+                cell.contentView.addSubview(textView)
+                textView.autoPinEdgesToSuperviewMargins()
+
+                return cell
+            }),
+        ])
+        let contents = OWSTableContents(
+            title: OWSLocalizedString(
+                "CALL_QUALITY_SURVEY_DIAGNOSTICS_TITLE",
+                comment: "Title for preview of the call diagnostic info that will be sent with the survey",
+            ),
+            sections: [section],
+        )
+        vc.setContents(contents)
+        vc.navigationItem.rightBarButtonItem = .cancelButton(dismissingFrom: vc)
+        let nav = OWSNavigationController(rootViewController: vc)
+        present(nav, animated: true)
     }
 
     private func showDebugLogPreview() {

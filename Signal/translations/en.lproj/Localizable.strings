@@ -1393,8 +1393,8 @@
 /* Footer text explaining what debug logs contain in the call quality survey */
 "CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER" = "Information shared with us contains low level app information and does not include the contents of your calls.";
 
-/* Header text explaining the purpose of sharing debug logs in the call quality survey */
-"CALL_QUALITY_SURVEY_DEBUG_LOG_HEADER" = "Submitting will share your feedback along with diagnostic information about your call. You can optionally share a debug log to help us improve call quality.";
+/* Header text explaining the purpose of sharing debug logs in the call quality survey. The text inside the <link> tags is tappable for viewing the diagnostic information. */
+"CALL_QUALITY_SURVEY_DEBUG_LOG_HEADER" = "Submitting will share your feedback along with <link>diagnostic information about your call</link>. You can optionally share a debug log to help us improve call quality.";
 
 /* Link text to open a preview of debug logs in the call quality survey. Appended to CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER */
 "CALL_QUALITY_SURVEY_DEBUG_LOG_PREVIEW_LINK" = "View debug log";
@@ -1404,6 +1404,9 @@
 
 /* Label for the toggle to share debug log in the call quality survey */
 "CALL_QUALITY_SURVEY_DEBUG_LOG_TOGGLE" = "Share Debug Log";
+
+/* Title for preview of the call diagnostic info that will be sent with the survey */
+"CALL_QUALITY_SURVEY_DIAGNOSTICS_TITLE" = "Diagnostic Information";
 
 /* Button label for indicating the call did not have issues in the call quality survey */
 "CALL_QUALITY_SURVEY_GREAT_BUTTON" = "Great";
