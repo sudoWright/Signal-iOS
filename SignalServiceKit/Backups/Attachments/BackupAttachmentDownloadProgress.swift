@@ -28,6 +28,8 @@ public class BackupAttachmentDownloadProgressObserver {
 /// of media tier downloads) we compute and store the total bytes to download. This class counts
 /// up to that number until all downloads finish; this ensures we show a stable total even as we make
 /// partial progress.
+///
+/// - SeeAlso `BackupAttachmentDownloadTracker`
 public protocol BackupAttachmentDownloadProgress: AnyObject {
 
     typealias Observer = BackupAttachmentDownloadProgressObserver

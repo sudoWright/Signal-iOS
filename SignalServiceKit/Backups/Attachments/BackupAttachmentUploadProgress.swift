@@ -41,6 +41,8 @@ public class BackupAttachmentUploadProgressObserver {
 /// and "remembers" the total bytes to download.
 ///
 /// Note: ignores/excludes thumbnail uploads; just deals with fullsize attachments.
+///
+/// - SeeAlso `BackupAttachmentUploadTracker`
 public protocol BackupAttachmentUploadProgress: AnyObject {
 
     typealias Observer = BackupAttachmentUploadProgressObserver

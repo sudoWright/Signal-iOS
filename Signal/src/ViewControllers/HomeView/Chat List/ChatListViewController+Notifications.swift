@@ -111,18 +111,6 @@ extension ChatListViewController {
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(backupAttachmentDownloadQueueStatusDidChange(_:)),
-            name: .backupAttachmentDownloadQueueStatusDidChange(mode: .fullsize),
-            object: nil,
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(backupPlanDidChange(_:)),
-            name: .backupPlanChanged,
-            object: nil,
-        )
-        NotificationCenter.default.addObserver(
-            self,
             selector: #selector(reloadExperienceUpgrades),
             name: .inactivePrimaryDeviceChanged,
             object: nil,
@@ -341,16 +329,6 @@ extension ChatListViewController {
     private func localUsernameStateDidChange() {
         updateUsernameReminderView()
         loadCoordinator.loadIfNecessary()
-    }
-
-    @objc
-    private func backupAttachmentDownloadQueueStatusDidChange(_ notification: Notification) {
-        viewState.backupDownloadProgressView.reloadStateAndUpdate()
-    }
-
-    @objc
-    private func backupPlanDidChange(_ notification: Notification) {
-        viewState.backupDownloadProgressView.reloadStateAndUpdate()
     }
 
     @objc

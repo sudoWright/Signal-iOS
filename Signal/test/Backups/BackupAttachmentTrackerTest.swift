@@ -8,9 +8,9 @@ import Testing
 
 @testable import Signal
 
-class BackupSettingsAttachmentTrackerTest<Update: Equatable> {
+class BackupAttachmentTrackerTest<Update: Equatable> {
     struct ExpectedUpdate {
-        let update: Update?
+        let update: Update
         let nextSteps: () async -> Void
     }
 
@@ -54,14 +54,14 @@ class BackupSettingsAttachmentTrackerTest<Update: Equatable> {
     }
 
     func runTest(
-        updateStream: AsyncStream<Update?>,
+        updateStream: AsyncStream<Update>,
         expectedUpdates: [ExpectedUpdate],
     ) async {
         await runTest(updateStreams: [updateStream], expectedUpdates: expectedUpdates)
     }
 
     func runTest(
-        updateStreams: [AsyncStream<Update?>],
+        updateStreams: [AsyncStream<Update>],
         expectedUpdates: [ExpectedUpdate],
     ) async {
         let expectedUpdateCompletionTracker = ExpectedUpdateCompletionTracker(expectedUpdates)

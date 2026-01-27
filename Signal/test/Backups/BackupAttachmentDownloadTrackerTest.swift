@@ -10,10 +10,10 @@ import Testing
 
 @MainActor
 @Suite(.serialized)
-final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmentTrackerTest<
-    BackupSettingsAttachmentDownloadTracker.DownloadUpdate,
+final class BackupAttachmentDownloadTrackerTest: BackupAttachmentTrackerTest<
+    BackupAttachmentDownloadTracker.DownloadUpdate,
 > {
-    typealias DownloadUpdate = BackupSettingsAttachmentDownloadTracker.DownloadUpdate
+    typealias DownloadUpdate = BackupAttachmentDownloadTracker.DownloadUpdate
 
     /// Simulates "launching with downloads enqueued from a previous launch".
     @Test
@@ -21,7 +21,7 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
         let downloadProgress = MockAttachmentDownloadProgress(total: 4)
         let downloadQueueStatusReporter = MockDownloadQueueStatusReporter(.running)
 
-        let downloadTracker = BackupSettingsAttachmentDownloadTracker(
+        let downloadTracker = BackupAttachmentDownloadTracker(
             backupAttachmentDownloadQueueStatusReporter: downloadQueueStatusReporter,
             backupAttachmentDownloadProgress: downloadProgress,
         )
@@ -45,7 +45,10 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
                     downloadQueueStatusReporter.currentStatusMock = .empty
                 },
             ),
-            ExpectedUpdate(update: nil, nextSteps: {}),
+            ExpectedUpdate(
+                update: DownloadUpdate(.empty, downloaded: 4, total: 4),
+                nextSteps: {},
+            ),
         ]
 
         await runTest(updateStream: downloadTracker.updates(), expectedUpdates: expectedUpdates)
@@ -58,7 +61,7 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
         let downloadProgress = MockAttachmentDownloadProgress(total: 4)
         let downloadQueueStatusReporter = MockDownloadQueueStatusReporter(.suspended)
 
-        let downloadTracker = BackupSettingsAttachmentDownloadTracker(
+        let downloadTracker = BackupAttachmentDownloadTracker(
             backupAttachmentDownloadQueueStatusReporter: downloadQueueStatusReporter,
             backupAttachmentDownloadProgress: downloadProgress,
         )
@@ -88,7 +91,10 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
                     downloadQueueStatusReporter.currentStatusMock = .empty
                 },
             ),
-            ExpectedUpdate(update: nil, nextSteps: {}),
+            ExpectedUpdate(
+                update: DownloadUpdate(.empty, downloaded: 4, total: 4),
+                nextSteps: {},
+            ),
         ]
 
         await runTest(updateStream: downloadTracker.updates(), expectedUpdates: expectedUpdates)
@@ -103,7 +109,7 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
         let downloadProgress = MockAttachmentDownloadProgress(precompleted: 50, total: 100)
         let downloadQueueStatusReporter = MockDownloadQueueStatusReporter(.running, minimumRequiredDiskSpace: 10)
 
-        let downloadTracker = BackupSettingsAttachmentDownloadTracker(
+        let downloadTracker = BackupAttachmentDownloadTracker(
             backupAttachmentDownloadQueueStatusReporter: downloadQueueStatusReporter,
             backupAttachmentDownloadProgress: downloadProgress,
         )
@@ -133,7 +139,7 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
         let downloadProgress = MockAttachmentDownloadProgress(precompleted: 4, total: 12)
         let downloadQueueStatusReporter = MockDownloadQueueStatusReporter(.running, minimumRequiredDiskSpace: 10)
 
-        let downloadTracker = BackupSettingsAttachmentDownloadTracker(
+        let downloadTracker = BackupAttachmentDownloadTracker(
             backupAttachmentDownloadQueueStatusReporter: downloadQueueStatusReporter,
             backupAttachmentDownloadProgress: downloadProgress,
         )
@@ -161,14 +167,14 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
         let downloadProgress = MockAttachmentDownloadProgress(total: 4)
         let downloadQueueStatusReporter = MockDownloadQueueStatusReporter(.empty)
 
-        let downloadTracker = BackupSettingsAttachmentDownloadTracker(
+        let downloadTracker = BackupAttachmentDownloadTracker(
             backupAttachmentDownloadQueueStatusReporter: downloadQueueStatusReporter,
             backupAttachmentDownloadProgress: downloadProgress,
         )
 
         let firstExpectedUpdates: [ExpectedUpdate] = [
             ExpectedUpdate(
-                update: nil,
+                update: DownloadUpdate(.empty, downloaded: 0, total: 4),
                 nextSteps: {
                     downloadQueueStatusReporter.currentStatusMock = .running
                 },
@@ -194,7 +200,7 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
                 },
             ),
             ExpectedUpdate(
-                update: nil,
+                update: DownloadUpdate(.empty, downloaded: 1, total: 1),
                 nextSteps: {},
             ),
         ]
@@ -206,14 +212,14 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
         let downloadProgress = MockAttachmentDownloadProgress(total: 1)
         let downloadQueueStatusReporter = MockDownloadQueueStatusReporter(.empty)
 
-        let downloadTracker = BackupSettingsAttachmentDownloadTracker(
+        let downloadTracker = BackupAttachmentDownloadTracker(
             backupAttachmentDownloadQueueStatusReporter: downloadQueueStatusReporter,
             backupAttachmentDownloadProgress: downloadProgress,
         )
 
         let expectedUpdates: [ExpectedUpdate] = [
             ExpectedUpdate(
-                update: nil,
+                update: DownloadUpdate(.empty, downloaded: 0, total: 1),
                 nextSteps: {
                     downloadQueueStatusReporter.currentStatusMock = .running
                 },
@@ -231,7 +237,7 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
                 },
             ),
             ExpectedUpdate(
-                update: nil,
+                update: DownloadUpdate(.empty, downloaded: 1, total: 1),
                 nextSteps: {},
             ),
         ]
@@ -245,7 +251,7 @@ final class BackupSettingsAttachmentDownloadTrackerTest: BackupSettingsAttachmen
 
 // MARK: -
 
-private extension BackupSettingsAttachmentDownloadTracker.DownloadUpdate {
+private extension BackupAttachmentDownloadTracker.DownloadUpdate {
     init(_ state: State, downloaded: UInt64, total: UInt64) {
         self.init(state: state, bytesDownloaded: downloaded, totalBytesToDownload: total)
     }

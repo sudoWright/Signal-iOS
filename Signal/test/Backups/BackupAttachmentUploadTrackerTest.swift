@@ -10,17 +10,17 @@ import Testing
 
 @MainActor
 @Suite(.serialized)
-final class BackupSettingsAttachmentUploadTrackerTest: BackupSettingsAttachmentTrackerTest<
-    BackupSettingsAttachmentUploadTracker.UploadUpdate,
+final class BackupAttachmentUploadTrackerTest: BackupAttachmentTrackerTest<
+    BackupAttachmentUploadTracker.UploadUpdate?,
 > {
-    typealias UploadUpdate = BackupSettingsAttachmentUploadTracker.UploadUpdate
+    typealias UploadUpdate = BackupAttachmentUploadTracker.UploadUpdate
 
     /// Simulates "launching with uploads enqueued from a previous launch".
     @Test
     func testLaunchingWithQueuePopulated() async {
         let uploadProgress = MockAttachmentUploadProgress(total: 4)
         let uploadQueueStatusReporter = MockUploadQueueStatusReporter(.running)
-        let uploadTracker = BackupSettingsAttachmentUploadTracker(
+        let uploadTracker = BackupAttachmentUploadTracker(
             backupAttachmentUploadQueueStatusReporter: uploadQueueStatusReporter,
             backupAttachmentUploadProgress: uploadProgress,
         )
@@ -56,7 +56,7 @@ final class BackupSettingsAttachmentUploadTrackerTest: BackupSettingsAttachmentT
     func testTrackingStoppingAndReTracking() async {
         let uploadProgress = MockAttachmentUploadProgress(total: 4)
         let uploadQueueStatusReporter = MockUploadQueueStatusReporter(.running)
-        let uploadTracker = BackupSettingsAttachmentUploadTracker(
+        let uploadTracker = BackupAttachmentUploadTracker(
             backupAttachmentUploadQueueStatusReporter: uploadQueueStatusReporter,
             backupAttachmentUploadProgress: uploadProgress,
         )
@@ -94,7 +94,7 @@ final class BackupSettingsAttachmentUploadTrackerTest: BackupSettingsAttachmentT
     func testTrackingMultipleStreamInstances() async {
         let uploadProgress = MockAttachmentUploadProgress(total: 1)
         let uploadQueueStatusReporter = MockUploadQueueStatusReporter(.running)
-        let uploadTracker = BackupSettingsAttachmentUploadTracker(
+        let uploadTracker = BackupAttachmentUploadTracker(
             backupAttachmentUploadQueueStatusReporter: uploadQueueStatusReporter,
             backupAttachmentUploadProgress: uploadProgress,
         )
@@ -127,7 +127,7 @@ final class BackupSettingsAttachmentUploadTrackerTest: BackupSettingsAttachmentT
 
 // MARK: -
 
-private extension BackupSettingsAttachmentUploadTracker.UploadUpdate {
+private extension BackupAttachmentUploadTracker.UploadUpdate {
     init(_ state: State, uploaded: UInt64, total: UInt64) {
         self.init(state: state, bytesUploaded: uploaded, totalBytesToUpload: total)
     }

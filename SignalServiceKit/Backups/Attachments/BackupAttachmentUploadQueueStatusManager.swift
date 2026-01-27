@@ -51,6 +51,8 @@ public extension Notification.Name {
 /// consolidated inputs.
 ///
 /// `@MainActor`-isolated because most of the inputs are themselves isolated.
+///
+/// - SeeAlso `BackupAttachmentUploadTracker`
 @MainActor
 public protocol BackupAttachmentUploadQueueStatusReporter {
     func currentStatus(for mode: BackupAttachmentUploadQueueMode) -> BackupAttachmentUploadQueueStatus

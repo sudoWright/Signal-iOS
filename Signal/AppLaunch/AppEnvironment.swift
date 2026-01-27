@@ -31,6 +31,8 @@ public class AppEnvironment: NSObject {
 
     private(set) var appIconBadgeUpdater: AppIconBadgeUpdater!
     private(set) var avatarHistoryManager: AvatarHistoryManager!
+    private(set) var backupAttachmentDownloadTracker: BackupAttachmentDownloadTracker!
+    private(set) var backupAttachmentUploadTracker: BackupAttachmentUploadTracker!
     private(set) var backupEnablingManager: BackupEnablingManager!
     private(set) var badgeManager: BadgeManager!
     private(set) var callLinkProfileKeySharingManager: CallLinkProfileKeySharingManager!
@@ -50,8 +52,7 @@ public class AppEnvironment: NSObject {
     }
 
     func setUp(appReadiness: AppReadiness, callService: CallService) {
-        let dependenciesBridge = DependenciesBridge.shared
-        let cron = dependenciesBridge.cron
+        let cron = DependenciesBridge.shared.cron
 
         let backupAttachmentUploadEraStore = BackupAttachmentUploadEraStore()
         let backupNonceStore = BackupNonceMetadataStore()
@@ -70,6 +71,14 @@ public class AppEnvironment: NSObject {
         self.avatarHistoryManager = AvatarHistoryManager(
             appReadiness: appReadiness,
             db: DependenciesBridge.shared.db,
+        )
+        self.backupAttachmentDownloadTracker = BackupAttachmentDownloadTracker(
+            backupAttachmentDownloadQueueStatusReporter: DependenciesBridge.shared.backupAttachmentDownloadQueueStatusReporter,
+            backupAttachmentDownloadProgress: DependenciesBridge.shared.backupAttachmentDownloadProgress,
+        )
+        self.backupAttachmentUploadTracker = BackupAttachmentUploadTracker(
+            backupAttachmentUploadQueueStatusReporter: DependenciesBridge.shared.backupAttachmentUploadQueueStatusReporter,
+            backupAttachmentUploadProgress: DependenciesBridge.shared.backupAttachmentUploadProgress,
         )
         self.badgeManager = badgeManager
         self.backupEnablingManager = BackupEnablingManager(

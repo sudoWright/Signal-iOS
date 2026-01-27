@@ -247,8 +247,7 @@ extension ChatListViewController {
     }
 
     public func updateDownloadProgressView() {
-        viewState.backupDownloadProgressView.observeDownloadProgressIfNecessary()
-        viewState.backupDownloadProgressView.reloadStateAndUpdate()
+        viewState.backupDownloadProgressView.trackDownloads()
     }
 
     // MARK: -

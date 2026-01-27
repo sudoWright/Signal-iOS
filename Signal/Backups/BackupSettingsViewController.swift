@@ -20,9 +20,9 @@ class BackupSettingsViewController:
 
     private let accountEntropyPoolManager: AccountEntropyPoolManager
     private let accountKeyStore: AccountKeyStore
-    private let backupAttachmentDownloadTracker: BackupSettingsAttachmentDownloadTracker
+    private let backupAttachmentDownloadTracker: BackupAttachmentDownloadTracker
     private let backupAttachmentUploadStore: BackupAttachmentUploadStore
-    private let backupAttachmentUploadTracker: BackupSettingsAttachmentUploadTracker
+    private let backupAttachmentUploadTracker: BackupAttachmentUploadTracker
     private let backupDisablingManager: BackupDisablingManager
     private let backupEnablingManager: BackupEnablingManager
     private let backupExportJobRunner: BackupExportJobRunner
@@ -53,10 +53,8 @@ class BackupSettingsViewController:
             onAppearAction: onAppearAction,
             accountEntropyPoolManager: DependenciesBridge.shared.accountEntropyPoolManager,
             accountKeyStore: DependenciesBridge.shared.accountKeyStore,
-            backupAttachmentDownloadProgress: DependenciesBridge.shared.backupAttachmentDownloadProgress,
-            backupAttachmentDownloadQueueStatusReporter: DependenciesBridge.shared.backupAttachmentDownloadQueueStatusReporter,
-            backupAttachmentUploadProgress: DependenciesBridge.shared.backupAttachmentUploadProgress,
-            backupAttachmentUploadQueueStatusReporter: DependenciesBridge.shared.backupAttachmentUploadQueueStatusReporter,
+            backupAttachmentDownloadTracker: AppEnvironment.shared.backupAttachmentDownloadTracker,
+            backupAttachmentUploadTracker: AppEnvironment.shared.backupAttachmentUploadTracker,
             backupAttachmentUploadStore: DependenciesBridge.shared.backupAttachmentUploadStore,
             backupDisablingManager: DependenciesBridge.shared.backupDisablingManager,
             backupEnablingManager: AppEnvironment.shared.backupEnablingManager,
@@ -78,10 +76,8 @@ class BackupSettingsViewController:
         onAppearAction: OnAppearAction?,
         accountEntropyPoolManager: AccountEntropyPoolManager,
         accountKeyStore: AccountKeyStore,
-        backupAttachmentDownloadProgress: BackupAttachmentDownloadProgress,
-        backupAttachmentDownloadQueueStatusReporter: BackupAttachmentDownloadQueueStatusReporter,
-        backupAttachmentUploadProgress: BackupAttachmentUploadProgress,
-        backupAttachmentUploadQueueStatusReporter: BackupAttachmentUploadQueueStatusReporter,
+        backupAttachmentDownloadTracker: BackupAttachmentDownloadTracker,
+        backupAttachmentUploadTracker: BackupAttachmentUploadTracker,
         backupAttachmentUploadStore: BackupAttachmentUploadStore,
         backupDisablingManager: BackupDisablingManager,
         backupEnablingManager: BackupEnablingManager,
@@ -104,14 +100,8 @@ class BackupSettingsViewController:
 
         self.accountEntropyPoolManager = accountEntropyPoolManager
         self.accountKeyStore = accountKeyStore
-        self.backupAttachmentDownloadTracker = BackupSettingsAttachmentDownloadTracker(
-            backupAttachmentDownloadQueueStatusReporter: backupAttachmentDownloadQueueStatusReporter,
-            backupAttachmentDownloadProgress: backupAttachmentDownloadProgress,
-        )
-        self.backupAttachmentUploadTracker = BackupSettingsAttachmentUploadTracker(
-            backupAttachmentUploadQueueStatusReporter: backupAttachmentUploadQueueStatusReporter,
-            backupAttachmentUploadProgress: backupAttachmentUploadProgress,
-        )
+        self.backupAttachmentDownloadTracker = backupAttachmentDownloadTracker
+        self.backupAttachmentUploadTracker = backupAttachmentUploadTracker
         self.backupAttachmentUploadStore = backupAttachmentUploadStore
         self.backupDisablingManager = backupDisablingManager
         self.backupEnablingManager = backupEnablingManager
@@ -230,12 +220,12 @@ class BackupSettingsViewController:
         }
 
         externalEventObservationTasks = [
-            Task { [weak self, backupExportJobRunner] in
-                await self?.preventDeviceSleepDuringNonNilUpdates(
-                    updateStream: backupExportJobRunner.updates(),
-                    label: "Export",
+            Task {
+                await manageDeviceSleepForUpdateStream(
+                    backupExportJobRunner.updates(),
+                    label: "BackupExportJob",
                 ) { [weak self] exportJobUpdate in
-                    guard let self else { return }
+                    guard let self else { return false }
 
                     switch exportJobUpdate {
                     case nil:
@@ -261,24 +251,55 @@ class BackupSettingsViewController:
                             self.viewModel.hasBackupFailed = self.backupFailureStateManager.hasFailedBackup(tx: tx)
                         }
                     }
+
+                    return exportJobUpdate != nil
                 }
             },
-            Task { [weak self, backupAttachmentDownloadTracker] in
-                await self?.preventDeviceSleepDuringNonNilUpdates(
-                    updateStream: backupAttachmentDownloadTracker.updates(),
+            Task {
+                await manageDeviceSleepForUpdateStream(
+                    backupAttachmentDownloadTracker.updates(),
                     label: "Downloads",
-                ) { [weak self] downloadUpdate in
-                    guard let self else { return }
-                    viewModel.latestBackupAttachmentDownloadUpdate = downloadUpdate
+                ) { [weak self] downloadTrackerUpdate in
+                    guard let self else { return false }
+
+                    let downloadViewUpdateState: BackupAttachmentDownloadProgressView.DownloadUpdate.State
+                    switch downloadTrackerUpdate.state {
+                    case .empty, .appBackgrounded, .notRegisteredAndReady:
+                        viewModel.latestBackupAttachmentDownloadUpdate = nil
+                        return false
+                    case .running:
+                        downloadViewUpdateState = .running
+                    case .suspended:
+                        downloadViewUpdateState = .suspended
+                    case .pausedLowBattery:
+                        downloadViewUpdateState = .pausedLowBattery
+                    case .pausedLowPowerMode:
+                        downloadViewUpdateState = .pausedLowPowerMode
+                    case .pausedNeedsWifi:
+                        downloadViewUpdateState = .pausedNeedsWifi
+                    case .pausedNeedsInternet:
+                        downloadViewUpdateState = .pausedNeedsInternet
+                    case .outOfDiskSpace(let bytesRequired):
+                        downloadViewUpdateState = .outOfDiskSpace(bytesRequired: bytesRequired)
+                    }
+
+                    viewModel.latestBackupAttachmentDownloadUpdate = BackupAttachmentDownloadProgressView.DownloadUpdate(
+                        state: downloadViewUpdateState,
+                        bytesDownloaded: downloadTrackerUpdate.bytesDownloaded,
+                        totalBytesToDownload: downloadTrackerUpdate.totalBytesToDownload,
+                        percentageDownloaded: downloadTrackerUpdate.percentageDownloaded,
+                    )
+                    return true
                 }
             },
-            Task { [weak self, backupAttachmentUploadTracker] in
-                await self?.preventDeviceSleepDuringNonNilUpdates(
-                    updateStream: backupAttachmentUploadTracker.updates(),
+            Task {
+                await manageDeviceSleepForUpdateStream(
+                    backupAttachmentUploadTracker.updates(),
                     label: "Uploads",
                 ) { [weak self] uploadUpdate in
-                    guard let self else { return }
+                    guard let self else { return false }
                     viewModel.latestBackupAttachmentUploadUpdate = uploadUpdate
+                    return uploadUpdate != nil
                 }
             },
             Task.detached { [weak self] in
@@ -369,20 +390,21 @@ class BackupSettingsViewController:
         externalEventObservationTasks = []
     }
 
-    /// Prevent device sleep when the given `updateStream` is producing non-nil
-    /// updates. This is appropriate when said updates result in us displaying
-    /// UX, such as a progress bar, for which we want to prevent sleep.
+    /// Listens to the given `updateStream`, calling `onUpdate` for each
+    /// element. Blocks sleep for a given update if `onUpdate` returns true.
     @MainActor
-    private func preventDeviceSleepDuringNonNilUpdates<T>(
-        updateStream: AsyncStream<T?>,
+    private func manageDeviceSleepForUpdateStream<T>(
+        _ updateStream: AsyncStream<T>,
         label: String,
-        onUpdate: (T?) -> Void,
+        onUpdate: (T) -> Bool,
     ) async {
         // Caller-retained as long as sleep-blocking is required.
         var deviceSleepBlock: DeviceSleepBlockObject?
 
         for await update in updateStream {
-            if update != nil {
+            let shouldBlockSleep = onUpdate(update)
+
+            if shouldBlockSleep {
                 deviceSleepBlock = deviceSleepBlock ?? {
                     let newSleepBlock = DeviceSleepBlockObject(blockReason: "BackupSettings: \(label)")
                     deviceSleepManager.addBlock(blockObject: newSleepBlock)
@@ -393,8 +415,6 @@ class BackupSettingsViewController:
                     .take()
                     .map { deviceSleepManager.removeBlock(blockObject: $0) }
             }
-
-            onUpdate(update)
         }
 
         if let deviceSleepBlock {
@@ -1465,8 +1485,8 @@ private class BackupSettingsViewModel: ObservableObject {
     @Published var failedToDisableBackupsRemotely: Bool
 
     @Published var latestBackupExportProgressUpdate: OWSSequentialProgress<BackupExportJobStep>?
-    @Published var latestBackupAttachmentDownloadUpdate: BackupSettingsAttachmentDownloadTracker.DownloadUpdate?
-    @Published var latestBackupAttachmentUploadUpdate: BackupSettingsAttachmentUploadTracker.UploadUpdate?
+    @Published var latestBackupAttachmentDownloadUpdate: BackupAttachmentDownloadProgressView.DownloadUpdate?
+    @Published var latestBackupAttachmentUploadUpdate: BackupAttachmentUploadTracker.UploadUpdate?
 
     @Published var lastBackupDetails: BackupSettingsStore.LastBackupDetails?
     @Published var shouldAllowBackupUploadsOnCellular: Bool
@@ -1492,8 +1512,8 @@ private class BackupSettingsViewModel: ObservableObject {
         backupPlan: BackupPlan,
         failedToDisableBackupsRemotely: Bool,
         latestBackupExportProgressUpdate: OWSSequentialProgress<BackupExportJobStep>?,
-        latestBackupAttachmentDownloadUpdate: BackupSettingsAttachmentDownloadTracker.DownloadUpdate?,
-        latestBackupAttachmentUploadUpdate: BackupSettingsAttachmentUploadTracker.UploadUpdate?,
+        latestBackupAttachmentDownloadUpdate: BackupAttachmentDownloadProgressView.DownloadUpdate?,
+        latestBackupAttachmentUploadUpdate: BackupAttachmentUploadTracker.UploadUpdate?,
         lastBackupDetails: BackupSettingsStore.LastBackupDetails?,
         shouldAllowBackupUploadsOnCellular: Bool,
         mediaTierCapacityOverflow: UInt64?,
@@ -1637,7 +1657,7 @@ private class BackupSettingsViewModel: ObservableObject {
 struct BackupSettingsView: View {
     private enum Contents {
         case enabled
-        case disablingDownloadsRunning(BackupSettingsAttachmentDownloadTracker.DownloadUpdate)
+        case disablingDownloadsRunning(BackupAttachmentDownloadProgressView.DownloadUpdate)
         case disabling
         case disabledFailedToDisableRemotely
         case disabled
@@ -2088,7 +2108,7 @@ private struct BackupExportProgressView: View {
     }
 
     let latestExportProgressUpdate: OWSSequentialProgress<BackupExportJobStep>
-    let latestAttachmentUploadUpdate: BackupSettingsAttachmentUploadTracker.UploadUpdate?
+    let latestAttachmentUploadUpdate: BackupAttachmentUploadTracker.UploadUpdate?
 
     private var progressBarState: ProgressBarState {
         switch latestExportProgressUpdate.currentStep {
@@ -2341,8 +2361,25 @@ private struct PulsingProgressBar: View {
 // MARK: -
 
 private struct BackupAttachmentDownloadProgressView: View {
+    struct DownloadUpdate {
+        enum State {
+            case running
+            case suspended
+            case pausedLowBattery
+            case pausedLowPowerMode
+            case pausedNeedsWifi
+            case pausedNeedsInternet
+            case outOfDiskSpace(bytesRequired: UInt64)
+        }
+
+        let state: State
+        let bytesDownloaded: UInt64
+        let totalBytesToDownload: UInt64
+        let percentageDownloaded: Float
+    }
+
     let backupPlan: BackupPlan
-    let latestDownloadUpdate: BackupSettingsAttachmentDownloadTracker.DownloadUpdate
+    let latestDownloadUpdate: DownloadUpdate
     let viewModel: BackupSettingsViewModel
 
     var body: some View {
@@ -2484,7 +2521,7 @@ private struct BackupAttachmentDownloadProgressView: View {
 // MARK: -
 
 private struct BackupAttachmentUploadProgressView: View {
-    let latestUploadUpdate: BackupSettingsAttachmentUploadTracker.UploadUpdate
+    let latestUploadUpdate: BackupAttachmentUploadTracker.UploadUpdate
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -2502,7 +2539,7 @@ private struct BackupAttachmentUploadProgressView: View {
     }
 
     static func subtitleText(
-        uploadUpdate: BackupSettingsAttachmentUploadTracker.UploadUpdate,
+        uploadUpdate: BackupAttachmentUploadTracker.UploadUpdate,
     ) -> String {
         switch uploadUpdate.state {
         case .running:
@@ -3025,8 +3062,8 @@ private extension BackupSettingsViewModel {
         backupSubscriptionAlreadyRedeemed: Bool = false,
         failedToDisableBackupsRemotely: Bool = false,
         latestBackupExportProgressUpdate: OWSSequentialProgress<BackupExportJobStep>? = nil,
-        latestBackupAttachmentDownloadUpdateState: BackupSettingsAttachmentDownloadTracker.DownloadUpdate.State? = nil,
-        latestBackupAttachmentUploadUpdateState: BackupSettingsAttachmentUploadTracker.UploadUpdate.State? = nil,
+        latestBackupAttachmentDownloadUpdateState: BackupAttachmentDownloadProgressView.DownloadUpdate.State? = nil,
+        latestBackupAttachmentUploadUpdateState: BackupAttachmentUploadTracker.UploadUpdate.State? = nil,
         mediaTierCapacityOverflow: UInt64? = nil,
         hasBackupFailed: Bool = false,
         isBackgroundAppRefreshDisabled: Bool = false,
@@ -3067,14 +3104,15 @@ private extension BackupSettingsViewModel {
             failedToDisableBackupsRemotely: failedToDisableBackupsRemotely,
             latestBackupExportProgressUpdate: latestBackupExportProgressUpdate,
             latestBackupAttachmentDownloadUpdate: latestBackupAttachmentDownloadUpdateState.map {
-                BackupSettingsAttachmentDownloadTracker.DownloadUpdate(
+                BackupAttachmentDownloadProgressView.DownloadUpdate(
                     state: $0,
                     bytesDownloaded: 1_400_000_000,
                     totalBytesToDownload: 1_600_000_000,
+                    percentageDownloaded: 1.4 / 1.6,
                 )
             },
             latestBackupAttachmentUploadUpdate: latestBackupAttachmentUploadUpdateState.map {
-                BackupSettingsAttachmentUploadTracker.UploadUpdate(
+                BackupAttachmentUploadTracker.UploadUpdate(
                     state: $0,
                     bytesUploaded: 400_000_000,
                     totalBytesToUpload: 1_600_000_000,

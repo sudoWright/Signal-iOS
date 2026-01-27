@@ -548,10 +548,7 @@ extension CLVTableDataSource: UITableViewDataSource {
             guard let viewState = viewController?.viewState else {
                 return 0
             }
-            return CLVBackupDownloadProgressView.measureHeight(
-                state: viewState.backupDownloadProgressView.state,
-                width: tableView.bounds.width,
-            )
+            return viewState.backupDownloadProgressView.measureHeight(width: tableView.bounds.width)
         case .pinned, .unpinned:
             return measureConversationCell(tableView: tableView, indexPath: indexPath)
         }

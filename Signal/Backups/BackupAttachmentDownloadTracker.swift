@@ -5,16 +5,26 @@
 
 import SignalServiceKit
 
-final class BackupSettingsAttachmentDownloadTracker {
+/// Manages async streams of `DownloadUpdate`s, which represent the state and
+/// progress of Backup Attachment downloads.
+///
+/// - SeeAlso `BackupAttachmentDownloadQueueStatusReporter`
+/// - SeeAlso `BackupAttachmentDownloadProgress`
+///
+/// - SeeAlso ``BackupAttachmentUploadTracker``
+final class BackupAttachmentDownloadTracker {
     struct DownloadUpdate: Equatable {
         enum State: Equatable {
-            case suspended
+            case empty
             case running
+            case suspended
             case pausedLowBattery
             case pausedLowPowerMode
             case pausedNeedsWifi
             case pausedNeedsInternet
             case outOfDiskSpace(bytesRequired: UInt64)
+            case appBackgrounded
+            case notRegisteredAndReady
         }
 
         let state: State
@@ -52,7 +62,7 @@ final class BackupSettingsAttachmentDownloadTracker {
         self.backupAttachmentDownloadProgress = backupAttachmentDownloadProgress
     }
 
-    func updates() -> AsyncStream<DownloadUpdate?> {
+    func updates() -> AsyncStream<DownloadUpdate> {
         return AsyncStream { continuation in
             let tracker = Tracker(
                 backupAttachmentDownloadQueueStatusReporter: backupAttachmentDownloadQueueStatusReporter,
@@ -80,7 +90,7 @@ final class BackupSettingsAttachmentDownloadTracker {
 // MARK: -
 
 private class Tracker {
-    typealias DownloadUpdate = BackupSettingsAttachmentDownloadTracker.DownloadUpdate
+    typealias DownloadUpdate = BackupAttachmentDownloadTracker.DownloadUpdate
 
     private struct State {
         var lastReportedDownloadProgress: OWSProgress = .zero
@@ -89,7 +99,7 @@ private class Tracker {
         var downloadQueueStatusObserver: NotificationCenter.Observer?
         var downloadProgressObserver: BackupAttachmentDownloadProgress.Observer?
 
-        let streamContinuation: AsyncStream<DownloadUpdate?>.Continuation
+        let streamContinuation: AsyncStream<DownloadUpdate>.Continuation
     }
 
     private let backupAttachmentDownloadQueueStatusReporter: BackupAttachmentDownloadQueueStatusReporter
@@ -99,7 +109,7 @@ private class Tracker {
     init(
         backupAttachmentDownloadQueueStatusReporter: BackupAttachmentDownloadQueueStatusReporter,
         backupAttachmentDownloadProgress: BackupAttachmentDownloadProgress,
-        continuation: AsyncStream<DownloadUpdate?>.Continuation,
+        continuation: AsyncStream<DownloadUpdate>.Continuation,
     ) {
         self.backupAttachmentDownloadQueueStatusReporter = backupAttachmentDownloadQueueStatusReporter
         self.backupAttachmentDownloadProgress = backupAttachmentDownloadProgress
@@ -194,12 +204,14 @@ private class Tracker {
             return
         }
 
-        let downloadUpdateState: DownloadUpdate.State? = {
+        let downloadUpdateState: DownloadUpdate.State = {
             switch lastReportedDownloadQueueStatus {
-            case .suspended:
-                return .suspended
+            case .empty:
+                return .empty
             case .running:
                 return .running
+            case .suspended:
+                return .suspended
             case .noWifiReachability:
                 return .pausedNeedsWifi
             case .noReachability:
@@ -213,18 +225,16 @@ private class Tracker {
                     lastReportedDownloadProgress.remainingUnitCount,
                     backupAttachmentDownloadQueueStatusReporter.minimumRequiredDiskSpaceToCompleteDownloads(),
                 ))
-            case .empty, .notRegisteredAndReady, .appBackgrounded:
-                return nil
+            case .notRegisteredAndReady:
+                return .notRegisteredAndReady
+            case .appBackgrounded:
+                return .appBackgrounded
             }
         }()
 
-        if let downloadUpdateState {
-            streamContinuation.yield(DownloadUpdate(
-                state: downloadUpdateState,
-                progress: lastReportedDownloadProgress,
-            ))
-        } else {
-            streamContinuation.yield(nil)
-        }
+        streamContinuation.yield(DownloadUpdate(
+            state: downloadUpdateState,
+            progress: lastReportedDownloadProgress,
+        ))
     }
 }

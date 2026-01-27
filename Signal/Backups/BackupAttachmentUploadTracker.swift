@@ -6,7 +6,14 @@
 import SignalServiceKit
 import SwiftUI
 
-final class BackupSettingsAttachmentUploadTracker {
+/// Manages async streams of `UploadUpdate`s, which represent the state and
+/// progress of Backup Attachment uploads.
+///
+/// - SeeAlso `BackupAttachmentUploadQueueStatusReporter`
+/// - SeeAlso `BackupAttachmentUploadProgress`
+///
+/// - SeeAlso ``BackupAttachmentDownloadTracker``
+final class BackupAttachmentUploadTracker {
     struct UploadUpdate: Equatable {
         enum State {
             case running
@@ -79,7 +86,7 @@ final class BackupSettingsAttachmentUploadTracker {
 // MARK: -
 
 private class Tracker {
-    typealias UploadUpdate = BackupSettingsAttachmentUploadTracker.UploadUpdate
+    typealias UploadUpdate = BackupAttachmentUploadTracker.UploadUpdate
 
     private struct State {
         var lastReportedUploadProgress: OWSProgress = .zero
