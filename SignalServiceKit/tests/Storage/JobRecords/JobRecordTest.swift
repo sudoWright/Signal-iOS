@@ -250,7 +250,7 @@ extension MessageSenderJobRecord: ValidatableModel {
         (
             MessageSenderJobRecord(
                 threadId: nil,
-                messageType: .none,
+                messageType: nil,
                 removeMessageAfterSending: false,
                 isHighPriority: true,
                 failureCount: UInt(Int.max),

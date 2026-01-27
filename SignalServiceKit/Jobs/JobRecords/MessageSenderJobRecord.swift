@@ -34,30 +34,29 @@ public final class MessageSenderJobRecord: JobRecord, FactoryInitializableFromRe
             useMediaQueue: Bool,
         )
         case transient(TransientOutgoingMessage)
-        /// Generally considered invalid, but failed at processing time not deserialization time.
-        case none
     }
 
-    public var messageType: MessageType {
+    public var messageType: MessageType? {
         if let editMessage = transientMessage as? OutgoingEditMessage {
             return .editMessage(
                 editedMessageId: persistedMessageId ?? editMessage.editedMessage.uniqueId,
                 messageForSending: editMessage,
                 useMediaQueue: useMediaQueue,
             )
-        } else if let transientMessage {
-            return .transient(transientMessage)
-        } else if let persistedMessageId {
-            return .persisted(messageId: persistedMessageId, useMediaQueue: useMediaQueue)
-        } else {
-            return .none
         }
+        if let transientMessage {
+            return .transient(transientMessage)
+        }
+        if let persistedMessageId {
+            return .persisted(messageId: persistedMessageId, useMediaQueue: useMediaQueue)
+        }
+        return nil
     }
 
     // exposed for tests
     init(
         threadId: String?,
-        messageType: MessageType,
+        messageType: MessageType?,
         removeMessageAfterSending: Bool,
         isHighPriority: Bool,
         failureCount: UInt = 0,
@@ -80,7 +79,7 @@ public final class MessageSenderJobRecord: JobRecord, FactoryInitializableFromRe
             self.persistedMessageId = nil
             self.transientMessage = outgoingMessage
             self.useMediaQueue = false
-        case .none:
+        case nil:
             self.persistedMessageId = nil
             self.transientMessage = nil
             self.useMediaQueue = false
