@@ -304,7 +304,7 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
             context.includedContentFilter.shouldSkipMessageBasedOnExpiration(
                 expireStartDate: details.expireStartDate,
                 expiresInMs: details.expiresInMs,
-                currentTimestamp: context.startTimestampMs,
+                currentTimestamp: context.startDate.ows_millisecondsSince1970,
             )
         {
             // Skip, but treat as a success.

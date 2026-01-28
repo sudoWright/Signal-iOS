@@ -108,7 +108,7 @@ public class BackupArchiveChatStyleArchiver: BackupArchiveProtoStreamWriter {
         /// in the Backup, we can't use the same timestamp for all colors. To
         /// that end, we'll start with "now" and increment as we create more
         /// colors.
-        var chatColorCreationTimestamp = context.startTimestampMs
+        var chatColorCreationTimestamp = context.startDate.ows_millisecondsSince1970
 
         for chatColorProto in chatColorProtos {
             let customChatColorId = BackupArchive.CustomChatColorId(value: chatColorProto.id)
@@ -454,9 +454,7 @@ public class BackupArchiveChatStyleArchiver: BackupArchiveProtoStreamWriter {
             return .success(nil)
         }
 
-        return .success(referencedAttachment.asBackupFilePointer(
-            attachmentByteCounter: context.attachmentByteCounter,
-        ))
+        return .success(referencedAttachment.asBackupFilePointer(context: context))
     }
 
     private func restoreWallpaperAttachment<IDType>(
@@ -522,9 +520,9 @@ public class BackupArchiveChatStyleArchiver: BackupArchiveProtoStreamWriter {
         for referencedAttachment in results {
             backupAttachmentDownloadScheduler.enqueueFromBackupIfNeeded(
                 referencedAttachment,
-                restoreStartTimestampMs: context.startTimestampMs,
+                restoreStartTimestampMs: context.startDate.ows_millisecondsSince1970,
                 backupPlan: backupPlan,
-                remoteConfig: context.accountDataContext.currentRemoteConfig,
+                remoteConfig: context.remoteConfig,
                 isPrimaryDevice: context.isPrimaryDevice,
                 tx: context.tx,
             )

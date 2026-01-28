@@ -133,14 +133,14 @@ extension BackupArchive {
         private let callLinkIdMap = SharedMap<CallLinkRecordId, RecipientId>()
 
         init(
-            bencher: BackupArchive.ArchiveBencher,
-            attachmentByteCounter: BackupArchiveAttachmentByteCounter,
-            currentBackupAttachmentUploadEra: String,
-            includedContentFilter: IncludedContentFilter,
             localIdentifiers: LocalIdentifiers,
             localRecipientId: RecipientId,
             localSignalRecipientRowId: SignalRecipient.RowId,
-            startTimestampMs: UInt64,
+            startDate: Date,
+            remoteConfig: RemoteConfig,
+            bencher: BackupArchive.ArchiveBencher,
+            attachmentByteCounter: BackupArchiveAttachmentByteCounter,
+            includedContentFilter: IncludedContentFilter,
             tx: DBReadTransaction,
         ) {
             self.localIdentifiers = localIdentifiers
@@ -161,11 +161,11 @@ extension BackupArchive {
             }
 
             super.init(
+                startDate: startDate,
+                remoteConfig: remoteConfig,
                 bencher: bencher,
                 attachmentByteCounter: attachmentByteCounter,
-                currentBackupAttachmentUploadEra: currentBackupAttachmentUploadEra,
                 includedContentFilter: includedContentFilter,
-                startTimestampMs: startTimestampMs,
                 tx: tx,
             )
         }
@@ -284,14 +284,16 @@ extension BackupArchive {
 
         init(
             localIdentifiers: LocalIdentifiers,
-            startTimestampMs: UInt64,
+            startDate: Date,
+            remoteConfig: RemoteConfig,
             attachmentByteCounter: BackupArchiveAttachmentByteCounter,
             isPrimaryDevice: Bool,
             tx: DBWriteTransaction,
         ) {
             self.localIdentifiers = localIdentifiers
             super.init(
-                startTimestampMs: startTimestampMs,
+                startDate: startDate,
+                remoteConfig: remoteConfig,
                 attachmentByteCounter: attachmentByteCounter,
                 isPrimaryDevice: isPrimaryDevice,
                 tx: tx,

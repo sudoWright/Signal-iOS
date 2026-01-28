@@ -105,23 +105,23 @@ extension BackupArchive {
         private let threadCache = SharedMap<ChatId, CachedThreadInfo>()
 
         init(
+            customChatColorContext: CustomChatColorArchivingContext,
+            recipientContext: RecipientArchivingContext,
+            startDate: Date,
+            remoteConfig: RemoteConfig,
             bencher: BackupArchive.ArchiveBencher,
             attachmentByteCounter: BackupArchiveAttachmentByteCounter,
-            currentBackupAttachmentUploadEra: String,
-            customChatColorContext: CustomChatColorArchivingContext,
             includedContentFilter: IncludedContentFilter,
-            recipientContext: RecipientArchivingContext,
-            startTimestampMs: UInt64,
             tx: DBReadTransaction,
         ) {
             self.customChatColorContext = customChatColorContext
             self.recipientContext = recipientContext
             super.init(
+                startDate: startDate,
+                remoteConfig: remoteConfig,
                 bencher: bencher,
                 attachmentByteCounter: attachmentByteCounter,
-                currentBackupAttachmentUploadEra: currentBackupAttachmentUploadEra,
                 includedContentFilter: includedContentFilter,
-                startTimestampMs: startTimestampMs,
                 tx: tx,
             )
         }
@@ -173,7 +173,8 @@ extension BackupArchive {
         init(
             customChatColorContext: CustomChatColorRestoringContext,
             recipientContext: RecipientRestoringContext,
-            startTimestampMs: UInt64,
+            startDate: Date,
+            remoteConfig: RemoteConfig,
             attachmentByteCounter: BackupArchiveAttachmentByteCounter,
             isPrimaryDevice: Bool,
             tx: DBWriteTransaction,
@@ -181,7 +182,8 @@ extension BackupArchive {
             self.customChatColorContext = customChatColorContext
             self.recipientContext = recipientContext
             super.init(
-                startTimestampMs: startTimestampMs,
+                startDate: startDate,
+                remoteConfig: remoteConfig,
                 attachmentByteCounter: attachmentByteCounter,
                 isPrimaryDevice: isPrimaryDevice,
                 tx: tx,
@@ -343,19 +345,19 @@ extension BackupArchive {
         private let map = SharedMap<CustomChatColor.Key, CustomChatColorId>()
 
         override init(
+            startDate: Date,
+            remoteConfig: RemoteConfig,
             bencher: BackupArchive.ArchiveBencher,
             attachmentByteCounter: BackupArchiveAttachmentByteCounter,
-            currentBackupAttachmentUploadEra: String,
             includedContentFilter: IncludedContentFilter,
-            startTimestampMs: UInt64,
             tx: DBReadTransaction,
         ) {
             super.init(
+                startDate: startDate,
+                remoteConfig: remoteConfig,
                 bencher: bencher,
                 attachmentByteCounter: attachmentByteCounter,
-                currentBackupAttachmentUploadEra: currentBackupAttachmentUploadEra,
                 includedContentFilter: includedContentFilter,
-                startTimestampMs: startTimestampMs,
                 tx: tx,
             )
         }
@@ -380,15 +382,17 @@ extension BackupArchive {
         let accountDataContext: AccountDataRestoringContext
 
         init(
-            startTimestampMs: UInt64,
+            accountDataContext: AccountDataRestoringContext,
+            startDate: Date,
+            remoteConfig: RemoteConfig,
             attachmentByteCounter: BackupArchiveAttachmentByteCounter,
             isPrimaryDevice: Bool,
-            accountDataContext: AccountDataRestoringContext,
             tx: DBWriteTransaction,
         ) {
             self.accountDataContext = accountDataContext
             super.init(
-                startTimestampMs: startTimestampMs,
+                startDate: startDate,
+                remoteConfig: remoteConfig,
                 attachmentByteCounter: attachmentByteCounter,
                 isPrimaryDevice: isPrimaryDevice,
                 tx: tx,

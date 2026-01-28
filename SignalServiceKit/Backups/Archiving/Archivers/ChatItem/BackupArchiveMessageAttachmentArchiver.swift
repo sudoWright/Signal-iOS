@@ -33,7 +33,7 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
 
         for referencedAttachment in referencedAttachments {
             let pointerProto = referencedAttachment.asBackupFilePointer(
-                attachmentByteCounter: context.attachmentByteCounter,
+                context: context,
             )
 
             var attachmentProto = BackupProto_MessageAttachment()
@@ -59,27 +59,21 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
         referencedAttachment: ReferencedAttachment,
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
-        return referencedAttachment.asBackupFilePointer(
-            attachmentByteCounter: context.attachmentByteCounter,
-        )
+        return referencedAttachment.asBackupFilePointer(context: context)
     }
 
     func archiveLinkPreviewAttachment(
         referencedAttachment: ReferencedAttachment,
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
-        return referencedAttachment.asBackupFilePointer(
-            attachmentByteCounter: context.attachmentByteCounter,
-        )
+        return referencedAttachment.asBackupFilePointer(context: context)
     }
 
     func archiveQuotedReplyThumbnailAttachment(
         referencedAttachment: ReferencedAttachment,
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_MessageAttachment {
-        let pointerProto = referencedAttachment.asBackupFilePointer(
-            attachmentByteCounter: context.attachmentByteCounter,
-        )
+        let pointerProto = referencedAttachment.asBackupFilePointer(context: context)
 
         var attachmentProto = BackupProto_MessageAttachment()
         attachmentProto.pointer = pointerProto
@@ -94,18 +88,14 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
         referencedAttachment: ReferencedAttachment,
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
-        return referencedAttachment.asBackupFilePointer(
-            attachmentByteCounter: context.attachmentByteCounter,
-        )
+        return referencedAttachment.asBackupFilePointer(context: context)
     }
 
     func archiveStickerAttachment(
         referencedAttachment: ReferencedAttachment,
         context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
-        return referencedAttachment.asBackupFilePointer(
-            attachmentByteCounter: context.attachmentByteCounter,
-        )
+        return referencedAttachment.asBackupFilePointer(context: context)
     }
 
     // MARK: Restoring -
@@ -374,12 +364,9 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
             )])
         }
 
-        let accountDataContext = context.chatContext.customChatColorContext.accountDataContext
-        guard let backupPlan = accountDataContext.backupPlan else {
+        guard let backupPlan = context.accountDataContext.backupPlan else {
             return .messageFailure([.restoreFrameError(
-                .invalidProtoData(
-                    .accountDataNotFound,
-                ),
+                .invalidProtoData(.accountDataNotFound),
                 chatItemId,
             )])
         }
@@ -387,9 +374,9 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
         for referencedAttachment in results {
             backupAttachmentDownloadScheduler.enqueueFromBackupIfNeeded(
                 referencedAttachment,
-                restoreStartTimestampMs: context.startTimestampMs,
+                restoreStartTimestampMs: context.startDate.ows_millisecondsSince1970,
                 backupPlan: backupPlan,
-                remoteConfig: accountDataContext.currentRemoteConfig,
+                remoteConfig: context.remoteConfig,
                 isPrimaryDevice: context.isPrimaryDevice,
                 tx: context.tx,
             )
@@ -448,7 +435,7 @@ extension BackupArchive.RestoreFrameError.ErrorType {
 extension ReferencedAttachment {
 
     func asBackupFilePointer(
-        attachmentByteCounter: BackupArchiveAttachmentByteCounter,
+        context: BackupArchive.ArchivingContext,
     ) -> BackupProto_FilePointer {
         var proto = BackupProto_FilePointer()
         proto.contentType = attachment.mimeType
@@ -478,7 +465,7 @@ extension ReferencedAttachment {
             }
         }
 
-        proto.locatorInfo = self.asBackupFilePointerLocatorInfo()
+        proto.locatorInfo = self.asBackupFilePointerLocatorInfo(context: context)
 
         if
             attachment.mediaName != nil,
@@ -486,7 +473,7 @@ extension ReferencedAttachment {
             attachment.streamInfo?.unencryptedByteCount
                 ?? attachment.mediaTierInfo?.unencryptedByteCount
         {
-            attachmentByteCounter.addToByteCount(
+            context.attachmentByteCounter.addToByteCount(
                 attachmentID: attachment.id,
                 byteCount: Cryptography.estimatedMediaTierCDNSize(unencryptedSize: UInt64(safeCast: unencryptedByteCount)) ?? UInt64(UInt32.max),
             )
@@ -497,7 +484,9 @@ extension ReferencedAttachment {
         return proto
     }
 
-    private func asBackupFilePointerLocatorInfo() -> BackupProto_FilePointer.LocatorInfo {
+    private func asBackupFilePointerLocatorInfo(
+        context: BackupArchive.ArchivingContext,
+    ) -> BackupProto_FilePointer.LocatorInfo {
         var locatorInfo = BackupProto_FilePointer.LocatorInfo()
 
         // Include the transit tier cdn info as a fallback, but only
@@ -509,7 +498,7 @@ extension ReferencedAttachment {
         // When encryption keys don't match: if we reupload (e.g. forward) an
         // attachment after 3+ days, we rotate to a new encryption key; transit
         // tier info uses this new random key and can't be the fallback here.
-        let transitTierInfoToExport: Attachment.TransitTierInfo?
+        var transitTierInfoToExport: Attachment.TransitTierInfo?
         if
             let latestTransitTierInfo = attachment.latestTransitTierInfo,
             latestTransitTierInfo.encryptionKey == attachment.encryptionKey
@@ -521,50 +510,56 @@ extension ReferencedAttachment {
             transitTierInfoToExport = nil
         }
 
+        if
+            let transitTierUploadDate = transitTierInfoToExport.map({ Date(millisecondsSince1970: $0.uploadTimestamp) }),
+            transitTierUploadDate.addingTimeInterval(context.remoteConfig.messageQueueTime) < context.startDate
+        {
+            // This transit tier info is expired, so there's no point in
+            // exporting it.
+            transitTierInfoToExport = nil
+        }
+
         if let transitTierInfoToExport {
             locatorInfo.transitCdnKey = transitTierInfoToExport.cdnKey
             locatorInfo.transitCdnNumber = transitTierInfoToExport.cdnNumber
             locatorInfo.transitTierUploadTimestamp = transitTierInfoToExport.uploadTimestamp
-            // We may overwrite this below with plaintext hash integrity check,
-            // which is desired. We only use encrypted digest integrity check
-            // if we don't have a plaintext hash and DO have a transit tier upload.
-            switch transitTierInfoToExport.integrityCheck {
-            case .digestSHA256Ciphertext(let data):
-                locatorInfo.integrityCheck = .encryptedDigest(data)
-            case .sha256ContentHash(let data):
-                locatorInfo.integrityCheck = .plaintextHash(data)
-            }
         }
 
-        // If we have absolutely no present-time source of data
-        // for this attachment, even if we have a plaintext hash because
-        // we _previously_ had data, don't bother exporting it. Its unrecoverable.
-        let isTotallyMissingAttachment =
-            attachment.streamInfo == nil
-                && transitTierInfoToExport == nil
-                && attachment.mediaTierInfo == nil
-
-        if !isTotallyMissingAttachment, let plaintextHash = attachment.sha256ContentHash {
-            locatorInfo.integrityCheck = .plaintextHash(plaintextHash)
-            if let mediaTierCdnNumber = attachment.mediaTierInfo?.cdnNumber {
-                locatorInfo.mediaTierCdnNumber = mediaTierCdnNumber
-            }
-        }
-
-        // Set fields only if some cdn info is available.
-        switch locatorInfo.integrityCheck {
-        case .plaintextHash, .encryptedDigest:
+        if let mediaTierInfo = attachment.mediaTierInfo {
             locatorInfo.key = attachment.encryptionKey
+            locatorInfo.size = mediaTierInfo.unencryptedByteCount
+            locatorInfo.integrityCheck = .plaintextHash(mediaTierInfo.sha256ContentHash)
 
-            if
-                let unencryptedByteCount = attachment.streamInfo?.unencryptedByteCount
-                ?? attachment.mediaTierInfo?.unencryptedByteCount
-                ?? attachment.latestTransitTierInfo?.unencryptedByteCount
-            {
-                locatorInfo.size = unencryptedByteCount
+            if let cdnNumber = mediaTierInfo.cdnNumber {
+                locatorInfo.mediaTierCdnNumber = cdnNumber
             }
-        case .none:
-            break
+        } else if let streamInfo = attachment.streamInfo {
+            locatorInfo.key = attachment.encryptionKey
+            locatorInfo.size = streamInfo.unencryptedByteCount
+            locatorInfo.integrityCheck = .plaintextHash(streamInfo.sha256ContentHash)
+        } else if let transitTierInfoToExport {
+            locatorInfo.key = attachment.encryptionKey
+            locatorInfo.size = transitTierInfoToExport.unencryptedByteCount ?? 0
+
+            // At the time of writing, TransitTierInfo.integrityCheck prefers
+            // the encrypted digest even if both are present. (See comment in
+            // that type's init.) So, manually check for the plaintext hash
+            // here, falling back to the encrypted digest otherwise.
+            if let plaintextHash = attachment.sha256ContentHash {
+                locatorInfo.integrityCheck = .plaintextHash(plaintextHash)
+            } else {
+                switch transitTierInfoToExport.integrityCheck {
+                case .sha256ContentHash(let plaintextHash):
+                    owsFailDebug("Missing Attachment plaintext hash, but had one on TransitTierInfo!")
+                    locatorInfo.integrityCheck = .plaintextHash(plaintextHash)
+                case .digestSHA256Ciphertext(let encryptedDigest):
+                    locatorInfo.integrityCheck = .encryptedDigest(encryptedDigest)
+                }
+            }
+        } else {
+            // This attachment isn't uploaded anywhere and this device won't be
+            // able to upload it in the future. So, we leave a bunch of fields
+            // unset so any restoring device knows it's unavailable.
         }
 
         return locatorInfo

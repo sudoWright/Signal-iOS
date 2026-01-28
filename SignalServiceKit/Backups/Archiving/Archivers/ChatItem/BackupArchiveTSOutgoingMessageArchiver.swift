@@ -535,18 +535,18 @@ extension BackupArchiveTSOutgoingMessageArchiver: BackupArchive.TSMessageEditHis
             return .messageFailure(partialErrors)
         }
 
-        let expireStartDate: UInt64
+        let expireStartedAt: UInt64
         if chatItem.hasExpireStartDate {
-            expireStartDate = chatItem.expireStartDate
+            expireStartedAt = chatItem.expireStartDate
         } else if
             expiresInSeconds > 0,
             TSOutgoingMessage.isEligibleToStartExpireTimer(recipientStates: Array(recipientAddressStates.values))
         {
             // If there is an expire timer and the message is eligible to start expiring,
             // set the expire start time to now even if unset in the proto.
-            expireStartDate = context.startTimestampMs
+            expireStartedAt = context.startDate.ows_millisecondsSince1970
         } else {
-            expireStartDate = 0
+            expireStartedAt = 0
         }
 
         let outgoingMessageResult: BackupArchive.RestoreInteractionResult<TSOutgoingMessage> = {
@@ -566,7 +566,7 @@ extension BackupArchiveTSOutgoingMessageArchiver: BackupArchive.TSMessageEditHis
                 expiresInSeconds: expiresInSeconds,
                 // Backed up messages don't set the chat timer; version is irrelevant.
                 expireTimerVersion: nil,
-                expireStartedAt: expireStartDate,
+                expireStartedAt: expireStartedAt,
                 isVoiceMessage: false,
                 isSmsMessageRestoredFromBackup: chatItem.sms,
                 isViewOnceMessage: false,

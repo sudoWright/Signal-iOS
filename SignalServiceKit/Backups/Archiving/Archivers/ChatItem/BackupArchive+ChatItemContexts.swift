@@ -7,23 +7,28 @@ extension BackupArchive {
 
     public class ChatItemRestoringContext: RestoringContext {
 
+        let accountDataContext: AccountDataRestoringContext
         let chatContext: ChatRestoringContext
         let recipientContext: RecipientRestoringContext
 
         public var uploadEra: String? { chatContext.customChatColorContext.accountDataContext.uploadEra }
 
         init(
+            accountDataContext: AccountDataRestoringContext,
             chatContext: ChatRestoringContext,
             recipientContext: RecipientRestoringContext,
-            startTimestampMs: UInt64,
+            startDate: Date,
+            remoteConfig: RemoteConfig,
             attachmentByteCounter: BackupArchiveAttachmentByteCounter,
             isPrimaryDevice: Bool,
             tx: DBWriteTransaction,
         ) {
+            self.accountDataContext = accountDataContext
             self.recipientContext = recipientContext
             self.chatContext = chatContext
             super.init(
-                startTimestampMs: startTimestampMs,
+                startDate: startDate,
+                remoteConfig: remoteConfig,
                 attachmentByteCounter: attachmentByteCounter,
                 isPrimaryDevice: isPrimaryDevice,
                 tx: tx,

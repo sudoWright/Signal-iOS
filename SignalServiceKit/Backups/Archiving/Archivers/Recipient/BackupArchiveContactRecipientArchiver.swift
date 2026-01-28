@@ -733,7 +733,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 uniqueId: recipient.uniqueId,
                 identityKey: identityKey,
                 isFirstKnownKey: true,
-                createdAt: Date(millisecondsSince1970: context.startTimestampMs),
+                createdAt: context.startDate,
                 verificationState: verificationState,
             )
             do {

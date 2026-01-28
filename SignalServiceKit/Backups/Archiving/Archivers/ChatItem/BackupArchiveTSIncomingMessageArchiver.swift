@@ -321,9 +321,9 @@ extension BackupArchiveTSIncomingMessageArchiver: BackupArchive.TSMessageEditHis
             // 0 == no expiration
             expiresInSeconds = 0
         }
-        let expireStartDate: UInt64
+        let expireStartedAt: UInt64
         if chatItem.hasExpireStartDate {
-            expireStartDate = chatItem.expireStartDate
+            expireStartedAt = chatItem.expireStartDate
         } else if
             expiresInSeconds > 0,
             incomingDetails.read
@@ -331,10 +331,10 @@ extension BackupArchiveTSIncomingMessageArchiver: BackupArchive.TSMessageEditHis
             // If marked as read but the chat timer hasn't started,
             // thats a bug on the export side but we can recover
             // from it now by starting the timer now.
-            expireStartDate = context.startTimestampMs
+            expireStartedAt = context.startDate.ows_millisecondsSince1970
         } else {
             // 0 = hasn't started expiring.
-            expireStartDate = 0
+            expireStartedAt = 0
         }
 
         let editState: TSEditState
@@ -385,7 +385,7 @@ extension BackupArchiveTSIncomingMessageArchiver: BackupArchive.TSMessageEditHis
                 expiresInSeconds: expiresInSeconds,
                 // Backed up messages don't set the chat timer; version is irrelevant.
                 expireTimerVersion: nil,
-                expireStartedAt: expireStartDate,
+                expireStartedAt: expireStartedAt,
                 read: wasReadForInteraction,
                 serverTimestamp: incomingDetails.dateServerSent,
                 serverDeliveryTimestamp: 0,

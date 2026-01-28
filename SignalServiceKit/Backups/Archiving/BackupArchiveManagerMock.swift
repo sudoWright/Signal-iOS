@@ -50,7 +50,7 @@ open class BackupArchiveManagerMock: BackupArchiveManager {
         let source = await progress?.addSource(withLabel: "", unitCount: 1)
         source?.incrementCompletedUnitCount(by: 1)
         return Upload.EncryptedBackupUploadMetadata(
-            exportStartTimestamp: Date(),
+            exportStartDate: Date(),
             fileUrl: URL(string: "file://")!,
             digest: Data(),
             encryptedDataLength: 0,

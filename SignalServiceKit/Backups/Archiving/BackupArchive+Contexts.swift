@@ -17,51 +17,58 @@ extension BackupArchive {
     /// archiving to be updating the database, just reading from it.
     /// (The exception to this is enqueuing attachment uploads.)
     open class ArchivingContext {
-
+        /// The timestamp at which the archiving process started.
+        let startDate: Date
+        /// The remote config at the start of archiving.
+        let remoteConfig: RemoteConfig
         /// For benchmarking archive steps.
         let bencher: BackupArchive.ArchiveBencher
+        /// Counts archived attachment bytes for future progress reporting.
         let attachmentByteCounter: BackupArchiveAttachmentByteCounter
         /// Parameters configuring what content is included in this archive.
         let includedContentFilter: IncludedContentFilter
-        /// The timestamp at which the archiving process started.
-        let startTimestampMs: UInt64
-        /// Always set even if BackupPlan is free
-        let currentBackupAttachmentUploadEra: String
+        /// The single transaction used to create the archive.
         let tx: DBReadTransaction
 
         init(
+            startDate: Date,
+            remoteConfig: RemoteConfig,
             bencher: BackupArchive.ArchiveBencher,
             attachmentByteCounter: BackupArchiveAttachmentByteCounter,
-            currentBackupAttachmentUploadEra: String,
             includedContentFilter: IncludedContentFilter,
-            startTimestampMs: UInt64,
             tx: DBReadTransaction,
         ) {
+            self.startDate = startDate
+            self.remoteConfig = remoteConfig
             self.bencher = bencher
             self.attachmentByteCounter = attachmentByteCounter
-            self.currentBackupAttachmentUploadEra = currentBackupAttachmentUploadEra
             self.includedContentFilter = includedContentFilter
-            self.startTimestampMs = startTimestampMs
             self.tx = tx
         }
     }
 
     /// Base context class used for restoring from a backup.
     open class RestoringContext {
-
         /// The timestamp at which we began restoring.
-        public let startTimestampMs: UInt64
+        public let startDate: Date
+        /// The remote config at the start of restoring.
+        public let remoteConfig: RemoteConfig
+        /// Counts restored attachment bytes for future progress reporting.
         public let attachmentByteCounter: BackupArchiveAttachmentByteCounter
+        /// Are we restoring onto a primary?
         public let isPrimaryDevice: Bool
+        /// The single transaction used to restore the archive.
         public let tx: DBWriteTransaction
 
         init(
-            startTimestampMs: UInt64,
+            startDate: Date,
+            remoteConfig: RemoteConfig,
             attachmentByteCounter: BackupArchiveAttachmentByteCounter,
             isPrimaryDevice: Bool,
             tx: DBWriteTransaction,
         ) {
-            self.startTimestampMs = startTimestampMs
+            self.startDate = startDate
+            self.remoteConfig = remoteConfig
             self.attachmentByteCounter = attachmentByteCounter
             self.isPrimaryDevice = isPrimaryDevice
             self.tx = tx

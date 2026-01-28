@@ -108,7 +108,7 @@ public class BackupArchiveEncryptedProtoStreamProvider {
     /// The caller owns the returned stream, and is responsible for closing it
     /// once finished.
     func openEncryptedOutputFileStream(
-        startTimestamp: Date,
+        startDate: Date,
         encryptionMetadata: BackupExportPurpose.EncryptionMetadata,
         exportProgress: BackupArchiveExportProgress?,
         attachmentByteCounter: BackupArchiveAttachmentByteCounter,
@@ -147,7 +147,7 @@ public class BackupArchiveEncryptedProtoStreamProvider {
                 outputStream,
                 metadataProvider: {
                     return Upload.EncryptedBackupUploadMetadata(
-                        exportStartTimestamp: startTimestamp,
+                        exportStartDate: startDate,
                         fileUrl: fileUrl,
                         digest: try outputTrackingTransform.digest(),
                         encryptedDataLength: UInt32(clamping: outputTrackingTransform.count),
