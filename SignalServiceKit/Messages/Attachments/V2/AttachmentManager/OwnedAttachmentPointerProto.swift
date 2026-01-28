@@ -16,10 +16,6 @@ public struct OwnedAttachmentPointerProto {
 }
 
 public struct OwnedAttachmentBackupPointerProto {
-    public enum CreationError: Error {
-        case dbInsertionError(Error)
-    }
-
     public let proto: BackupProto_FilePointer
     public let renderingFlag: AttachmentReference.RenderingFlag
     public let clientUUID: UUID?

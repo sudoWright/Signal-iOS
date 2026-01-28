@@ -91,7 +91,7 @@ public extension TSMessage {
     func removeAllAttachments(tx: DBWriteTransaction) {
         let attachmentStore = DependenciesBridge.shared.attachmentStore
         for referencedAttachment in allAttachments(transaction: tx) {
-            try? attachmentStore.removeReference(
+            attachmentStore.removeReference(
                 reference: referencedAttachment.reference,
                 tx: tx,
             )

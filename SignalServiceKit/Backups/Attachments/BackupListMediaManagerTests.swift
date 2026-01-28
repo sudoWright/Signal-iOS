@@ -346,7 +346,7 @@ public class BackupListMediaManagerTests {
                 creationTimestamp: 0,
             ))),
         )
-        let reference = try! attachmentStore.addReference(
+        let reference = attachmentStore.addReference(
             referenceParams,
             attachmentRowId: attachmentRecord.sqliteId!,
             tx: tx,

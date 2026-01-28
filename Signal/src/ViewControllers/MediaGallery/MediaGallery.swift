@@ -862,10 +862,10 @@ class MediaGallery {
             $0.attachmentStream.reference.referenceId
         })
 
-        db.asyncWrite { tx in
-            do {
+        Task {
+            await db.awaitableWrite { tx in
                 guard let thread = TSThread.anyFetch(uniqueId: self.threadUniqueId, transaction: tx) else {
-                    throw OWSGenericError("Couldn't load thread that should exist.")
+                    owsFail("Unexpectedly missing thread!")
                 }
 
                 var attachmentsRemoved = [TSMessage: [ReferencedAttachment]]()
@@ -874,7 +874,7 @@ class MediaGallery {
                     let message = item.message
                     let referencedAttachment: ReferencedAttachment = item.attachmentStream
 
-                    try attachmentStore.removeReference(
+                    attachmentStore.removeReference(
                         reference: referencedAttachment.reference,
                         tx: tx,
                     )
@@ -901,7 +901,7 @@ class MediaGallery {
                 /// attachments.
                 for (message, removedAttachments) in attachmentsRemoved {
                     let noBodyAttachments = message.hasBodyAttachments(transaction: tx).negated
-                    let finderIsEmptyOfAttachments = try self.mediaGalleryFinder
+                    let finderIsEmptyOfAttachments = mediaGalleryFinder
                         .countAllAttachments(of: message, tx: tx) == 0
 
                     if noBodyAttachments || finderIsEmptyOfAttachments {
@@ -927,8 +927,6 @@ class MediaGallery {
                     ),
                     tx: tx,
                 )
-            } catch {
-                owsFailDebug("database error: \(error)")
             }
         }
 

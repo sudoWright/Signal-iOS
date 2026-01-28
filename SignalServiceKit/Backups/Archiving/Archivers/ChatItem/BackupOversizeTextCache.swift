@@ -77,10 +77,11 @@ class BackupArchiveInlinedOversizeTextArchiver {
     private let attachmentManager: AttachmentManager
     private let attachmentStore: AttachmentStore
     private let db: DB
+    private let kvStore: KeyValueStore
     private let logger: PrefixedLogger
+    private let orphanedAttachmentStore: OrphanedAttachmentStore
 
     private static let lastRestoredRowIdKey = "lastRestoredRowIdKey"
-    private let kvStore = KeyValueStore(collection: "BackupOversizeTextCacheStore")
 
     // MARK: - Public API
 
@@ -90,6 +91,7 @@ class BackupArchiveInlinedOversizeTextArchiver {
         attachmentManager: AttachmentManager,
         attachmentStore: AttachmentStore,
         db: DB,
+        orphanedAttachmentStore: OrphanedAttachmentStore,
     ) {
         self.attachmentsArchiver = attachmentsArchiver
         self.attachmentContentValidator = attachmentContentValidator
@@ -97,6 +99,8 @@ class BackupArchiveInlinedOversizeTextArchiver {
         self.attachmentStore = attachmentStore
         self.db = db
         self.logger = PrefixedLogger(prefix: "[Backups]")
+        self.kvStore = KeyValueStore(collection: "BackupOversizeTextCacheStore")
+        self.orphanedAttachmentStore = orphanedAttachmentStore
     }
 
     // MARK: - Archive
@@ -318,18 +322,12 @@ class BackupArchiveInlinedOversizeTextArchiver {
             return .messageFailure([.restoreFrameError(.invalidProtoData(.accountDataNotFound), chatItemId)])
         }
 
-        let error = attachmentManager.createAttachmentPointer(
+        attachmentManager.createAttachmentPointer(
             from: ownedAttachment,
             uploadEra: uploadEra,
             attachmentByteCounter: context.attachmentByteCounter,
             tx: context.tx,
         )
-        if error != nil {
-            return .messageFailure([.restoreFrameError(
-                .failedToCreateAttachment,
-                chatItemId,
-            )])
-        }
 
         // Fetch the attachment reference we just created.
         let reference = attachmentStore.fetchAnyReference(
@@ -491,7 +489,7 @@ class BackupArchiveInlinedOversizeTextArchiver {
                 attachmentKeys: attachmentKeys,
             )
 
-            try await db.awaitableWriteWithRollbackIfThrows { tx in
+            try await db.awaitableWrite { tx in
                 var maxRecordId: BackupOversizeTextCache.IDType = 0
                 defer {
                     // Mark progress by writing the max record id.
@@ -507,7 +505,16 @@ class BackupArchiveInlinedOversizeTextArchiver {
                         owsFailDebug("Missing attachment id")
                         continue
                     }
-                    try attachmentManager.updateAttachmentWithOversizeTextFromBackup(
+                    guard
+                        orphanedAttachmentStore.orphanAttachmentExists(
+                            with: pendingAttachment.orphanRecordId,
+                            tx: tx,
+                        )
+                    else {
+                        throw OWSAssertionError("Attachment file deleted before creation")
+                    }
+
+                    attachmentManager.updateAttachmentWithOversizeTextFromBackup(
                         attachmentId: attachmentId,
                         pendingAttachment: pendingAttachment,
                         tx: tx,
@@ -519,7 +526,7 @@ class BackupArchiveInlinedOversizeTextArchiver {
             // Skip this batch; the backup already committed and theres no going back,
             // so all we can do is drop this long text to avoid bricking the app entirely.
             let maxRecordId: BackupOversizeTextCache.IDType = records.lazy.compactMap(\.id).max() ?? 0
-            await db.awaitableWriteWithRollbackIfThrows { tx in
+            await db.awaitableWrite { tx in
                 kvStore.setInt64(maxRecordId, key: Self.lastRestoredRowIdKey, transaction: tx)
             }
         }

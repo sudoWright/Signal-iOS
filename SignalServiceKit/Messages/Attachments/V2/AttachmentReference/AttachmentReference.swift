@@ -65,6 +65,8 @@ public class AttachmentReference {
         self.sourceMediaSizePixels = nil
     }
 
+    // MARK: -
+
     private static func buildSourceMediaSizePixels(
         sourceMediaWidthPixels: UInt32?,
         sourceMediaHeightPixels: UInt32?,

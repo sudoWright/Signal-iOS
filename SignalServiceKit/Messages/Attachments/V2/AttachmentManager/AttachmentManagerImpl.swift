@@ -65,7 +65,7 @@ public class AttachmentManagerImpl: AttachmentManager {
         uploadEra: String,
         attachmentByteCounter: BackupArchiveAttachmentByteCounter,
         tx: DBWriteTransaction,
-    ) -> OwnedAttachmentBackupPointerProto.CreationError? {
+    ) {
         let sanitizedOwnedBackupProto = OwnedAttachmentBackupPointerProto(
             proto: ownedBackupProto.proto,
             renderingFlag: ownedBackupProto.renderingFlag,
@@ -76,17 +76,12 @@ public class AttachmentManagerImpl: AttachmentManager {
             ),
         )
 
-        switch _createAttachmentPointer(
+        _createAttachmentPointer(
             from: sanitizedOwnedBackupProto,
             uploadEra: uploadEra,
             attachmentByteCounter: attachmentByteCounter,
             tx: tx,
-        ) {
-        case .success:
-            return nil
-        case .failure(let error):
-            return error
-        }
+        )
     }
 
     public func createAttachmentStream(
@@ -117,7 +112,7 @@ public class AttachmentManagerImpl: AttachmentManager {
         attachmentId: Attachment.IDType,
         pendingAttachment: PendingAttachment,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         guard let attachment = attachmentStore.fetch(id: attachmentId, tx: tx) else {
             // The attachment got deleted? Should be impossible but ultimately fine.
             return
@@ -128,7 +123,7 @@ public class AttachmentManagerImpl: AttachmentManager {
             return
         }
 
-        try _updateAttachmentWithOversizeTextFromBackup(
+        _updateAttachmentWithOversizeTextFromBackup(
             attachment: attachment,
             pendingAttachment: pendingAttachment,
             tx: tx,
@@ -304,7 +299,7 @@ public class AttachmentManagerImpl: AttachmentManager {
         uploadEra: String,
         attachmentByteCounter: BackupArchiveAttachmentByteCounter,
         tx: DBWriteTransaction,
-    ) -> Result<Void, OwnedAttachmentBackupPointerProto.CreationError> {
+    ) {
         let proto = ownedProto.proto
 
         let knownIdFromProto = ownedProto.clientUUID.map {
@@ -442,8 +437,8 @@ public class AttachmentManagerImpl: AttachmentManager {
             )
         }
 
-        do {
-            let attachmentRowId = try attachmentStore.insert(
+        do throws(AttachmentInsertError) {
+            let attachment = try attachmentStore.insert(
                 attachmentParams,
                 reference: referenceParams,
                 tx: tx,
@@ -451,7 +446,7 @@ public class AttachmentManagerImpl: AttachmentManager {
 
             if let sourceUnencryptedByteCount {
                 attachmentByteCounter.addToByteCount(
-                    attachmentID: attachmentRowId,
+                    attachmentID: attachment.id,
                     byteCount: Cryptography.estimatedMediaTierCDNSize(unencryptedSize: UInt64(safeCast: sourceUnencryptedByteCount)) ?? UInt64(UInt32.max),
                 )
             }
@@ -462,9 +457,7 @@ public class AttachmentManagerImpl: AttachmentManager {
                     tx: tx,
                 )
             }
-
-            return .success(())
-        } catch let error as AttachmentInsertError {
+        } catch {
             switch error {
             case .duplicatePlaintextHash(let existingAttachmentId):
                 // Ideally, exporting clients would dedupe by plaintext hash, merging
@@ -479,19 +472,12 @@ public class AttachmentManagerImpl: AttachmentManager {
             case .duplicateMediaName(let existingAttachmentId):
                 // We already have an attachment with the same mediaName (likely from this same
                 // backup). Just point the reference at the existing attachment.
-                do {
-                    try attachmentStore.addReference(
-                        referenceParams,
-                        attachmentRowId: existingAttachmentId,
-                        tx: tx,
-                    )
-                    return .success(())
-                } catch {
-                    return .failure(.dbInsertionError(error))
-                }
+                attachmentStore.addReference(
+                    referenceParams,
+                    attachmentRowId: existingAttachmentId,
+                    tx: tx,
+                )
             }
-        } catch {
-            return .failure(.dbInsertionError(error))
         }
     }
 
@@ -600,7 +586,7 @@ public class AttachmentManagerImpl: AttachmentManager {
                 sourceUnencryptedByteCount: existingAttachmentMetadata.sourceUnencryptedByteCount,
                 sourceMediaSizePixels: existingAttachmentMetadata.sourceMediaSizePixels,
             )
-            try attachmentStore.addReference(
+            attachmentStore.addReference(
                 referenceParams,
                 attachmentRowId: existingAttachment.id,
                 tx: tx,
@@ -652,10 +638,19 @@ public class AttachmentManagerImpl: AttachmentManager {
             )
 
             do {
-                let hasExistingAttachmentWithSameFile = attachmentStore.fetchAttachment(
-                    sha256ContentHash: pendingAttachment.sha256ContentHash,
-                    tx: tx,
-                )?.streamInfo?.localRelativeFilePath == pendingAttachment.localRelativeFilePath
+                let hasExistingAttachmentWithSameFile: Bool
+                if
+                    let existingAttachmentRecord = attachmentStore.fetchAttachmentRecord(
+                        sha256ContentHash: pendingAttachment.sha256ContentHash,
+                        tx: tx,
+                    ),
+                    let existingAttachment = try? Attachment(record: existingAttachmentRecord),
+                    let existingAttachmentFilePath = existingAttachment.streamInfo?.localRelativeFilePath
+                {
+                    hasExistingAttachmentWithSameFile = existingAttachmentFilePath == pendingAttachment.localRelativeFilePath
+                } else {
+                    hasExistingAttachmentWithSameFile = false
+                }
 
                 // Typically, we'd expect an orphan record to exist (which ensures that
                 // if this creation transaction fails, the file on disk gets cleaned up).
@@ -668,7 +663,7 @@ public class AttachmentManagerImpl: AttachmentManager {
                 }
 
                 // Try and insert the new attachment.
-                try attachmentStore.insert(
+                let newAttachment = try attachmentStore.insert(
                     attachmentParams,
                     reference: referenceParams,
                     tx: tx,
@@ -683,18 +678,11 @@ public class AttachmentManagerImpl: AttachmentManager {
                         tx: tx,
                     )
 
-                    if
-                        let attachment = attachmentStore.fetchAttachment(
-                            mediaName: mediaName,
-                            tx: tx,
-                        )
-                    {
-                        backupAttachmentUploadScheduler.enqueueIfNeededWithOwner(
-                            attachment,
-                            owner: owner,
-                            tx: tx,
-                        )
-                    }
+                    backupAttachmentUploadScheduler.enqueueIfNeededWithOwner(
+                        newAttachment,
+                        owner: owner,
+                        tx: tx,
+                    )
                 }
             } catch let error {
                 let existingAttachmentId: Attachment.IDType
@@ -720,14 +708,11 @@ public class AttachmentManagerImpl: AttachmentManager {
                 }
 
                 // Already have an attachment with the same plaintext hash or media name! Create a new reference to it instead.
-                // If this fails and throws, the database won't be in an invalid state even if not rolled
-                // back; the existing attachment just doesn't get its new owner.
-                try attachmentStore.addReference(
+                attachmentStore.addReference(
                     referenceParams,
                     attachmentRowId: existingAttachmentId,
                     tx: tx,
                 )
-                return
             }
         }
     }
@@ -736,7 +721,7 @@ public class AttachmentManagerImpl: AttachmentManager {
         attachment: Attachment,
         pendingAttachment: PendingAttachment,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         let mediaName = Attachment.mediaName(
             sha256ContentHash: pendingAttachment.sha256ContentHash,
             encryptionKey: pendingAttachment.encryptionKey,
@@ -751,17 +736,13 @@ public class AttachmentManagerImpl: AttachmentManager {
             localRelativeFilePath: pendingAttachment.localRelativeFilePath,
         )
 
-        do {
-            guard self.orphanedAttachmentStore.orphanAttachmentExists(with: pendingAttachment.orphanRecordId, tx: tx) else {
-                throw OWSAssertionError("Attachment file deleted before creation")
-            }
-
+        do throws(AttachmentInsertError) {
             // Update the placeholder attachment we previously created with the stream info
             try self.attachmentStore.updateAttachmentAsDownloaded(
+                attachment: attachment,
                 // Not technically true but close enough.
                 from: .mediaTierFullsize,
                 priority: .backupRestore,
-                id: attachment.id,
                 validatedMimeType: pendingAttachment.mimeType,
                 streamInfo: streamInfo,
                 // This is used for "last viewed" state which isn't used
@@ -777,7 +758,7 @@ public class AttachmentManagerImpl: AttachmentManager {
             // media tier deletion jobs, etc. But we don't back up oversize text to media tier (since
             // we inline it) so we don't need to do any of that.
 
-        } catch let error as AttachmentInsertError {
+        } catch {
             let existingAttachmentId: Attachment.IDType
             switch error {
             case .duplicatePlaintextHash(let id):
@@ -796,14 +777,14 @@ public class AttachmentManagerImpl: AttachmentManager {
             // Just hold all refs in memory; there shouldn't in practice be
             // so many pointers to the same attachment.
             var references = [AttachmentReference]()
-            self.attachmentStore.enumerateAllReferences(
+            attachmentStore.enumerateAllReferences(
                 toAttachmentId: attachment.id,
                 tx: tx,
             ) { reference, _ in
                 references.append(reference)
             }
-            try references.forEach { reference in
-                try self.attachmentStore.removeReference(
+            for reference in references {
+                attachmentStore.removeReference(
                     reference: reference,
                     tx: tx,
                 )
@@ -813,7 +794,7 @@ public class AttachmentManagerImpl: AttachmentManager {
                     sourceUnencryptedByteCount: reference.sourceUnencryptedByteCount,
                     sourceMediaSizePixels: reference.sourceMediaSizePixels,
                 )
-                try self.attachmentStore.addReference(
+                attachmentStore.addReference(
                     newOwnerParams,
                     attachmentRowId: existingAttachmentId,
                     tx: tx,
@@ -956,7 +937,7 @@ public class AttachmentManagerImpl: AttachmentManager {
         }
 
         // Set the stream info on the existing attachment, if needed.
-        try attachmentStore.merge(
+        attachmentStore.merge(
             streamInfo: pendingAttachmentStreamInfo,
             into: existingAttachment,
             encryptionKey: pendingAttachmentEncryptionKey,

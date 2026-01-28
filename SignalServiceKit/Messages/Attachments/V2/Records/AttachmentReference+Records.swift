@@ -245,8 +245,8 @@ extension AttachmentReference {
         init(
             attachmentReference: AttachmentReference,
             storyMessageSource: AttachmentReference.Owner.StoryMessageSource,
-        ) throws {
-            try self.init(
+        ) {
+            self.init(
                 attachmentRowId: attachmentReference.attachmentRowId,
                 sourceFilename: attachmentReference.sourceFilename,
                 sourceUnencryptedByteCount: attachmentReference.sourceUnencryptedByteCount,
@@ -261,7 +261,7 @@ extension AttachmentReference {
             sourceUnencryptedByteCount: UInt32?,
             sourceMediaSizePixels: CGSize?,
             storyMessageSource: AttachmentReference.Owner.StoryMessageSource,
-        ) throws {
+        ) {
             self.ownerTypeRaw = storyMessageSource.persistedOwnerType.rawValue
             self.attachmentRowId = attachmentRowId
             self.sourceFilename = sourceFilename
@@ -282,7 +282,7 @@ extension AttachmentReference {
                 if let caption = metadata.caption {
                     self.caption = caption.text
                     let styles: [NSRangedValue<MessageBodyRanges.CollapsedStyle>] = caption.collapsedStyles
-                    self.captionBodyRanges = try JSONEncoder().encode(styles)
+                    self.captionBodyRanges = failIfThrows { try JSONEncoder().encode(styles) }
                 } else {
                     self.caption = nil
                     self.captionBodyRanges = nil

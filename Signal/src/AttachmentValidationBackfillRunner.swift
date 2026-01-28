@@ -31,10 +31,10 @@ class AttachmentValidationBackfillRunner: BGProcessingTaskRunner {
     static let requiresNetworkConnectivity = false
     static let requiresExternalPower = false
 
-    func run() async throws {
+    func run() async throws(CancellationError) {
         try await self.runInBatches(
             willBegin: {},
-            runNextBatch: { try await migrator().runNextBatch() },
+            runNextBatch: { await migrator().runNextBatch() },
         )
     }
 

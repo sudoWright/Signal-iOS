@@ -273,8 +273,8 @@ public class ColorAndWallpaperSettingsViewController: OWSTableViewController2 {
         Task {
             do {
                 let wallpaperStore = DependenciesBridge.shared.wallpaperStore
-                let onInsert = { [wallpaperStore] (tx: DBWriteTransaction) throws -> Void in
-                    try wallpaperStore.reset(for: thread, tx: tx)
+                let onInsert = { [wallpaperStore] (tx: DBWriteTransaction) -> Void in
+                    wallpaperStore.reset(for: thread, tx: tx)
                 }
 
                 if let thread {
@@ -300,28 +300,15 @@ public class ColorAndWallpaperSettingsViewController: OWSTableViewController2 {
     }
 
     private func resetAllWallpapers() {
-        SSKEnvironment.shared.databaseStorageRef.asyncWrite { tx in
-            do {
-                let wallpaperStore = DependenciesBridge.shared.wallpaperStore
-                try wallpaperStore.resetAll(tx: tx)
-                try DependenciesBridge.shared.wallpaperImageStore.resetAllWallpaperImages(tx: tx)
-            } catch {
-                owsFailDebug("Failed to reset all wallpapers with error: \(error)")
-                DispatchQueue.main.async {
-                    OWSActionSheets.showErrorAlert(
-                        message: OWSLocalizedString(
-                            "WALLPAPER_SETTINGS_FAILED_TO_RESET",
-                            comment: "An error indicating to the user that we failed to reset all wallpapers.",
-                        ),
-                    )
-                }
-            }
-            tx.addSyncCompletion {
-                Task { @MainActor in
-                    self.updateTableContents()
-                }
-            }
+        let db = DependenciesBridge.shared.db
+        let wallpaperStore = DependenciesBridge.shared.wallpaperStore
+        let wallpaperImageStore = DependenciesBridge.shared.wallpaperImageStore
+        db.write { tx in
+            wallpaperStore.resetAll(tx: tx)
+            wallpaperImageStore.resetAllWallpaperImages(tx: tx)
         }
+
+        updateTableContents()
     }
 
     // MARK: - Reset Chat Colors

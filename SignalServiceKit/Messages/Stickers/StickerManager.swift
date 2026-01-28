@@ -702,7 +702,7 @@ public class StickerManager: NSObject {
             do {
                 // For every attachment referencing this sticker, we can now enqueue a "download"
                 // that's really just a local file clone, from the newly installed sticker.
-                let attachmentIds = try DependenciesBridge.shared.attachmentStore.allAttachmentIdsForSticker(
+                let attachmentIds = DependenciesBridge.shared.attachmentStore.allAttachmentIdsForSticker(
                     stickerInfo,
                     tx: transaction,
                 )
@@ -715,8 +715,6 @@ public class StickerManager: NSObject {
                         tx: transaction,
                     )
                 }
-            } catch {
-                owsFailDebug("Failed to enqueue attachments \(error.grdbErrorForLogging)")
             }
 
             self.addStickerToEmojiMap(installedSticker, tx: transaction)
@@ -857,7 +855,7 @@ public class StickerManager: NSObject {
 
     public class func knownStickerPacksFromMessages(transaction: DBReadTransaction) -> [DatedStickerPackInfo] {
         do {
-            return try DependenciesBridge.shared.attachmentStore
+            return DependenciesBridge.shared.attachmentStore
                 .oldestStickerPackReferences(tx: transaction)
                 .compactMap { stickerReferenceMetadata in
                     // Join to the message so we can get the sticker pack key.
@@ -880,9 +878,6 @@ public class StickerManager: NSObject {
                         ),
                     )
                 }
-        } catch {
-            owsFailDebug("Failed fetching sticker attachments \(error)")
-            return []
         }
     }
 

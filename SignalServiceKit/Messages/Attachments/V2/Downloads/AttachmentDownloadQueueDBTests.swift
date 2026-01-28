@@ -32,11 +32,7 @@ class AttachmentDownloadQueueDBTests: XCTestCase {
                 attachmentParams,
                 reference: referenceParams,
                 tx: tx,
-            )
-            return try Int64.fetchOne(
-                tx.database,
-                sql: "SELECT \(Attachment.Record.CodingKeys.sqliteId.rawValue) from \(Attachment.Record.databaseTableName)",
-            )!
+            ).id
         }
 
         // Create a download for the attachment.

@@ -21,9 +21,8 @@ open class AttachmentManagerMock: AttachmentManager {
         uploadEra: String,
         attachmentByteCounter: BackupArchiveAttachmentByteCounter,
         tx: DBWriteTransaction,
-    ) -> OwnedAttachmentBackupPointerProto.CreationError? {
+    ) {
         // Do nothing
-        return nil
     }
 
     open func createAttachmentStream(
@@ -37,7 +36,7 @@ open class AttachmentManagerMock: AttachmentManager {
         attachmentId: Attachment.IDType,
         pendingAttachment: PendingAttachment,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         // Do nothing
     }
 

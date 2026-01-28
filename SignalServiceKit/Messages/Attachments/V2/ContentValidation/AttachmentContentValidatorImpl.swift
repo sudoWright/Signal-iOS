@@ -1020,11 +1020,15 @@ public class AttachmentContentValidatorImpl: AttachmentContentValidator {
     /// then. That's ok; worst case when we merge two different encryption keys we drop media tier
     /// uploads and have to reupload again, and everything recovers.
     private func attachmentKeyToUse(primaryFilePlaintextHash: Data, inputAttachmentKey: AttachmentKey?) throws -> AttachmentKey {
-        let existingAttachment = db.read(block: { tx in
-            attachmentStore.fetchAttachment(sha256ContentHash: primaryFilePlaintextHash, tx: tx)
-        })
-        if let existingAttachment {
-            return try AttachmentKey(combinedKey: existingAttachment.encryptionKey)
+        let existingAttachmentEncryptionKey = db.read { tx in
+            return attachmentStore.fetchAttachmentRecord(
+                sha256ContentHash: primaryFilePlaintextHash,
+                tx: tx,
+            )?.encryptionKey
+        }
+
+        if let existingAttachmentEncryptionKey {
+            return try AttachmentKey(combinedKey: existingAttachmentEncryptionKey)
         } else {
             return inputAttachmentKey ?? .generate()
         }

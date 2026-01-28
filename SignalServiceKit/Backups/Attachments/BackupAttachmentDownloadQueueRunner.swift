@@ -601,7 +601,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             let source: DownloadSource
         }
 
-        func didFail(record: Store.Record, error: any Error, isRetryable: Bool, tx: DBWriteTransaction) throws {
+        func didFail(record: Store.Record, error: any Error, isRetryable: Bool, tx: DBWriteTransaction) {
             logger.warn("Failed restoring attachment \(record.record.attachmentRowId), download \(record.id), isRetryable: \(isRetryable), isThumbnail: \(record.record.isThumbnail), error: \(error)")
 
             if
@@ -613,7 +613,9 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 var downloadRecord = record.record
                 downloadRecord.minRetryTimestamp = nextRetryTimestamp
                 downloadRecord.numRetries += 1
-                try downloadRecord.update(tx.database)
+                failIfThrows {
+                    try downloadRecord.update(tx.database)
+                }
             } else if
                 isRetryable,
                 let error = error as? RetryAsTransitTierError
@@ -622,18 +624,21 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 // the retry timestamp so we retry immediately as transit tier.
                 var downloadRecord = record.record
                 downloadRecord.numRetries += 1
-                try downloadRecord.update(tx.database)
+                failIfThrows {
+                    try downloadRecord.update(tx.database)
+                }
 
-                if error.shouldWipeMediaTierInfo {
-                    try attachmentStore.removeMediaTierInfo(
-                        forAttachmentId: record.record.attachmentRowId,
+                if
+                    error.shouldWipeMediaTierInfo,
+                    let attachment = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx)
+                {
+                    attachmentStore.removeMediaTierInfo(
+                        attachment: attachment,
                         tx: tx,
                     )
-                    if
-                        let stream = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx)?.asStream()
-                    {
+                    if attachment.asStream() != nil {
                         backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
-                            stream.attachment,
+                            attachment,
                             mode: .fullsizeOnly,
                             tx: tx,
                         )
@@ -648,43 +653,47 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 // For non-retryable 404 errors, go ahead and wipe the relevant cdn
                 // info from the attachment, as download failed.
                 if let error = error as? Unretryable404Error {
-                    switch error.source {
-                    case .mediaTierThumbnail:
-                        try attachmentStore.removeThumbnailMediaTierInfo(
-                            forAttachmentId: record.record.attachmentRowId,
+                    guard
+                        let attachment = attachmentStore.fetch(
+                            id: record.record.attachmentRowId,
                             tx: tx,
                         )
-                        if
-                            let stream = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx)?.asStream()
-                        {
+                    else {
+                        owsFailDebug("Missing attachment!")
+                        return
+                    }
+
+                    switch error.source {
+                    case .mediaTierThumbnail:
+                        attachmentStore.removeThumbnailMediaTierInfo(
+                            attachment: attachment,
+                            tx: tx,
+                        )
+                        if attachment.asStream() != nil {
                             backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
-                                stream.attachment,
+                                attachment,
                                 mode: .thumbnailOnly,
                                 tx: tx,
                             )
                         }
                     case .mediaTierFullsize:
-                        try attachmentStore.removeMediaTierInfo(
-                            forAttachmentId: record.record.attachmentRowId,
+                        attachmentStore.removeMediaTierInfo(
+                            attachment: attachment,
                             tx: tx,
                         )
-                        if
-                            let stream = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx)?.asStream()
-                        {
+                        if attachment.asStream() != nil {
                             backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
-                                stream.attachment,
+                                attachment,
                                 mode: .fullsizeOnly,
                                 tx: tx,
                             )
                         }
                     case .transitTier(let transitTierInfo):
-                        if let attachment = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx) {
-                            attachmentUploadStore.markTransitTierUploadExpired(
-                                attachment: attachment,
-                                info: transitTierInfo,
-                                tx: tx,
-                            )
-                        }
+                        attachmentUploadStore.markTransitTierUploadExpired(
+                            attachment: attachment,
+                            info: transitTierInfo,
+                            tx: tx,
+                        )
                     }
                 }
             } else {

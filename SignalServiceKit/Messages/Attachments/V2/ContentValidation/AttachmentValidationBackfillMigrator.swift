@@ -24,7 +24,7 @@ public protocol AttachmentValidationBackfillMigrator {
 
     /// Runs another batch, returns true if all batches completed.
     /// If returns false, another batch may be needed and should be run.
-    func runNextBatch() async throws -> Bool
+    func runNextBatch() async -> Bool
 }
 
 enum ValidationBackfill: Int, CaseIterable {
@@ -120,24 +120,26 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
 
     // MARK: - Public
 
-    public func runNextBatch() async throws -> Bool {
+    public func runNextBatch() async -> Bool {
         await enqueueForBackfillIfNeeded()
-        return try await runNextValidationBatch()
+        return await runNextValidationBatch()
     }
 
     // MARK: - Private
 
     /// Re-validate enqueued attachments, one batch at a time.
     /// Returns true if there is nothing left to re-validate (finished).
-    private func runNextValidationBatch() async throws -> Bool {
+    private func runNextValidationBatch() async -> Bool {
         // Pop attachments off the queue, newest first.
-        let attachments: [Attachment.IDType: Attachment.Record?] = try databaseStorage.read { tx in
+        let attachments: [Attachment.IDType: Attachment.Record?] = databaseStorage.read { tx in
             let attachmentIds = store.getNextAttachmentIdBatch(tx: tx)
 
-            let attachments = try Attachment.Record.fetchAll(
-                tx.database,
-                keys: attachmentIds,
-            )
+            let attachments = failIfThrows {
+                try Attachment.Record.fetchAll(
+                    tx.database,
+                    keys: attachmentIds,
+                )
+            }
             return attachmentIds.dictionaryMappingToValues { id in
                 return attachments.first(where: { $0.sqliteId == id })
             }
@@ -182,11 +184,11 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
         // Commit the batch.
         // 1. Remove the enqueued row (including for "skipped" ids)
         // 2. Update the content type everywhere needed to the newly validated type.
-        try await databaseStorage.awaitableWrite { tx in
+        await databaseStorage.awaitableWrite { tx in
             skippedAttachmentIds.forEach { self.store.dequeue(attachmentId: $0, tx: tx) }
-            try revalidatedAttachmentIds.forEach { attachmentId, revalidatedAttachment in
+            revalidatedAttachmentIds.forEach { attachmentId, revalidatedAttachment in
                 self.store.dequeue(attachmentId: attachmentId, tx: tx)
-                try self.updateRevalidatedAttachment(
+                self.updateRevalidatedAttachment(
                     revalidatedAttachment,
                     id: attachmentId,
                     tx: tx,
@@ -215,13 +217,14 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
         _ revalidatedAttachment: RevalidatedAttachment,
         id: Attachment.IDType,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         let hasOrphanRecord = orphanedAttachmentStore.orphanAttachmentExists(
             with: revalidatedAttachment.orphanRecordId,
             tx: tx,
         )
         guard hasOrphanRecord else {
-            throw OWSAssertionError("Orphan record deleted before creation")
+            owsFailDebug("Orphan record deleted before creation")
+            return
         }
 
         guard let attachment = attachmentStore.fetch(id: id, tx: tx) else {
@@ -255,7 +258,7 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
         }()
 
         // Update the attachment
-        try attachmentStore.updateAttachment(
+        attachmentStore.updateAttachment(
             attachment,
             revalidatedContentType: revalidatedAttachment.validatedContentType,
             mimeType: revalidatedAttachment.mimeType,

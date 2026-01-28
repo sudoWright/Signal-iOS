@@ -28,13 +28,15 @@ public struct AttachmentStore {
 
     // MARK: -
 
-    public func fetchMaxRowId(tx: DBReadTransaction) throws -> Attachment.IDType? {
-        return try Attachment.Record
-            .select(
-                max(Column(Attachment.Record.CodingKeys.sqliteId)),
-                as: Int64.self,
-            )
-            .fetchOne(tx.database)
+    public func fetchMaxRowId(tx: DBReadTransaction) -> Attachment.IDType? {
+        return failIfThrows {
+            try Attachment.Record
+                .select(
+                    max(Column(Attachment.Record.CodingKeys.sqliteId)),
+                    as: Int64.self,
+                )
+                .fetchOne(tx.database)
+        }
     }
 
     // MARK: -
@@ -187,40 +189,32 @@ public struct AttachmentStore {
         }
     }
 
-    /// Fetch attachment by plaintext hash. There can be only one match.
-    public func fetchAttachment(
+    /// Fetch an existing Attachment record with the given plaintext hash. There
+    /// will be at most one.
+    public func fetchAttachmentRecord(
         sha256ContentHash: Data,
         tx: DBReadTransaction,
-    ) -> Attachment? {
-        return try? fetchAttachmentThrows(sha256ContentHash: sha256ContentHash, tx: tx)
-    }
-
-    private func fetchAttachmentThrows(
-        sha256ContentHash: Data,
-        tx: DBReadTransaction,
-    ) throws -> Attachment? {
-        return try Attachment.Record
+    ) -> Attachment.Record? {
+        let query = Attachment.Record
             .filter(Column(Attachment.Record.CodingKeys.sha256ContentHash) == sha256ContentHash)
-            .fetchOne(tx.database)
-            .map(Attachment.init(record:))
+
+        return failIfThrows {
+            try query.fetchOne(tx.database)
+        }
     }
 
-    /// Fetch attachment by media name. There can be only one match.
-    public func fetchAttachment(
+    /// Fetch an existing Attachment record with the given mediaName. There will
+    /// be at most one.
+    public func fetchAttachmentRecord(
         mediaName: String,
         tx: DBReadTransaction,
-    ) -> Attachment? {
-        return try? fetchAttachmentThrows(mediaName: mediaName, tx: tx)
-    }
-
-    private func fetchAttachmentThrows(
-        mediaName: String,
-        tx: DBReadTransaction,
-    ) throws -> Attachment? {
-        return try Attachment.Record
+    ) -> Attachment.Record? {
+        let query = Attachment.Record
             .filter(Column(Attachment.Record.CodingKeys.mediaName) == mediaName)
-            .fetchOne(tx.database)
-            .map(Attachment.init(record:))
+
+        return failIfThrows {
+            try query.fetchOne(tx.database)
+        }
     }
 
     // MARK: -
@@ -334,11 +328,14 @@ public struct AttachmentStore {
     public func allQuotedReplyAttachments(
         forOriginalAttachmentId originalAttachmentId: Attachment.IDType,
         tx: DBReadTransaction,
-    ) throws -> [Attachment] {
-        return try Attachment.Record
+    ) -> [Attachment] {
+        let query = Attachment.Record
             .filter(Column(Attachment.Record.CodingKeys.originalAttachmentIdForQuotedReply) == originalAttachmentId)
-            .fetchAll(tx.database)
-            .map(Attachment.init(record:))
+
+        return failIfThrows {
+            try query.fetchAll(tx.database)
+                .compactMap { try? Attachment(record: $0) }
+        }
     }
 
     public func quotedAttachmentReference(
@@ -461,24 +458,29 @@ public struct AttachmentStore {
     /// Not very efficient; don't put this query on the hot path for anything.
     public func oldestStickerPackReferences(
         tx: DBReadTransaction,
-    ) throws -> [AttachmentReference.Owner.MessageSource.StickerMetadata] {
+    ) -> [AttachmentReference.Owner.MessageSource.StickerMetadata] {
         let ownerRowIdColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.ownerRowId)
         let packIdColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.stickerPackId)
-        return try MessageAttachmentReferenceRecord
-            .fetchAll(
-                tx.database,
-                sql: """
+
+        let records = failIfThrows {
+            let sql = """
                 SELECT *
                 FROM \(MessageAttachmentReferenceRecord.databaseTableName)
                 WHERE (\(packIdColumn.name), \(ownerRowIdColumn.name)) IN (
                     SELECT \(packIdColumn.name), MIN(\(ownerRowIdColumn.name))
                     FROM \(MessageAttachmentReferenceRecord.databaseTableName)
                     GROUP BY \(packIdColumn.name)
-                );
-                """,
+                )
+            """
+            return try MessageAttachmentReferenceRecord.fetchAll(
+                tx.database,
+                sql: sql,
             )
+        }
+
+        return records
             .compactMap { record in
-                switch try AttachmentReference(record: record).owner {
+                switch try? AttachmentReference(record: record).owner {
                 case .message(.sticker(let stickerMetadata)):
                     return stickerMetadata
                 default:
@@ -491,21 +493,25 @@ public struct AttachmentStore {
     public func allAttachmentIdsForSticker(
         _ stickerInfo: StickerInfo,
         tx: DBReadTransaction,
-    ) throws -> [Attachment.IDType] {
+    ) -> [Attachment.IDType] {
         let attachmentIdColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.attachmentRowId)
         let packIdColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.stickerPackId)
         let stickerIdColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.stickerId)
-        return try Attachment.IDType.fetchAll(
-            tx.database,
-            sql: """
+        let sql = """
             SELECT \(attachmentIdColumn.name)
             FROM \(MessageAttachmentReferenceRecord.databaseTableName)
             WHERE
                 \(packIdColumn.name) = ?
                 AND \(stickerIdColumn.name) = ?;
-            """,
-            arguments: [stickerInfo.packId, stickerInfo.stickerId],
-        )
+        """
+
+        return failIfThrows {
+            return try Attachment.IDType.fetchAll(
+                tx.database,
+                sql: sql,
+                arguments: [stickerInfo.packId, stickerInfo.stickerId],
+            )
+        }
     }
 
     // MARK: -
@@ -529,101 +535,95 @@ public struct AttachmentStore {
         }
     }
 
-    /// Create a new ownership reference, copying properties of an existing reference.
-    ///
-    /// Copies the database row directly, only modifying the owner column.
-    /// IMPORTANT: also copies the createdTimestamp!
-    public func duplicateExistingThreadOwner(
-        _ existingOwnerSource: AttachmentReference.Owner.ThreadSource,
-        with existingReference: AttachmentReference,
-        newOwnerThreadRowId: Int64,
+    // MARK: -
+
+    /// Add an attachment reference for a thread, cloning the existing reference
+    /// with a new owner.
+    public func cloneThreadOwner(
+        existingReference: AttachmentReference,
+        existingOwnerSource: AttachmentReference.Owner.ThreadSource,
+        newThreadRowId: Int64,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         var newRecord = ThreadAttachmentReferenceRecord(
             attachmentRowId: existingReference.attachmentRowId,
             threadSource: existingOwnerSource,
         )
-        newRecord.ownerRowId = newOwnerThreadRowId
-        try newRecord.insert(tx.database)
+        newRecord.ownerRowId = newThreadRowId
+        failIfThrows {
+            try newRecord.insert(tx.database)
+        }
     }
 
     /// Remove all owners of thread types (wallpaper and global wallpaper owners).
     /// Will also delete any attachments that become unowned, like any other deletion.
-    public func removeAllThreadOwners(tx: DBWriteTransaction) throws {
-        try ThreadAttachmentReferenceRecord.deleteAll(tx.database)
+    public func removeAllThreadOwners(tx: DBWriteTransaction) {
+        failIfThrows {
+            try ThreadAttachmentReferenceRecord.deleteAll(tx.database)
+        }
     }
 
     // MARK: -
 
-    /// Update the received at timestamp on a reference.
-    /// Used for edits which update the received timestamp on an existing message.
-    public func update(
-        _ reference: AttachmentReference,
-        withReceivedAtTimestamp receivedAtTimestamp: UInt64,
+    /// Update a message-owner attachment reference's received-at timestamp.
+    public func updateReceivedAtTimestamp(
+        owningMessageSource messageSource: AttachmentReference.Owner.MessageSource,
+        newReceivedAtTimestamp receivedAtTimestamp: UInt64,
         tx: DBWriteTransaction,
-    ) throws {
-        switch reference.owner {
-        case .message(let messageSource):
-            // GRDB's swift query API can't help us here because MessageAttachmentReferenceRecord
-            // lacks a primary id column. Just update the single column with manual SQL.
-            let receivedAtTimestampColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.receivedAtTimestamp)
-            let ownerTypeColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.ownerTypeRaw)
-            let ownerRowIdColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.ownerRowId)
+    ) {
+        let receivedAtTimestampColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.receivedAtTimestamp)
+        let ownerTypeColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.ownerTypeRaw)
+        let ownerRowIdColumn = Column(MessageAttachmentReferenceRecord.CodingKeys.ownerRowId)
+        let sql = """
+            UPDATE \(MessageAttachmentReferenceRecord.databaseTableName)
+            SET \(receivedAtTimestampColumn.name) = ?
+            "WHERE \(ownerTypeColumn.name) = ? AND \(ownerRowIdColumn.name) = ?
+        """
+
+        failIfThrows {
             try tx.database.execute(
-                sql:
-                "UPDATE \(MessageAttachmentReferenceRecord.databaseTableName) "
-                    + "SET \(receivedAtTimestampColumn.name) = ? "
-                    + "WHERE \(ownerTypeColumn.name) = ? AND \(ownerRowIdColumn.name) = ?;",
+                sql: sql,
                 arguments: [
                     receivedAtTimestamp,
                     messageSource.persistedOwnerType.rawValue,
                     messageSource.messageRowId,
                 ],
             )
-        case .storyMessage:
-            throw OWSAssertionError("Cannot update timestamp on story attachment reference")
-        case .thread:
-            throw OWSAssertionError("Cannot update timestamp on thread attachment reference")
         }
     }
 
     public func updateAttachmentAsDownloaded(
+        attachment: Attachment,
         from source: QueuedAttachmentDownloadRecord.SourceType,
         priority: AttachmentDownloadPriority,
-        id: Attachment.IDType,
         validatedMimeType: String,
         streamInfo: Attachment.StreamInfo,
         timestamp: UInt64,
         tx: DBWriteTransaction,
-    ) throws {
-        let existingAttachment = fetch(ids: [id], tx: tx).first
-        guard let existingAttachment else {
-            throw OWSAssertionError("Attachment does not exist")
-        }
-        guard existingAttachment.asStream() == nil else {
-            throw OWSAssertionError("Attachment already a stream")
-        }
-
+    ) throws(AttachmentInsertError) {
         // Find if there is already an attachment with the same plaintext hash.
-        let existingRecord = try fetchAttachmentThrows(
-            sha256ContentHash: streamInfo.sha256ContentHash,
-            tx: tx,
-        )
-
-        if let existingRecord, existingRecord.id != id {
-            throw AttachmentInsertError.duplicatePlaintextHash(existingAttachmentId: existingRecord.id)
+        if
+            let existingAttachmentId = fetchAttachmentRecord(
+                sha256ContentHash: streamInfo.sha256ContentHash,
+                tx: tx,
+            )?.sqliteId,
+            existingAttachmentId != attachment.id
+        {
+            throw AttachmentInsertError.duplicatePlaintextHash(existingAttachmentId: existingAttachmentId)
         }
 
         // Find if there is already an attachment with the same media name.
-        let existingMediaNameRecord = try fetchAttachmentThrows(
-            mediaName: Attachment.mediaName(
-                sha256ContentHash: streamInfo.sha256ContentHash,
-                encryptionKey: existingAttachment.encryptionKey,
-            ),
-            tx: tx,
-        )
-        if let existingMediaNameRecord, existingMediaNameRecord.id != id {
-            throw AttachmentInsertError.duplicateMediaName(existingAttachmentId: existingMediaNameRecord.id)
+        if
+            let existingAttachmentId = fetchAttachmentRecord(
+                mediaName: Attachment.mediaName(
+                    sha256ContentHash: streamInfo.sha256ContentHash,
+                    encryptionKey: attachment.encryptionKey,
+                ),
+                tx: tx,
+            )?.sqliteId,
+            existingAttachmentId != attachment.id
+        {
+            throw AttachmentInsertError.duplicateMediaName(existingAttachmentId: existingAttachmentId)
         }
 
         // We count it as a "view" if the download was initiated by the user
@@ -640,7 +640,7 @@ public struct AttachmentStore {
         case .transitTier:
             newRecord = Attachment.Record(
                 params: .forUpdatingAsDownlodedFromTransitTier(
-                    attachment: existingAttachment,
+                    attachment: attachment,
                     validatedMimeType: validatedMimeType,
                     streamInfo: streamInfo,
                     sha256ContentHash: streamInfo.sha256ContentHash,
@@ -652,7 +652,7 @@ public struct AttachmentStore {
         case .mediaTierFullsize:
             newRecord = Attachment.Record(
                 params: .forUpdatingAsDownlodedFromMediaTier(
-                    attachment: existingAttachment,
+                    attachment: attachment,
                     validatedMimeType: validatedMimeType,
                     streamInfo: streamInfo,
                     sha256ContentHash: streamInfo.sha256ContentHash,
@@ -663,14 +663,16 @@ public struct AttachmentStore {
         case .mediaTierThumbnail:
             newRecord = Attachment.Record(
                 params: .forUpdatingAsDownlodedThumbnailFromMediaTier(
-                    attachment: existingAttachment,
+                    attachment: attachment,
                     validatedMimeType: validatedMimeType,
                     streamInfo: streamInfo,
                 ),
             )
         }
-        newRecord.sqliteId = id
-        try newRecord.update(tx.database)
+        newRecord.sqliteId = attachment.id
+        failIfThrows {
+            try newRecord.update(tx.database)
+        }
     }
 
     /// Update an attachment when we have a media name or plaintext hash collision.
@@ -687,10 +689,11 @@ public struct AttachmentStore {
         mediaTierInfo: Attachment.MediaTierInfo?,
         thumbnailMediaTierInfo: Attachment.ThumbnailMediaTierInfo?,
         tx: DBWriteTransaction,
-    ) throws {
-        guard attachment.asStream() == nil else {
-            throw OWSAssertionError("Already a stream!")
-        }
+    ) {
+        owsPrecondition(
+            attachment.asStream() == nil,
+            "Merging stream info into an attachment that is already a stream!",
+        )
 
         var newRecord = Attachment.Record(params: .forMerging(
             streamInfo: streamInfo,
@@ -704,21 +707,20 @@ public struct AttachmentStore {
         ))
 
         newRecord.sqliteId = attachment.id
-        try newRecord.update(tx.database)
+        failIfThrows {
+            try newRecord.update(tx.database)
+        }
     }
 
     public func updateAttachmentAsFailedToDownload(
-        from source: QueuedAttachmentDownloadRecord.SourceType,
-        id: Attachment.IDType,
+        attachment existingAttachment: Attachment,
+        source: QueuedAttachmentDownloadRecord.SourceType,
         timestamp: UInt64,
         tx: DBWriteTransaction,
-    ) throws {
-        let existingAttachment = fetch(ids: [id], tx: tx).first
-        guard let existingAttachment else {
-            throw OWSAssertionError("Attachment does not exist")
-        }
+    ) {
         guard existingAttachment.asStream() == nil else {
-            throw OWSAssertionError("Attachment already a stream")
+            Logger.warn("Attachment already a stream!")
+            return
         }
 
         var newRecord: Attachment.Record
@@ -745,41 +747,39 @@ public struct AttachmentStore {
                 ),
             )
         }
-        newRecord.sqliteId = id
-        try newRecord.update(tx.database)
+        newRecord.sqliteId = existingAttachment.id
+        failIfThrows {
+            try newRecord.update(tx.database)
+        }
     }
 
     public func removeMediaTierInfo(
-        forAttachmentId id: Attachment.IDType,
+        attachment: Attachment,
         tx: DBWriteTransaction,
-    ) throws {
-        let existingAttachment = fetch(ids: [id], tx: tx).first
-        guard let existingAttachment else {
-            throw OWSAssertionError("Attachment does not exist")
-        }
-
+    ) {
         var newRecord = Attachment.Record(
-            params: .forRemovingMediaTierInfo(attachment: existingAttachment),
+            params: .forRemovingMediaTierInfo(attachment: attachment),
         )
-        newRecord.sqliteId = id
-        try newRecord.update(tx.database)
+        newRecord.sqliteId = attachment.id
+        failIfThrows {
+            try newRecord.update(tx.database)
+        }
     }
 
     public func removeThumbnailMediaTierInfo(
-        forAttachmentId id: Attachment.IDType,
+        attachment: Attachment,
         tx: DBWriteTransaction,
-    ) throws {
-        let existingAttachment = fetch(ids: [id], tx: tx).first
-        guard let existingAttachment else {
-            throw OWSAssertionError("Attachment does not exist")
-        }
-
+    ) {
         var newRecord = Attachment.Record(
-            params: .forRemovingThumbnailMediaTierInfo(attachment: existingAttachment),
+            params: .forRemovingThumbnailMediaTierInfo(attachment: attachment),
         )
-        newRecord.sqliteId = id
-        try newRecord.update(tx.database)
+        newRecord.sqliteId = attachment.id
+        failIfThrows {
+            try newRecord.update(tx.database)
+        }
     }
+
+    // MARK: -
 
     /// Update an attachment after revalidating.
     public func updateAttachment(
@@ -788,7 +788,7 @@ public struct AttachmentStore {
         mimeType: String,
         blurHash: String?,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         var newRecord = Attachment.Record(
             params: .forUpdatingWithRevalidatedContentType(
                 attachment: attachment,
@@ -800,7 +800,9 @@ public struct AttachmentStore {
         newRecord.sqliteId = attachment.id
         // NOTE: a sqlite trigger handles updating all attachment reference rows
         // with the new content type.
-        try newRecord.update(tx.database)
+        failIfThrows {
+            try newRecord.update(tx.database)
+        }
     }
 
     // MARK: -
@@ -810,7 +812,7 @@ public struct AttachmentStore {
         _ referenceParams: AttachmentReference.ConstructionParams,
         attachmentRowId: Attachment.IDType,
         tx: DBWriteTransaction,
-    ) throws -> AttachmentReference {
+    ) -> AttachmentReference {
         switch referenceParams.owner {
         case .thread(let threadSource):
             let threadReferenceRecord = ThreadAttachmentReferenceRecord(
@@ -820,14 +822,16 @@ public struct AttachmentStore {
             switch threadSource {
             case .globalThreadWallpaperImage:
                 // This is a special case; see comment on method.
-                try insertGlobalThreadAttachmentReference(
+                return insertGlobalThreadAttachmentReference(
                     newRecord: threadReferenceRecord,
                     tx: tx,
                 )
-            default:
-                try threadReferenceRecord.insert(tx.database)
+            case .threadWallpaperImage:
+                return failIfThrows {
+                    try threadReferenceRecord.insert(tx.database)
+                    return try AttachmentReference(record: threadReferenceRecord)
+                }
             }
-            return try AttachmentReference(record: threadReferenceRecord)
         case .message(let messageSource):
             let messageReferenceRecord = MessageAttachmentReferenceRecord(
                 attachmentRowId: attachmentRowId,
@@ -836,18 +840,22 @@ public struct AttachmentStore {
                 sourceMediaSizePixels: referenceParams.sourceMediaSizePixels,
                 messageSource: messageSource,
             )
-            try messageReferenceRecord.insert(tx.database)
-            return try AttachmentReference(record: messageReferenceRecord)
+            return failIfThrows {
+                try messageReferenceRecord.insert(tx.database)
+                return try AttachmentReference(record: messageReferenceRecord)
+            }
         case .storyMessage(let storyMessageSource):
-            let storyReferenceRecord = try StoryMessageAttachmentReferenceRecord(
+            let storyReferenceRecord = StoryMessageAttachmentReferenceRecord(
                 attachmentRowId: attachmentRowId,
                 sourceFilename: referenceParams.sourceFilename,
                 sourceUnencryptedByteCount: referenceParams.sourceUnencryptedByteCount,
                 sourceMediaSizePixels: referenceParams.sourceMediaSizePixels,
                 storyMessageSource: storyMessageSource,
             )
-            try storyReferenceRecord.insert(tx.database)
-            return try AttachmentReference(record: storyReferenceRecord)
+            return failIfThrows {
+                try storyReferenceRecord.insert(tx.database)
+                return try AttachmentReference(record: storyReferenceRecord)
+            }
         }
     }
 
@@ -859,10 +867,10 @@ public struct AttachmentStore {
     public func removeReference(
         reference: AttachmentReference,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         switch reference.owner {
         case .message(let messageSource):
-            try removeMessageReference(
+            removeMessageReference(
                 attachmentID: reference.attachmentRowId,
                 ownerType: messageSource.persistedOwnerType,
                 messageRowID: messageSource.messageRowId,
@@ -870,14 +878,14 @@ public struct AttachmentStore {
                 tx: tx,
             )
         case .storyMessage(let storyMessageSource):
-            try removeStoryMessageReference(
+            removeStoryMessageReference(
                 attachmentID: reference.attachmentRowId,
                 ownerType: storyMessageSource.persistedOwnerType,
                 storyMessageRowID: storyMessageSource.storyMessageRowId,
                 tx: tx,
             )
         case .thread(let threadSource):
-            try removeThreadReference(
+            removeThreadReference(
                 attachmentID: reference.attachmentRowId,
                 threadRowID: threadSource.threadRowId,
                 tx: tx,
@@ -891,14 +899,16 @@ public struct AttachmentStore {
         messageRowID: Int64,
         idInMessage: UUID?,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         let query = MessageAttachmentReferenceRecord
             .filter(MessageAttachmentReferenceRecord.Columns.attachmentRowId == attachmentID)
             .filter(MessageAttachmentReferenceRecord.Columns.ownerType == ownerType.rawValue)
             .filter(MessageAttachmentReferenceRecord.Columns.ownerRowId == messageRowID)
             .filter(MessageAttachmentReferenceRecord.Columns.idInMessage == idInMessage?.uuidString)
 
-        try query.deleteAll(tx.database)
+        failIfThrows {
+            try query.deleteAll(tx.database)
+        }
     }
 
     private func removeStoryMessageReference(
@@ -906,86 +916,77 @@ public struct AttachmentStore {
         ownerType: StoryMessageAttachmentReferenceRecord.OwnerType,
         storyMessageRowID: Int64,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         let query = StoryMessageAttachmentReferenceRecord
             .filter(StoryMessageAttachmentReferenceRecord.Columns.attachmentRowId == attachmentID)
             .filter(StoryMessageAttachmentReferenceRecord.Columns.ownerType == ownerType.rawValue)
             .filter(StoryMessageAttachmentReferenceRecord.Columns.ownerRowId == storyMessageRowID)
 
-        try query.deleteAll(tx.database)
+        failIfThrows {
+            try query.deleteAll(tx.database)
+        }
     }
 
     private func removeThreadReference(
         attachmentID: Attachment.IDType,
         threadRowID: Int64?,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         let query = ThreadAttachmentReferenceRecord
             .filter(ThreadAttachmentReferenceRecord.Columns.attachmentRowId == attachmentID)
             .filter(ThreadAttachmentReferenceRecord.Columns.ownerRowId == threadRowID)
 
-        try query.deleteAll(tx.database)
+        failIfThrows {
+            try query.deleteAll(tx.database)
+        }
     }
 
     // MARK: -
 
-    /// Throws ``AttachmentInsertError.duplicatePlaintextHash`` if an existing
-    /// attachment is found with the same plaintext hash.
-    /// May throw other errors with less strict typing if database operations fail.
     @discardableResult
     public func insert(
         _ attachmentParams: Attachment.ConstructionParams,
         reference referenceParams: AttachmentReference.ConstructionParams,
         tx: DBWriteTransaction,
-    ) throws -> Attachment.IDType {
+    ) throws(AttachmentInsertError) -> Attachment {
         // Find if there is already an attachment with the same plaintext hash.
-        let sha256ContentHash = attachmentParams.sha256ContentHash ?? attachmentParams.streamInfo?.sha256ContentHash
-        let existingRecord = try sha256ContentHash.map {
-            return try fetchAttachmentThrows(
-                sha256ContentHash: $0,
+        if
+            let sha256ContentHash = attachmentParams.sha256ContentHash ?? attachmentParams.streamInfo?.sha256ContentHash,
+            let existingAttachmentId = fetchAttachmentRecord(
+                sha256ContentHash: sha256ContentHash,
                 tx: tx,
-            ).map(Attachment.Record.init(attachment:))
-        } ?? nil
-
-        if let existingRecord {
-            throw AttachmentInsertError.duplicatePlaintextHash(existingAttachmentId: existingRecord.sqliteId!)
+            )?.sqliteId
+        {
+            throw AttachmentInsertError.duplicatePlaintextHash(existingAttachmentId: existingAttachmentId)
         }
 
         // Find if there is already an attachment with the same media name.
-        let existingMediaNameRecord = try attachmentParams.mediaName.map { mediaName in
-            try fetchAttachmentThrows(
+        if
+            let mediaName = attachmentParams.mediaName,
+            let existingAttachmentId = fetchAttachmentRecord(
                 mediaName: mediaName,
                 tx: tx,
-            )
-        } ?? nil
-        if let existingMediaNameRecord {
-            throw AttachmentInsertError.duplicateMediaName(existingAttachmentId: existingMediaNameRecord.id)
+            )?.sqliteId
+        {
+            throw AttachmentInsertError.duplicateMediaName(existingAttachmentId: existingAttachmentId)
         }
 
-        var attachmentRecord = Attachment.Record(params: attachmentParams)
-
-        // Note that this will fail if we have collisions in medianame (unique constraint)
-        // but thats a hash so we just ignore that possibility.
-        try attachmentRecord.insert(tx.database)
-
-        guard let attachmentRowId = attachmentRecord.sqliteId else {
-            throw OWSAssertionError("No sqlite id assigned to inserted attachment")
+        let attachment = failIfThrows {
+            // Note that there are UNIQUE constraints on this table (e.g.,
+            // plaintext hash and mediaName). Importantly, those are checked
+            // above manually.
+            var attachmentRecord = Attachment.Record(params: attachmentParams)
+            try attachmentRecord.insert(tx.database)
+            return try Attachment(record: attachmentRecord)
         }
 
-        do {
-            try addReference(
-                referenceParams,
-                attachmentRowId: attachmentRowId,
-                tx: tx,
-            )
-        } catch let ownerError {
-            // We have to delete the ownerless attachment if owner creation failed.
-            // Crash if the delete fails; that will certainly roll back the transaction.
-            try! attachmentRecord.delete(tx.database)
-            throw ownerError
-        }
+        addReference(
+            referenceParams,
+            attachmentRowId: attachment.id,
+            tx: tx,
+        )
 
-        return attachmentRowId
+        return attachment
     }
 
     // MARK: -
@@ -998,49 +999,40 @@ public struct AttachmentStore {
     private func insertGlobalThreadAttachmentReference(
         newRecord: ThreadAttachmentReferenceRecord,
         tx: DBWriteTransaction,
-    ) throws {
+    ) -> AttachmentReference {
         let db = tx.database
         let ownerRowIdColumn = Column(ThreadAttachmentReferenceRecord.CodingKeys.ownerRowId)
         let timestampColumn = Column(ThreadAttachmentReferenceRecord.CodingKeys.creationTimestamp)
         let attachmentRowIdColumn = Column(ThreadAttachmentReferenceRecord.CodingKeys.attachmentRowId)
 
-        let oldRecord = try AttachmentReference.ThreadAttachmentReferenceRecord
-            .filter(ownerRowIdColumn == nil)
-            .fetchOne(db)
-
-        if let oldRecord, oldRecord == newRecord {
-            // They're the same, no need to do anything.
-            return
+        let oldRecord = failIfThrows {
+            try AttachmentReference.ThreadAttachmentReferenceRecord
+                .filter(ownerRowIdColumn == nil)
+                .fetchOne(db)
         }
 
         // First we insert the new row and then we delete the old one, so that the deletion
         // of the old one doesn't trigger any unecessary zero-refcount attachment deletions.
-        try newRecord.insert(db)
+        let newReference = failIfThrows {
+            try newRecord.insert(db)
+            return try AttachmentReference(record: newRecord)
+        }
 
-        func deleteRecord(_ record: AttachmentReference.ThreadAttachmentReferenceRecord) throws -> Int {
-            return try AttachmentReference.ThreadAttachmentReferenceRecord
+        if let record = oldRecord {
+            let query = AttachmentReference.ThreadAttachmentReferenceRecord
                 .filter(ownerRowIdColumn == nil)
                 .filter(timestampColumn == record.creationTimestamp)
                 .filter(attachmentRowIdColumn == record.attachmentRowId)
-                .deleteAll(db)
-        }
 
-        do {
-            if let oldRecord {
-                // Delete the old row. Match the timestamp and attachment so we are sure its the old one.
-                let deleteCount = try deleteRecord(oldRecord)
-
+            failIfThrows {
+                let deleteCount = try query.deleteAll(db)
                 // It should have deleted only the single previous row; if this matched
                 // both the equality check above should have exited early.
                 owsAssertDebug(deleteCount == 1)
             }
-        } catch let deleteError {
-            // If we failed the subsequent delete, delete the new
-            // owner reference we created (or we'll end up with two).
-            // Crash if the delete fails; that will certainly roll back the transaction.
-            _ = try! deleteRecord(newRecord)
-            throw deleteError
         }
+
+        return newReference
     }
 
     // MARK: -
@@ -1051,7 +1043,7 @@ public struct AttachmentStore {
         attachment: Attachment,
         timestamp: UInt64,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         var newRecord = Attachment.Record(
             params: .forMarkingViewedFullscreen(
                 attachment: attachment,
@@ -1059,7 +1051,9 @@ public struct AttachmentStore {
             ),
         )
         newRecord.sqliteId = attachment.id
-        try newRecord.update(tx.database)
+        failIfThrows {
+            try newRecord.update(tx.database)
+        }
     }
 
     // MARK: - Thread Merging
@@ -1068,10 +1062,13 @@ public struct AttachmentStore {
         fromThreadRowId: Int64,
         intoThreadRowId: Int64,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         let threadRowIdColumn = GRDB.Column(AttachmentReference.MessageAttachmentReferenceRecord.CodingKeys.threadRowId)
-        try AttachmentReference.MessageAttachmentReferenceRecord
+        let query = AttachmentReference.MessageAttachmentReferenceRecord
             .filter(threadRowIdColumn == fromThreadRowId)
-            .updateAll(tx.database, threadRowIdColumn.set(to: intoThreadRowId))
+
+        failIfThrows {
+            try query.updateAll(tx.database, threadRowIdColumn.set(to: intoThreadRowId))
+        }
     }
 }

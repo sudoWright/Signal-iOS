@@ -27,7 +27,7 @@ public class WallpaperImageStoreImpl: WallpaperImageStore {
     public func setWallpaperImage(
         _ photo: UIImage?,
         for thread: TSThread,
-        onInsert: @escaping (DBWriteTransaction) throws -> Void,
+        onInsert: @escaping (DBWriteTransaction) -> Void,
     ) async throws {
         guard let rowId = thread.sqliteRowId else {
             throw OWSAssertionError("Inserting wallpaper for uninserted thread!")
@@ -50,7 +50,7 @@ public class WallpaperImageStoreImpl: WallpaperImageStore {
 
     public func setGlobalThreadWallpaperImage(
         _ photo: UIImage?,
-        onInsert: @escaping (DBWriteTransaction) throws -> Void,
+        onInsert: @escaping (DBWriteTransaction) -> Void,
     ) async throws {
         if let photo {
             let dataSource = try await dataSource(wallpaperImage: photo)
@@ -83,15 +83,15 @@ public class WallpaperImageStoreImpl: WallpaperImageStore {
 
         // If the toThread had a wallpaper, remove it.
         if let toReference = attachmentStore.fetchAnyReference(owner: .threadWallpaperImage(threadRowId: toRowId), tx: tx) {
-            try attachmentStore.removeReference(reference: toReference, tx: tx)
+            attachmentStore.removeReference(reference: toReference, tx: tx)
         }
 
         switch fromReference.owner {
         case .thread(let threadSource):
-            try attachmentStore.duplicateExistingThreadOwner(
-                threadSource,
-                with: fromReference,
-                newOwnerThreadRowId: toRowId,
+            attachmentStore.cloneThreadOwner(
+                existingReference: fromReference,
+                existingOwnerSource: threadSource,
+                newThreadRowId: toRowId,
                 tx: tx,
             )
         default:
@@ -99,8 +99,8 @@ public class WallpaperImageStoreImpl: WallpaperImageStore {
         }
     }
 
-    public func resetAllWallpaperImages(tx: DBWriteTransaction) throws {
-        try attachmentStore.removeAllThreadOwners(tx: tx)
+    public func resetAllWallpaperImages(tx: DBWriteTransaction) {
+        attachmentStore.removeAllThreadOwners(tx: tx)
     }
 
     // MARK: - Private
@@ -129,7 +129,7 @@ public class WallpaperImageStoreImpl: WallpaperImageStore {
         try await db.awaitableWrite { tx in
             // First remove any existing wallpaper.
             if let existingReference = self.attachmentStore.fetchAnyReference(owner: owner.id, tx: tx) {
-                try self.attachmentStore.removeReference(reference: existingReference, tx: tx)
+                self.attachmentStore.removeReference(reference: existingReference, tx: tx)
             }
             // Set the new image if any.
             if let dataSource {

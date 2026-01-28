@@ -149,8 +149,8 @@ extension BGProcessingTaskRunner where Self: Sendable {
     /// true if the entire migration is completed.
     func runInBatches(
         willBegin: () -> Void,
-        runNextBatch: () async throws -> Bool,
-    ) async throws {
+        runNextBatch: () async -> Bool,
+    ) async throws(CancellationError) {
         logger.info("Starting.")
 
         // Note: we _could_ check the minimum date from ``BGProcessingTaskStartCondition.after``,
@@ -166,19 +166,12 @@ extension BGProcessingTaskRunner where Self: Sendable {
         var batchCount = 0
         var didFinish = false
         while !didFinish {
-            do {
-                try Task.checkCancellation()
-            } catch {
+            if Task.isCancelled {
                 logger.warn("Canceled after \(batchCount) batches")
-                throw error
+                throw CancellationError()
             }
 
-            do {
-                didFinish = try await runNextBatch()
-            } catch {
-                logger.error("Failed after \(batchCount) batches: \(error)")
-                throw error
-            }
+            didFinish = await runNextBatch()
             batchCount += 1
         }
         logger.info("Finished after \(batchCount) batches")

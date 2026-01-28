@@ -1389,6 +1389,7 @@ extension AppSetup.GlobalsContinuation {
             attachmentManager: attachmentManager,
             attachmentStore: attachmentStore,
             db: db,
+            orphanedAttachmentStore: orphanedAttachmentStore,
         )
         let backupReactionArchiver = BackupArchiveReactionArchiver(
             reactionStore: BackupArchiveReactionStore(),

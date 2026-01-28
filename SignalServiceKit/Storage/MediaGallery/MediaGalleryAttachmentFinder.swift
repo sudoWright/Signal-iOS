@@ -257,7 +257,7 @@ public struct MediaGalleryAttachmentFinder {
     public func countAllAttachments(
         of interaction: TSInteraction,
         tx: DBReadTransaction,
-    ) throws -> UInt {
+    ) -> UInt {
         guard let rowId = interaction.sqliteRowId else {
             owsFailDebug("Counting attachments for uninserted message!")
             return 0

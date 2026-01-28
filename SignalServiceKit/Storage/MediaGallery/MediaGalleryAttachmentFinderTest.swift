@@ -315,7 +315,7 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
 
         try db.write { tx in
             try attachmentRecord.insert(tx.database)
-            try attachmentStore.addReference(
+            attachmentStore.addReference(
                 referenceParams,
                 attachmentRowId: attachmentRecord.sqliteId!,
                 tx: tx,

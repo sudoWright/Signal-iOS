@@ -36,7 +36,7 @@ public protocol AttachmentManager {
         uploadEra: String,
         attachmentByteCounter: BackupArchiveAttachmentByteCounter,
         tx: DBWriteTransaction,
-    ) -> OwnedAttachmentBackupPointerProto.CreationError?
+    )
 
     /// Create attachment streams from the given data sources.
     ///
@@ -58,7 +58,7 @@ public protocol AttachmentManager {
         attachmentId: Attachment.IDType,
         pendingAttachment: PendingAttachment,
         tx: DBWriteTransaction,
-    ) throws
+    )
 
     // MARK: - Quoted Replies
 

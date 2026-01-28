@@ -68,7 +68,7 @@ class ThreadRemoverImpl: ThreadRemover {
         threadReplyInfoStore.remove(for: thread.uniqueId, tx: tx)
         threadStore.removeThread(thread, tx: tx)
         threadReadCache.didRemove(thread: thread, tx: tx)
-        try? wallpaperStore.reset(for: thread, tx: tx)
+        wallpaperStore.reset(for: thread, tx: tx)
         lastVisibleInteractionStore.clearLastVisibleInteraction(for: thread, tx: tx)
     }
 }

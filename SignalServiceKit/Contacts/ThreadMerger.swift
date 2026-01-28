@@ -377,7 +377,7 @@ class _ThreadMerger_SDSThreadMergerWrapper: _ThreadMerger_SDSThreadMergerShim {
         else {
             return
         }
-        try? DependenciesBridge.shared.attachmentStore.updateMessageAttachmentThreadRowIdsForThreadMerge(
+        DependenciesBridge.shared.attachmentStore.updateMessageAttachmentThreadRowIdsForThreadMerge(
             fromThreadRowId: fromThreadRowId,
             intoThreadRowId: intoThreadRowId,
             tx: tx,

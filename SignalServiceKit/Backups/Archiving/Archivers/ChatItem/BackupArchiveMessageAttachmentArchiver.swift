@@ -321,24 +321,13 @@ class BackupArchiveMessageAttachmentArchiver: BackupArchiveProtoStreamWriter {
             return .messageFailure([.restoreFrameError(.invalidProtoData(.accountDataNotFound), chatItemId)])
         }
 
-        let errors = attachments.compactMap { attachment in
-            return attachmentManager.createAttachmentPointer(
+        for attachment in attachments {
+            attachmentManager.createAttachmentPointer(
                 from: attachment,
                 uploadEra: uploadEra,
                 attachmentByteCounter: context.attachmentByteCounter,
                 tx: context.tx,
             )
-        }
-
-        guard errors.isEmpty else {
-            // Treat attachment failures as message failures; a message
-            // might have _only_ attachments and without them its invalid.
-            return .messageFailure(errors.map {
-                return .restoreFrameError(
-                    .fromAttachmentCreationError($0),
-                    chatItemId,
-                )
-            })
         }
 
         let results: [ReferencedAttachment]
@@ -416,18 +405,6 @@ extension AttachmentReference.RenderingFlag {
             return .borderless
         case .shouldLoop:
             return .gif
-        }
-    }
-}
-
-extension BackupArchive.RestoreFrameError.ErrorType {
-
-    static func fromAttachmentCreationError(
-        _ error: OwnedAttachmentBackupPointerProto.CreationError,
-    ) -> Self {
-        switch error {
-        case .dbInsertionError(let error):
-            return .databaseInsertionFailed(error)
         }
     }
 }

@@ -52,7 +52,7 @@ public class WallpaperStore {
     private func _set(_ wallpaper: Wallpaper?, photo: UIImage? = nil, for thread: TSThread?) async throws {
         owsAssertDebug(photo == nil || wallpaper == .photo)
 
-        let onInsert = { [self] (tx: DBWriteTransaction) throws -> Void in
+        let onInsert = { [self] (tx: DBWriteTransaction) -> Void in
             self.setWallpaperType(wallpaper, for: thread?.uniqueId, tx: tx)
         }
 
@@ -122,14 +122,14 @@ public class WallpaperStore {
 
     // MARK: - Resetting Values
 
-    public func reset(for thread: TSThread?, tx: DBWriteTransaction) throws {
+    public func reset(for thread: TSThread?, tx: DBWriteTransaction) {
         let threadUniqueId = thread?.uniqueId
         enumStore.removeValue(forKey: Self.persistenceKey(for: threadUniqueId), transaction: tx)
         dimmingStore.removeValue(forKey: Self.persistenceKey(for: threadUniqueId), transaction: tx)
         postWallpaperDidChangeNotification(for: threadUniqueId, tx: tx)
     }
 
-    public func resetAll(tx: DBWriteTransaction) throws {
+    public func resetAll(tx: DBWriteTransaction) {
         enumStore.removeAll(transaction: tx)
         dimmingStore.removeAll(transaction: tx)
         postWallpaperDidChangeNotification(for: nil, tx: tx)

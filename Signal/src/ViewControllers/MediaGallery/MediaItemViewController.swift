@@ -223,11 +223,11 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
         let timestamp = Date().ows_millisecondsSince1970
         let attachmentId = galleryItem.attachmentStream.attachment.id
         Task {
-            try await DependenciesBridge.shared.db.awaitableWrite { tx in
+            await DependenciesBridge.shared.db.awaitableWrite { tx in
                 guard let attachment = DependenciesBridge.shared.attachmentStore.fetch(id: attachmentId, tx: tx) else {
                     return
                 }
-                try DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
+                DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
                     attachment: attachment,
                     timestamp: timestamp,
                     tx: tx,

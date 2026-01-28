@@ -290,12 +290,7 @@ public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress 
             return 0
         }
 
-        do {
-            return try attachmentStore.fetchMaxRowId(tx: tx) ?? 0
-        } catch {
-            owsFailDebug("Failed to get max attachment row ID! \(error)")
-            return 0
-        }
+        return attachmentStore.fetchMaxRowId(tx: tx) ?? 0
     }
 
     private nonisolated func computeRemainingUnuploadedByteCount() throws -> UploadQueueSnapshot {

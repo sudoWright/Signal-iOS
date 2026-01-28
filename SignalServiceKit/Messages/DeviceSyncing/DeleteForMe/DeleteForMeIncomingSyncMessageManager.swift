@@ -235,14 +235,10 @@ final class DeleteForMeIncomingSyncMessageManagerImpl: DeleteForMeIncomingSyncMe
             return
         }
 
-        do {
-            try attachmentStore.removeReference(
-                reference: targetAttachment.reference,
-                tx: tx,
-            )
-        } catch {
-            logger.error("Failed to delete targe attachment!")
-        }
+        attachmentStore.removeReference(
+            reference: targetAttachment.reference,
+            tx: tx,
+        )
     }
 
     func handleConversationDelete(
