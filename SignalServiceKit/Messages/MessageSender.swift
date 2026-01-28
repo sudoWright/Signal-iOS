@@ -1109,15 +1109,9 @@ public class MessageSender {
                     tx: tx,
                 )
             }
-            if message.shouldBeSaved {
-                let latestInteraction = TSInteraction.anyFetch(uniqueId: message.uniqueId, transaction: tx)
-                guard let latestMessage = latestInteraction as? TSOutgoingMessage else {
-                    Logger.warn("Could not update expiration for deleted message.")
-                    return
-                }
-                ViewOnceMessages.completeIfNecessary(message: latestMessage, transaction: tx)
-            }
         }
+
+        await completeViewOnceMessageIfNeeded(message)
 
         try await sendSyncTranscriptIfNeeded(forMessage: message, localIdentifiers: localIdentifiers)
 
@@ -1154,6 +1148,28 @@ public class MessageSender {
                     )
                 }
             }
+        }
+    }
+
+    private func completeViewOnceMessageIfNeeded(_ message: any SendableMessage) async {
+        // View once messages are never transient (transient messages don't have
+        // attachments AND they're deleted immediately after being sent).
+        guard let message = message as? TSOutgoingMessage, !(message is TransientOutgoingMessage) else {
+            return
+        }
+        // Don't refetch the message unless it's view once; most messages won't be
+        // and are thus able to avoid an expensive read operation.
+        guard message.isViewOnceMessage else {
+            return
+        }
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+        await databaseStorage.awaitableWrite { tx in
+            let latestMessage = TSInteraction.anyFetch(uniqueId: message.uniqueId, transaction: tx)
+            guard let latestMessage = latestMessage as? TSOutgoingMessage else {
+                Logger.warn("Could not update expiration for deleted message.")
+                return
+            }
+            ViewOnceMessages.completeIfNecessary(message: latestMessage, transaction: tx)
         }
     }
 
