@@ -6,17 +6,6 @@
 import Foundation
 import LibSignalClient
 
-// MARK: - Message "isXYZ" properties
-
-extension TSOutgoingMessage {
-    var canSendToLocalAddress: Bool {
-        return self is OutgoingSyncMessage ||
-            self is OutgoingCallMessage ||
-            self is OutgoingResendRequest ||
-            self is OWSOutgoingResendResponse
-    }
-}
-
 // MARK: - MessageSender
 
 public class MessageSender {
@@ -602,13 +591,17 @@ public class MessageSender {
         let syncResult: Result<Void, any Error>?
         if sendResult.isSuccess || message.wasSentToAnyRecipient {
             syncResult = await Result(catching: {
-                try await handleMessageSentLocally(message, localIdentifiers: registeredState.localIdentifiers)
+                try await handleMessageSentLocally(
+                    message,
+                    sendResult: sendResult,
+                    localIdentifiers: registeredState.localIdentifiers,
+                )
             })
         } else {
             syncResult = nil
         }
         // If we encountered an error when sending, return that.
-        if let sendFailure = try sendResult.get() {
+        if let sendFailure = try sendResult.get().sendMessageFailure {
             return sendFailure
         }
         // Otherwise, if only the sync message failed, return that.
@@ -619,6 +612,10 @@ public class MessageSender {
     private enum SendMessageNextAction {
         /// Look up missing phone numbers & then try sending again.
         case lookUpPhoneNumbersAndTryAgain([E164])
+
+        /// There's nothing to be sent; return an early result. NOTE: We might still
+        /// need to send a sync transcript.
+        case skipSend(SendMessageResult)
 
         /// Fetch a new set of GSEs & then try sending again.
         case fetchGroupSendEndorsementsAndTryAgain(GroupSecretParams)
@@ -658,14 +655,19 @@ public class MessageSender {
         }
     }
 
+    private struct SendMessageResult {
+        let isNoteToSelf: Bool
+        let sendMessageFailure: SendMessageFailure?
+    }
+
     private func sendPreparedMessage(
         _ message: any SendableMessage,
         recoveryState: OuterRecoveryState,
         senderCertificates: SenderCertificates,
         localIdentifiers: LocalIdentifiers,
-    ) async throws -> SendMessageFailure? {
+    ) async throws -> SendMessageResult {
         let databaseStorage = SSKEnvironment.shared.databaseStorageRef
-        let nextAction = try await databaseStorage.awaitableWrite { tx -> SendMessageNextAction? in
+        let nextAction = try await databaseStorage.awaitableWrite { tx -> SendMessageNextAction in
             guard let thread = message.thread(tx: tx) else {
                 throw MessageSenderError.threadMissing
             }
@@ -686,22 +688,26 @@ public class MessageSender {
 
             self.markSkippedRecipients(of: message, sendingRecipients: serviceIds, tx: tx)
 
-            if let contactThread = thread as? TSContactThread {
-                // In the "self-send" aka "Note to Self" special case, we only need to send
-                // certain kinds of messages. (In particular, regular data messages are
-                // sent via their implicit sync message only.)
-                if contactThread.contactAddress.isLocalAddress, !message.canSendToLocalAddress {
-                    owsAssertDebug(serviceIds.count == 1)
-                    Logger.info("Dropping \(type(of: message)) sent to local address (it should be sent by sync message)")
-                    // Don't mark self-sent messages as read (or sent) until the sync transcript is sent.
-                    return nil
-                }
+            // In the "self-send" aka "Note to Self" special case, we only need to send
+            // certain kinds of messages. (In particular, regular data messages are
+            // sent via their implicit sync message only.)
+            // TODO: Consider combining this with SyncTranscriptableMessage.
+            if
+                let contactThread = thread as? TSContactThread,
+                contactThread.contactAddress == localIdentifiers.aciAddress,
+                !(message is OutgoingSyncMessage),
+                !(message is OutgoingCallMessage),
+                !(message is OutgoingResendRequest),
+                !(message is OWSOutgoingResendResponse)
+            {
+                owsAssertDebug(serviceIds.count == 1)
+                // Don't mark self-sent messages as read (or sent) until the sync transcript is sent.
+                return .skipSend(SendMessageResult(isNoteToSelf: true, sendMessageFailure: nil))
             }
 
             if serviceIds.isEmpty {
-                // All recipients are already sent or can be skipped. NOTE: We might still
-                // need to send a sync transcript.
-                return nil
+                // All recipients are already sent or can be skipped.
+                return .skipSend(SendMessageResult(isNoteToSelf: false, sendMessageFailure: nil))
             }
 
             let serializedMessage = try self.buildAndRecordMessage(message, in: thread, tx: tx)
@@ -787,8 +793,8 @@ public class MessageSender {
         let retryRecoveryState: OuterRecoveryState
 
         switch nextAction {
-        case .none:
-            return nil
+        case .skipSend(let result):
+            return result
         case .lookUpPhoneNumbersAndTryAgain(let phoneNumbers):
             try await lookUpPhoneNumbers(phoneNumbers)
             retryRecoveryState = recoveryState.mutated({ $0.canLookUpPhoneNumbers = false })
@@ -843,7 +849,7 @@ public class MessageSender {
                     break
                 }
             }
-            return sendMessageFailure
+            return SendMessageResult(isNoteToSelf: false, sendMessageFailure: sendMessageFailure)
         }
 
         return try await sendPreparedMessage(
@@ -1093,8 +1099,10 @@ public class MessageSender {
         return false
     }
 
+    // TODO: Remove Result<...> from the sendResult parameter.
     private func handleMessageSentLocally(
         _ message: any SendableMessage,
+        sendResult: Result<SendMessageResult, any Error>,
         localIdentifiers: LocalIdentifiers,
     ) async throws {
         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
@@ -1119,35 +1127,8 @@ public class MessageSender {
         // transcript is sent.
         //
         // NOTE: This only applies to the 'note to self' conversation.
-        if message is OutgoingSyncMessage {
-            return
-        }
-        let thread = SSKEnvironment.shared.databaseStorageRef.read { tx in message.thread(tx: tx) }
-        guard let contactThread = thread as? TSContactThread, contactThread.contactAddress == localIdentifiers.aciAddress else {
-            return
-        }
-        owsAssertDebug(message.recipientAddresses().count == 1)
-        await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
-            guard let deviceId = DependenciesBridge.shared.tsAccountManager.storedDeviceId(tx: tx).ifValid else {
-                owsFailDebug("Can't send a Note to Self message with an invalid deviceId.")
-                return
-            }
-            for sendingAddress in message.sendingRecipientAddresses() {
-                message.update(
-                    withReadRecipient: sendingAddress,
-                    deviceId: deviceId,
-                    readTimestamp: message.timestamp,
-                    tx: tx,
-                )
-                if message.isVoiceMessage || message.isViewOnceMessage {
-                    message.update(
-                        withViewedRecipient: sendingAddress,
-                        deviceId: deviceId,
-                        viewedTimestamp: message.timestamp,
-                        tx: tx,
-                    )
-                }
-            }
+        if let sendResult = try? sendResult.get() {
+            await markNoteToSelfMessageAsReadAndViewedIfNecessary(message, sendResult: sendResult)
         }
     }
 
@@ -1211,6 +1192,47 @@ public class MessageSender {
         try await performMessageSend(messageSend, sealedSenderParameters: nil)
     }
 
+    // TODO: Remove this method; it won't be necessary with modern receipts.
+    private func markNoteToSelfMessageAsReadAndViewedIfNecessary(
+        _ message: any SendableMessage,
+        sendResult: SendMessageResult,
+    ) async {
+        // Non-TSOutgoingMessage/"normal" messages never have receipts and thus
+        // never need to be marked as read/viewed.
+        guard let message = message as? TSOutgoingMessage, !(message is TransientOutgoingMessage) else {
+            return
+        }
+        // Non-Note to Self messages don't require Note to Self treatment.
+        guard sendResult.isNoteToSelf else {
+            return
+        }
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        owsAssertDebug(message.recipientAddresses().count == 1)
+        await databaseStorage.awaitableWrite { tx in
+            guard let deviceId = tsAccountManager.storedDeviceId(tx: tx).ifValid else {
+                owsFailDebug("Can't send a Note to Self message with an invalid deviceId.")
+                return
+            }
+            for sendingAddress in message.sendingRecipientAddresses() {
+                message.update(
+                    withReadRecipient: sendingAddress,
+                    deviceId: deviceId,
+                    readTimestamp: message.timestamp,
+                    tx: tx,
+                )
+                if message.isVoiceMessage || message.isViewOnceMessage {
+                    message.update(
+                        withViewedRecipient: sendingAddress,
+                        deviceId: deviceId,
+                        viewedTimestamp: message.timestamp,
+                        tx: tx,
+                    )
+                }
+            }
+        }
+    }
+
     // MARK: - Performing Message Sends
 
     struct SerializedMessage {
@@ -1270,7 +1292,7 @@ public class MessageSender {
         let retryRecoveryState: InnerRecoveryState
         do {
             if messageSend.isSelfSend {
-                owsAssertDebug(messageSend.message.canSendToLocalAddress, "Shouldn't send \(type(of: message)) to \(messageSend.serviceId)")
+                owsAssertDebug(!(messageSend.serviceId is Pni), "Shouldn't send \(type(of: message)) to \(messageSend.serviceId)")
             }
 
             var deviceMessages = try await buildDeviceMessages(
