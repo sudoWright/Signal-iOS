@@ -29,7 +29,7 @@ public protocol ConversationItem {
     var image: UIImage? { get }
     var isBlocked: Bool { get }
     var isStory: Bool { get }
-    var disappearingMessagesConfig: OWSDisappearingMessagesConfiguration? { get }
+    var disappearingMessagesConfig: DisappearingMessagesConfigurationRecord? { get }
 
     func getExistingThread(transaction: DBReadTransaction) -> TSThread?
     func getOrCreateThread(transaction: DBWriteTransaction) -> TSThread?
@@ -103,7 +103,7 @@ extension RecentConversationItem: ConversationItem {
 
     var isStory: Bool { return false }
 
-    var disappearingMessagesConfig: OWSDisappearingMessagesConfiguration? {
+    var disappearingMessagesConfig: DisappearingMessagesConfigurationRecord? {
         return unwrapped.disappearingMessagesConfig
     }
 
@@ -121,13 +121,13 @@ extension RecentConversationItem: ConversationItem {
 struct ContactConversationItem {
     let address: SignalServiceAddress
     let isBlocked: Bool
-    let disappearingMessagesConfig: OWSDisappearingMessagesConfiguration?
+    let disappearingMessagesConfig: DisappearingMessagesConfigurationRecord?
     let comparableName: ComparableDisplayName
 
     init(
         address: SignalServiceAddress,
         isBlocked: Bool,
-        disappearingMessagesConfig: OWSDisappearingMessagesConfiguration?,
+        disappearingMessagesConfig: DisappearingMessagesConfigurationRecord?,
         comparableName: ComparableDisplayName,
     ) {
         owsAssertBeta(
@@ -189,12 +189,12 @@ extension ContactConversationItem: ConversationItem {
 public struct GroupConversationItem {
     public let groupThreadId: String
     public let isBlocked: Bool
-    public let disappearingMessagesConfig: OWSDisappearingMessagesConfiguration?
+    public let disappearingMessagesConfig: DisappearingMessagesConfigurationRecord?
 
     init(
         groupThreadId: String,
         isBlocked: Bool,
-        disappearingMessagesConfig: OWSDisappearingMessagesConfiguration?,
+        disappearingMessagesConfig: DisappearingMessagesConfigurationRecord?,
     ) {
         owsAssertBeta(
             !isBlocked,
@@ -571,7 +571,7 @@ extension StoryConversationItem: ConversationItem {
 
     public var isStory: Bool { return true }
 
-    public var disappearingMessagesConfig: OWSDisappearingMessagesConfiguration? {
+    public var disappearingMessagesConfig: DisappearingMessagesConfigurationRecord? {
         unwrapped.disappearingMessagesConfig
     }
 
@@ -610,7 +610,7 @@ extension PrivateStoryConversationItem: ConversationItem {
 
     public var isStory: Bool { return true }
 
-    public var disappearingMessagesConfig: OWSDisappearingMessagesConfiguration? { nil }
+    public var disappearingMessagesConfig: DisappearingMessagesConfigurationRecord? { nil }
 
     public var messageRecipient: MessageRecipient { .privateStory(storyThreadId, isMyStory: isMyStory) }
 

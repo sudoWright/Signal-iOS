@@ -7,11 +7,11 @@ import Foundation
 
 public protocol DisappearingMessagesConfigurationStore {
     typealias SetTokenResult = (
-        oldConfiguration: OWSDisappearingMessagesConfiguration,
-        newConfiguration: OWSDisappearingMessagesConfiguration,
+        oldConfiguration: DisappearingMessagesConfigurationRecord,
+        newConfiguration: DisappearingMessagesConfigurationRecord,
     )
 
-    func fetch(for scope: DisappearingMessagesConfigurationScope, tx: DBReadTransaction) -> OWSDisappearingMessagesConfiguration?
+    func fetch(for scope: DisappearingMessagesConfigurationScope, tx: DBReadTransaction) -> DisappearingMessagesConfigurationRecord?
 
     func remove(for thread: TSThread, tx: DBWriteTransaction)
 
@@ -90,10 +90,10 @@ extension DisappearingMessagesConfigurationStore {
     public func fetchOrBuildDefault(
         for scope: DisappearingMessagesConfigurationScope,
         tx: DBReadTransaction,
-    ) -> OWSDisappearingMessagesConfiguration {
-        fetch(for: scope, tx: tx) ?? OWSDisappearingMessagesConfiguration(
-            threadId: scope.persistenceKey,
-            enabled: false,
+    ) -> DisappearingMessagesConfigurationRecord {
+        fetch(for: scope, tx: tx) ?? DisappearingMessagesConfigurationRecord(
+            threadUniqueId: scope.persistenceKey,
+            isEnabled: false,
             durationSeconds: 0,
             timerVersion: 1,
         )
@@ -105,9 +105,9 @@ extension DisappearingMessagesConfigurationStore {
 }
 
 class DisappearingMessagesConfigurationStoreImpl: DisappearingMessagesConfigurationStore {
-    func fetch(for scope: DisappearingMessagesConfigurationScope, tx: DBReadTransaction) -> OWSDisappearingMessagesConfiguration? {
+    func fetch(for scope: DisappearingMessagesConfigurationScope, tx: DBReadTransaction) -> DisappearingMessagesConfigurationRecord? {
         guard
-            let config = OWSDisappearingMessagesConfiguration.anyFetch(
+            let config = DisappearingMessagesConfigurationRecord.anyFetch(
                 uniqueId: scope.persistenceKey,
                 transaction: tx,
             )
@@ -117,7 +117,7 @@ class DisappearingMessagesConfigurationStoreImpl: DisappearingMessagesConfigurat
         // What's in the database may have a nonzero duration but isEnabled=false.
         // Normalize so if isEnabled is false, duration is 0.
         if !config.isEnabled, config.durationSeconds != 0 {
-            return config.copy(withDurationSeconds: 0, timerVersion: config.timerVersion)
+            return config.copyWith(durationSeconds: 0, timerVersion: config.timerVersion)
         }
         return config
     }
@@ -143,8 +143,8 @@ class DisappearingMessagesConfigurationStoreImpl: DisappearingMessagesConfigurat
         let newVersion = token.version == 0 ? oldConfiguration.timerVersion : token.version
         let newConfiguration = (
             token.isEnabled
-                ? oldConfiguration.copyAsEnabled(withDurationSeconds: token.durationSeconds, timerVersion: newVersion)
-                : oldConfiguration.copy(withIsEnabled: false, timerVersion: newVersion),
+                ? oldConfiguration.copyAsEnabledWith(durationSeconds: token.durationSeconds, timerVersion: newVersion)
+                : oldConfiguration.copyWith(isEnabled: false, timerVersion: newVersion),
         )
         if newConfiguration.grdbId == nil || newConfiguration != oldConfiguration {
             newConfiguration.anyUpsert(transaction: tx)
@@ -158,8 +158,8 @@ class DisappearingMessagesConfigurationStoreImpl: DisappearingMessagesConfigurat
 
     func resetAllDMTimerVersions(tx: DBWriteTransaction) throws {
         try tx.database.execute(sql: """
-            UPDATE \(OWSDisappearingMessagesConfigurationSerializer.table.tableName)
-            SET \(OWSDisappearingMessagesConfigurationSerializer.timerVersionColumn.columnName) = 1;
+            UPDATE \(DisappearingMessagesConfigurationRecord.databaseTableName)
+            SET \(DisappearingMessagesConfigurationRecord.CodingKeys.timerVersion.rawValue) = 1
         """)
     }
 }
@@ -167,9 +167,9 @@ class DisappearingMessagesConfigurationStoreImpl: DisappearingMessagesConfigurat
 #if TESTABLE_BUILD
 
 class MockDisappearingMessagesConfigurationStore: DisappearingMessagesConfigurationStore {
-    var values = [String: OWSDisappearingMessagesConfiguration]()
+    var values = [String: DisappearingMessagesConfigurationRecord]()
 
-    func fetch(for scope: DisappearingMessagesConfigurationScope, tx: DBReadTransaction) -> OWSDisappearingMessagesConfiguration? {
+    func fetch(for scope: DisappearingMessagesConfigurationScope, tx: DBReadTransaction) -> DisappearingMessagesConfigurationRecord? {
         values[scope.persistenceKey]
     }
 
@@ -181,9 +181,9 @@ class MockDisappearingMessagesConfigurationStore: DisappearingMessagesConfigurat
     ) -> SetTokenResult {
         let oldConfiguration = fetchOrBuildDefault(for: scope, tx: tx)
         let newVersion = oldConfiguration.timerVersion
-        let newConfiguration = OWSDisappearingMessagesConfiguration(
-            threadId: scope.persistenceKey,
-            enabled: token.isEnabled,
+        let newConfiguration = DisappearingMessagesConfigurationRecord(
+            threadUniqueId: scope.persistenceKey,
+            isEnabled: token.isEnabled,
             durationSeconds: token.durationSeconds,
             timerVersion: newVersion,
         )
@@ -197,9 +197,9 @@ class MockDisappearingMessagesConfigurationStore: DisappearingMessagesConfigurat
 
     func resetAllDMTimerVersions(tx: DBWriteTransaction) throws {
         values.forEach { key, value in
-            values[key] = OWSDisappearingMessagesConfiguration(
-                threadId: value.uniqueId,
-                enabled: value.isEnabled,
+            values[key] = DisappearingMessagesConfigurationRecord(
+                threadUniqueId: value.uniqueId,
+                isEnabled: value.isEnabled,
                 durationSeconds: value.durationSeconds,
                 timerVersion: 1,
             )

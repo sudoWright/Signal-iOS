@@ -7,7 +7,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class OWSDisappearingMessagesConfiguration;
 @class TSContactThread;
 
 @interface OWSDisappearingConfigurationUpdateInfoMessage : TSInfoMessage

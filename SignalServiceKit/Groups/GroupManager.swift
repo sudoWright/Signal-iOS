@@ -348,7 +348,7 @@ public class GroupManager: NSObject {
             )
 
         // Skip redundant updates.
-        if !result.newConfiguration.hasSameDuration(as: result.oldConfiguration) {
+        if !result.newConfiguration.hasSameDurationAs(result.oldConfiguration) {
             let remoteContactName: String? = {
                 if
                     let changeAuthor,

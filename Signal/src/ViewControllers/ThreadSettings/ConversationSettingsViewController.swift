@@ -50,7 +50,7 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
 
     var showVerificationOnAppear = false
 
-    var disappearingMessagesConfiguration: OWSDisappearingMessagesConfiguration
+    var disappearingMessagesConfiguration: DisappearingMessagesConfigurationRecord
     var avatarView: ConversationAvatarView?
 
     var isShowingAllGroupMembers = false

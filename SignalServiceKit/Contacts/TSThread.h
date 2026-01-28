@@ -11,7 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class DBWriteTransaction;
 @class MessageBody;
 @class MessageBodyRanges;
-@class OWSDisappearingMessagesConfiguration;
 @class SignalServiceAddress;
 @class TSInteraction;
 @class TSInvalidIdentityKeyReceivingErrorMessage;

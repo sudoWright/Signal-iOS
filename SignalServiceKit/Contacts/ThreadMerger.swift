@@ -145,7 +145,7 @@ final class ThreadMerger {
         }
 
         let oldConfig = configPair.intoValue
-        let newConfig = oldConfig.copyAsEnabled(withDurationSeconds: resolvedValue, timerVersion: resolvedVersion)
+        let newConfig = oldConfig.copyAsEnabledWith(durationSeconds: resolvedValue, timerVersion: resolvedVersion)
 
         if newConfig == oldConfig {
             return

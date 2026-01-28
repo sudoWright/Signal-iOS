@@ -4,7 +4,6 @@
 //
 
 #import "OWSVerificationStateChangeMessage.h"
-#import "OWSDisappearingMessagesConfiguration.h"
 #import <SignalServiceKit/SignalServiceKit-Swift.h>
 
 NS_ASSUME_NONNULL_BEGIN

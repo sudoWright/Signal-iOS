@@ -4,7 +4,6 @@
 //
 
 #import "TSThread.h"
-#import "OWSDisappearingMessagesConfiguration.h"
 #import "OWSReadTracking.h"
 #import "TSIncomingMessage.h"
 #import "TSInfoMessage.h"

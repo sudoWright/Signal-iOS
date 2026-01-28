@@ -14,10 +14,10 @@ class DisappearingMessagesTimerSettingsViewController: HostingController<Disappe
         case universal
     }
 
-    private let initialConfiguration: OWSDisappearingMessagesConfiguration
-    private var selectedConfiguration: OWSDisappearingMessagesConfiguration
+    private let initialConfiguration: DisappearingMessagesConfigurationRecord
+    private var selectedConfiguration: DisappearingMessagesConfigurationRecord
     private let settingsMode: SettingsMode
-    private let completion: (OWSDisappearingMessagesConfiguration) -> Void
+    private let completion: (DisappearingMessagesConfigurationRecord) -> Void
 
     private let viewModel: DisappearingMessagesTimerSettingsViewModel
 
@@ -26,9 +26,9 @@ class DisappearingMessagesTimerSettingsViewController: HostingController<Disappe
     }
 
     init(
-        initialConfiguration: OWSDisappearingMessagesConfiguration,
+        initialConfiguration: DisappearingMessagesConfigurationRecord,
         settingsMode: SettingsMode,
-        completion: @escaping (OWSDisappearingMessagesConfiguration) -> Void,
+        completion: @escaping (DisappearingMessagesConfigurationRecord) -> Void,
     ) {
         self.initialConfiguration = initialConfiguration
         self.selectedConfiguration = initialConfiguration
@@ -148,13 +148,13 @@ class DisappearingMessagesTimerSettingsViewController: HostingController<Disappe
 extension DisappearingMessagesTimerSettingsViewController: DisappearingMessagesTimerSettingsViewModel.ActionsDelegate {
     fileprivate func updateForSelection(_ durationSeconds: UInt32) {
         if durationSeconds == 0 {
-            selectedConfiguration = initialConfiguration.copy(
-                withIsEnabled: false,
+            selectedConfiguration = initialConfiguration.copyWith(
+                isEnabled: false,
                 timerVersion: initialConfiguration.timerVersion + 1,
             )
         } else {
-            selectedConfiguration = initialConfiguration.copyAsEnabled(
-                withDurationSeconds: durationSeconds,
+            selectedConfiguration = initialConfiguration.copyAsEnabledWith(
+                durationSeconds: durationSeconds,
                 timerVersion: initialConfiguration.timerVersion + 1,
             )
         }
@@ -228,10 +228,9 @@ private class DisappearingMessagesTimerSettingsViewModel: ObservableObject {
             localizedDescription: CommonStrings.switchOff,
             durationSeconds: 0,
         )
-        let enabledPresets = OWSDisappearingMessagesConfiguration
+        let enabledPresets = DisappearingMessagesConfigurationRecord
             .presetDurationsSeconds()
             .reversed()
-            .map { $0.uint32Value }
             .map { durationSeconds in
                 Preset(
                     localizedDescription: DateUtil.formatDuration(seconds: durationSeconds, useShortFormat: false),

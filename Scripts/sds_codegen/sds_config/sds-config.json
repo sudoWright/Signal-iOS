@@ -17,8 +17,6 @@
 	"properties_to_ignore": [
 		"TSYapDatabaseObject.grdbId",
 		"OWSDynamicOutgoingMessage.block",
-		"OWSDisappearingMessagesConfiguration.originalDictionaryValue",
-		"OWSDisappearingMessagesConfiguration.newRecord",
 		"TSThread.isArchivedByLegacyTimestampForSorting",
 		"TSContactThread.contactThreadSchemaVersion",
 		"TSCall.callSchemaVersion",
@@ -113,9 +111,7 @@
 		"TSIncomingMessage.read": "wasRead",
 		"TSCall.read": "wasRead",
 		"OWSGroupCallMessage.read": "wasRead",
-		"TSIncomingMessage.viewed": "wasViewed",
-		"OWSDisappearingMessagesConfiguration.enabled": "isEnabled",
-		"OWSDisappearingMessagesConfiguration.newRecord": "isNewRecord"
+		"TSIncomingMessage.viewed": "wasViewed"
 	},
 	"custom_column_names": {
 		"TSInteraction.uniqueThreadId": "threadUniqueId",

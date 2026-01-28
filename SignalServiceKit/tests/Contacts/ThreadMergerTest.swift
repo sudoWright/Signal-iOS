@@ -140,15 +140,15 @@ final class ThreadMergerTest: XCTestCase {
 
     private func setDisappearingMessageIntervals(serviceIdValue: UInt32?, phoneNumberValue: UInt32?) {
         disappearingMessagesConfigurationStore.values = [
-            serviceIdThread.uniqueId: OWSDisappearingMessagesConfiguration(
-                threadId: serviceIdThread.uniqueId,
-                enabled: serviceIdValue != nil,
+            serviceIdThread.uniqueId: DisappearingMessagesConfigurationRecord(
+                threadUniqueId: serviceIdThread.uniqueId,
+                isEnabled: serviceIdValue != nil,
                 durationSeconds: serviceIdValue ?? 0,
                 timerVersion: 1,
             ),
-            phoneNumberThread.uniqueId: OWSDisappearingMessagesConfiguration(
-                threadId: phoneNumberThread.uniqueId,
-                enabled: phoneNumberValue != nil,
+            phoneNumberThread.uniqueId: DisappearingMessagesConfigurationRecord(
+                threadUniqueId: phoneNumberThread.uniqueId,
+                isEnabled: phoneNumberValue != nil,
                 durationSeconds: phoneNumberValue ?? 0,
                 timerVersion: 1,
             ),

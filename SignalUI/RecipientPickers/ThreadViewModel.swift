@@ -16,7 +16,7 @@ public class ThreadViewModel: NSObject {
     public let shortName: String?
     public let associatedData: ThreadAssociatedData
     public let hasPendingMessageRequest: Bool
-    public let disappearingMessagesConfiguration: OWSDisappearingMessagesConfiguration
+    public let disappearingMessagesConfiguration: DisappearingMessagesConfigurationRecord
     public let isBlocked: Bool
     public let isPinned: Bool
 

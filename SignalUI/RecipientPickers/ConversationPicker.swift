@@ -1369,7 +1369,7 @@ class ConversationPickerCell: ContactTableViewCell {
         return container
     }()
 
-    func buildAccessoryView(disappearingMessagesConfig: OWSDisappearingMessagesConfiguration?) -> ContactCellAccessoryView {
+    func buildAccessoryView(disappearingMessagesConfig: DisappearingMessagesConfigurationRecord?) -> ContactCellAccessoryView {
 
         selectionView.removeFromSuperview()
         let selectionWrapper = ManualLayoutView.wrapSubviewUsingIOSAutoLayout(selectionView)

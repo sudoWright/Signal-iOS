@@ -795,15 +795,6 @@ public extension String {
     }
 }
 
-// MARK: -
-
-@objc
-public extension NSString {
-    static func formatDurationLossless(durationSeconds: UInt32) -> String {
-        String.formatDurationLossless(durationSeconds: durationSeconds)
-    }
-}
-
 // MARK: - Filename
 
 public extension String {

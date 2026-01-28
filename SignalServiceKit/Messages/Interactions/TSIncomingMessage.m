@@ -4,7 +4,6 @@
 //
 
 #import "TSIncomingMessage.h"
-#import "OWSDisappearingMessagesConfiguration.h"
 #import "TSContactThread.h"
 #import "TSGroupThread.h"
 #import <SignalServiceKit/SignalServiceKit-Swift.h>

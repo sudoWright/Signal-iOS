@@ -18,7 +18,7 @@ final class ContactOutputStream {
         aci: Aci?,
         phoneNumber: E164?,
         signalAccount: SignalAccount?,
-        disappearingMessagesConfiguration: OWSDisappearingMessagesConfiguration?,
+        disappearingMessagesConfiguration: DisappearingMessagesConfigurationRecord?,
         inboxPosition: Int?,
     ) throws {
         let contactBuilder = SSKProtoContactDetails.builder()

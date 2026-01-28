@@ -1152,7 +1152,7 @@ extension CVComponentSystemMessage {
             "SYSTEM_MESSAGE_DEFAULT_DISAPPEARING_MESSAGE_TIMER_FORMAT",
             comment: "Indicator that the default disappearing message timer will be applied when you send a message. Embeds {default disappearing message time}",
         )
-        labelText.append(String(format: titleFormat, configuration.durationString))
+        labelText.append(String(format: titleFormat, configuration.durationString()))
 
         return buildComponentState(title: labelText, action: nil, expiration: nil)
     }

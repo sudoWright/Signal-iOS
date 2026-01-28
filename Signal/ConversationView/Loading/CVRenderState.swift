@@ -55,7 +55,7 @@ class CVRenderState {
 
     // TODO: We might want to precompute: interactionIndexMap, focusItemIndex, unreadIndicatorIndex
 
-    var disappearingMessagesConfiguration: OWSDisappearingMessagesConfiguration {
+    var disappearingMessagesConfiguration: DisappearingMessagesConfigurationRecord {
         threadViewModel.disappearingMessagesConfiguration
     }
 

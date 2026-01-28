@@ -8,12 +8,12 @@ import Foundation
 @objc(OWSDisappearingMessagesConfigurationMessage)
 final class DisappearingMessagesConfigurationMessage: TransientOutgoingMessage {
 
-    private let configuration: OWSDisappearingMessagesConfiguration
+    private let configuration: DisappearingMessagesConfigurationRecord
 
     override var isUrgent: Bool { false }
 
     init(
-        configuration: OWSDisappearingMessagesConfiguration,
+        configuration: DisappearingMessagesConfigurationRecord,
         thread: TSThread,
         tx: DBReadTransaction,
     ) {
@@ -35,7 +35,7 @@ final class DisappearingMessagesConfigurationMessage: TransientOutgoingMessage {
     }
 
     required init?(coder: NSCoder) {
-        guard let configuration = coder.decodeObject(of: OWSDisappearingMessagesConfiguration.self, forKey: "configuration") else {
+        guard let configuration = coder.decodeObject(of: DisappearingMessagesConfigurationRecord.self, forKey: "configuration") else {
             return nil
         }
         self.configuration = configuration

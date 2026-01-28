@@ -177,7 +177,7 @@ extension ConversationViewController {
 
     var thread: TSThread { threadViewModel.threadRecord }
 
-    var disappearingMessagesConfiguration: OWSDisappearingMessagesConfiguration { threadViewModel.disappearingMessagesConfiguration }
+    var disappearingMessagesConfiguration: DisappearingMessagesConfigurationRecord { threadViewModel.disappearingMessagesConfiguration }
 
     var conversationStyle: ConversationStyle {
         get { viewState.conversationStyle }
