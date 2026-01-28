@@ -126,10 +126,14 @@ public class CVComponentSystemMessage: CVComponentBase, CVRootComponent {
         let wallpaperModeHasChanged = hasWallpaper != componentView.hasWallpaper
         let isFirstInCluster = itemModel.itemViewState.isFirstInCluster
         let isLastInCluster = itemModel.itemViewState.isLastInCluster
-        let hasClusteringChanges = (componentView.isFirstInCluster != isFirstInCluster ||
-            componentView.isLastInCluster != isLastInCluster)
-        let hasSelectionChanges = (componentView.isShowingSelectionUI != isShowingSelectionUI ||
-            componentView.wasShowingSelectionUI != wasShowingSelectionUI)
+        let hasClusteringChanges = (
+            componentView.isFirstInCluster != isFirstInCluster ||
+                componentView.isLastInCluster != isLastInCluster,
+        )
+        let hasSelectionChanges = (
+            componentView.isShowingSelectionUI != isShowingSelectionUI ||
+                componentView.wasShowingSelectionUI != wasShowingSelectionUI,
+        )
         var hasActionButton = false
         if
             nil != action,
@@ -139,13 +143,15 @@ public class CVComponentSystemMessage: CVComponentBase, CVRootComponent {
             hasActionButton = true
         }
 
-        let isReusing = (componentView.rootView.superview != nil &&
-            !themeHasChanged &&
-            !wallpaperModeHasChanged &&
-            !hasClusteringChanges &&
-            !hasSelectionChanges &&
-            !hasActionButton &&
-            !componentView.hasActionButton)
+        let isReusing = (
+            componentView.rootView.superview != nil &&
+                !themeHasChanged &&
+                !wallpaperModeHasChanged &&
+                !hasClusteringChanges &&
+                !hasSelectionChanges &&
+                !hasActionButton &&
+                !componentView.hasActionButton,
+        )
         if !isReusing {
             componentView.reset(resetReusableState: true)
         }
@@ -453,10 +459,14 @@ public class CVComponentSystemMessage: CVComponentBase, CVRootComponent {
     public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
-        var maxContentWidth = (maxWidth -
-            (outerHStackConfig.layoutMargins.totalWidth +
-                outerVStackConfig.layoutMargins.totalWidth +
-                innerVStackConfig.layoutMargins.totalWidth))
+        var maxContentWidth = (
+            maxWidth -
+                (
+                    outerHStackConfig.layoutMargins.totalWidth +
+                        outerVStackConfig.layoutMargins.totalWidth +
+                        innerVStackConfig.layoutMargins.totalWidth
+                ),
+        )
 
         let selectionViewSize = CGSize(width: ConversationStyle.selectionViewWidth, height: 0)
         if isShowingSelectionUI || wasShowingSelectionUI {
@@ -493,11 +503,13 @@ public class CVComponentSystemMessage: CVComponentBase, CVRootComponent {
         innerVStackSubviewInfos.append(innerHStackMeasurement.measuredSize.asManualSubviewInfo)
         if let action, !itemViewState.shouldCollapseSystemMessageAction {
             let buttonLabelConfig = self.buttonLabelConfig(action: action)
-            let actionButtonSize = (CVText.measureLabel(
-                config: buttonLabelConfig,
-                maxWidth: maxContentWidth,
-            ) +
-                buttonContentEdgeInsets.asSize)
+            let actionButtonSize = (
+                CVText.measureLabel(
+                    config: buttonLabelConfig,
+                    maxWidth: maxContentWidth,
+                ) +
+                    buttonContentEdgeInsets.asSize,
+            )
             measurementBuilder.setSize(key: Self.measurementKey_buttonSize, size: actionButtonSize)
             innerVStackSubviewInfos.append(actionButtonSize.asManualSubviewInfo(hasFixedSize: true))
         }

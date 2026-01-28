@@ -133,8 +133,10 @@ class HTMLMetadataTests: XCTestCase {
     }
 
     func testLinkDataParsing() {
-        let linkText = ("<meta property=\"og:title\" content=\"Randomness is Random - Numberphile\">" +
-            "<meta property=\"og:image\" content=\"https://i.ytimg.com/vi/tP-Ipsat90c/maxresdefault.jpg\">")
+        let linkText = (
+            "<meta property=\"og:title\" content=\"Randomness is Random - Numberphile\">" +
+                "<meta property=\"og:image\" content=\"https://i.ytimg.com/vi/tP-Ipsat90c/maxresdefault.jpg\">",
+        )
 
         let content = HTMLMetadata.construct(parsing: linkText)
         XCTAssertNotNil(content)

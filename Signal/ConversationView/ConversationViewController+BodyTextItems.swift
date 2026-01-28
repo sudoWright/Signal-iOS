@@ -285,7 +285,8 @@ extension ConversationViewController {
                         from: self,
                         completion: nil,
                     )
-                })
+                },
+            )
 
         } else {
             // https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/PhoneLinks/PhoneLinks.html

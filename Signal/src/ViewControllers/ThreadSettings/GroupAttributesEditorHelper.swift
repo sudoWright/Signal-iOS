@@ -71,9 +71,11 @@ class GroupAttributesEditorHelper: NSObject {
     private let renderDefaultAvatarWhenCleared: Bool
 
     var hasUnsavedChanges: Bool {
-        return (groupNameOriginal != groupNameCurrent ||
-            groupDescriptionOriginal != groupDescriptionCurrent ||
-            avatarOriginal?.imageData != avatarCurrent?.imageData)
+        return (
+            groupNameOriginal != groupNameCurrent ||
+                groupDescriptionOriginal != groupDescriptionCurrent ||
+                avatarOriginal?.imageData != avatarCurrent?.imageData,
+        )
     }
 
     convenience init(

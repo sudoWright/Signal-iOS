@@ -364,7 +364,8 @@ private class PinnedMessageLongPressDelegate: NSObject, UIContextMenuInteraction
                             image: .copyLight,
                         ) { [weak self] _ in
                             self?.itemViewModel.copyTextAction()
-                        })
+                        },
+                    )
                 }
 
                 if itemViewModel.canSaveMedia {
@@ -377,7 +378,8 @@ private class PinnedMessageLongPressDelegate: NSObject, UIContextMenuInteraction
                             image: .saveLight,
                         ) { [weak self] _ in
                             self?.itemViewModel.saveMediaAction()
-                        })
+                        },
+                    )
                 }
 
                 if BuildFlags.PinnedMessages.send {

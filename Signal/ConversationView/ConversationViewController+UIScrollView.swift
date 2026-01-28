@@ -52,10 +52,14 @@ extension ConversationViewController {
             return
         }
 
-        let scrollSpaceToBottom = (safeContentHeight + collectionView.contentInset.bottom
-            - (collectionView.contentOffset.y + collectionView.frame.height))
-        let pageHeight = (collectionView.frame.height
-            - (collectionView.contentInset.top + collectionView.contentInset.bottom))
+        let scrollSpaceToBottom = (
+            safeContentHeight + collectionView.contentInset.bottom
+                - (collectionView.contentOffset.y + collectionView.frame.height),
+        )
+        let pageHeight = (
+            collectionView.frame.height
+                - (collectionView.contentInset.top + collectionView.contentInset.bottom),
+        )
         let isScrolledUpOnePage = scrollSpaceToBottom > pageHeight * 1.0
 
         let hasLaterMessageOffscreen = (lastSortIdInLoadedWindow > lastVisibleSortId) || canLoadNewerItems

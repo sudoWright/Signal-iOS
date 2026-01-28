@@ -330,14 +330,18 @@ public class CVComponentGenericAttachment: CVComponentBase, CVComponent {
             genericAttachment: genericAttachment,
             interaction: interaction,
         )
-        let leftViewSize: CGSize = (hasProgressView
-            ? .square(progressSize)
-            : iconSize)
+        let leftViewSize: CGSize = (
+            hasProgressView
+                ? .square(progressSize)
+                : iconSize,
+        )
 
-        let maxLabelWidth = max(0, maxWidth - (leftViewSize.width +
+        let maxLabelWidth = max(0, maxWidth - (
+            leftViewSize.width +
                 hSpacing +
                 hStackConfig.layoutMargins.totalWidth +
-                vStackConfig.layoutMargins.totalWidth))
+                vStackConfig.layoutMargins.totalWidth
+        ))
         let topLabelConfig = Self.topLabelConfig(
             genericAttachment: genericAttachment,
             textColor: .black, // Irrelevant for sizing

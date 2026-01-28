@@ -111,7 +111,8 @@ struct BackupOnboardingIntroView: View {
                         .padding(.vertical, 4)
                         .background(
                             Capsule().fill(
-                                Color.Signal.secondaryFill),
+                                Color.Signal.secondaryFill,
+                            ),
                         )
                         .foregroundStyle(Color.Signal.label)
                 }

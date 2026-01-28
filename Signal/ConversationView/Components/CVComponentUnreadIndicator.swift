@@ -62,9 +62,11 @@ public class CVComponentUnreadIndicator: CVComponentBase, CVRootComponent {
         let hasWallpaper = conversationStyle.hasWallpaper
         let wallpaperModeHasChanged = hasWallpaper != componentView.hasWallpaper
 
-        let isReusing = (componentView.rootView.superview != nil &&
-            !themeHasChanged &&
-            !wallpaperModeHasChanged)
+        let isReusing = (
+            componentView.rootView.superview != nil &&
+                !themeHasChanged &&
+                !wallpaperModeHasChanged,
+        )
 
         if !isReusing {
             componentView.reset(resetReusableState: true)
@@ -171,8 +173,10 @@ public class CVComponentUnreadIndicator: CVComponentBase, CVRootComponent {
         let availableWidth = max(
             0,
             maxWidth -
-                (innerStackConfig.layoutMargins.totalWidth +
-                    outerStackConfig.layoutMargins.totalWidth),
+                (
+                    innerStackConfig.layoutMargins.totalWidth +
+                        outerStackConfig.layoutMargins.totalWidth
+                ),
         )
         let labelSize = CVText.measureLabel(config: titleLabelConfig, maxWidth: availableWidth)
         let strokeSize = CGSize(width: 0, height: 1)

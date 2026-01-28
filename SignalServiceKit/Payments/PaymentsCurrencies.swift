@@ -84,8 +84,10 @@ public struct CurrencyConversionInfo {
         _ left: CurrencyConversionInfo?,
         _ right: CurrencyConversionInfo?,
     ) -> Bool {
-        return (left?.currencyCode == right?.currencyCode &&
-            left?.conversionRate == right?.conversionRate)
+        return (
+            left?.currencyCode == right?.currencyCode &&
+                left?.conversionRate == right?.conversionRate,
+        )
     }
 }
 

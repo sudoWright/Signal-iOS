@@ -718,8 +718,10 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
 
         var innerSubviewInfos = [ManualStackSubviewInfo]()
 
-        let maxContentWidth = maxWidth - (outerStackConfig.layoutMargins.totalWidth +
-            innerStackConfig.layoutMargins.totalWidth)
+        let maxContentWidth = maxWidth - (
+            outerStackConfig.layoutMargins.totalWidth +
+                innerStackConfig.layoutMargins.totalWidth
+        )
 
         innerSubviewInfos.append(avatarSizeClass.size.asManualSubviewInfo)
         innerSubviewInfos.append(CGSize(square: vSpacingTitle).asManualSubviewInfo)

@@ -294,9 +294,11 @@ public class CVPollView: ManualStackView {
             let voteLabelWidth = voteLabelWidthWithPadding(localizedVotes: localizedVotesString)
             let innerStackConfig = configurator.buildOptionRowInnerStackConfig(voteLabelWidth: voteLabelWidth)
 
-            let maxOptionLabelWidth = (maxLabelWidth - (innerStackConfig.layoutMargins.trailing +
+            let maxOptionLabelWidth = (maxLabelWidth - (
+                innerStackConfig.layoutMargins.trailing +
                     checkboxSize +
-                    innerStackConfig.spacing))
+                    innerStackConfig.spacing
+            ))
 
             let optionLabelTextSize = CVText.measureLabel(
                 config: optionTextConfig,

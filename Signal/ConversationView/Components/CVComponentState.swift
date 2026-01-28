@@ -1944,7 +1944,8 @@ private extension CVComponentState.Builder {
             let prevPollInteraction = prevRenderState.items.first(
                 where: {
                     $0.interactionUniqueId == message.uniqueId
-                }),
+                },
+            ),
             let _prevPollState = prevPollInteraction.componentState.poll
         {
             prevPollState = _prevPollState

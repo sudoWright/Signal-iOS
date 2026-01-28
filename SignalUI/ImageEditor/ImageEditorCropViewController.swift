@@ -1055,7 +1055,8 @@ extension ImageEditorCropViewController {
                         guard let self else { return }
                         self.cropTo(aspectRatio: aspectRatio)
                     },
-                ))
+                ),
+            )
         }
         actionSheet.addAction(ActionSheetAction(title: CommonStrings.cancelButton, style: .cancel))
         presentActionSheet(actionSheet)

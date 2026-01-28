@@ -186,9 +186,11 @@ class CustomColorViewController: OWSTableViewController2 {
     private var navigationState: NavigationState = .unknown
 
     private func updateNavigation() {
-        let navigationState: NavigationState = (hasUnsavedChanges
-            ? .hasUnsavedChanges
-            : .noUnsavedChanges)
+        let navigationState: NavigationState = (
+            hasUnsavedChanges
+                ? .hasUnsavedChanges
+                : .noUnsavedChanges,
+        )
         guard self.navigationState != navigationState else {
             return
         }
@@ -1088,9 +1090,11 @@ private class CustomColorPreviewView: UIView {
             self.addSubview(swatchView)
             swatchView.autoCenterInSuperview()
 
-            let selectedColor = (Theme.isDarkThemeEnabled
-                ? UIColor.ows_white
-                : UIColor(white: 0, alpha: 0.6))
+            let selectedColor = (
+                Theme.isDarkThemeEnabled
+                    ? UIColor.ows_white
+                    : UIColor(white: 0, alpha: 0.6),
+            )
             selectedBorder.layer.borderColor = selectedColor.cgColor
             selectedBorder.layer.borderWidth = Self.selectedBorderThickness
             selectedBorder.autoSetDimensions(to: .square(Self.swatchSize + Self.selectedBorderThickness * 2))
@@ -1256,9 +1260,11 @@ private class CustomColorPreviewView: UIView {
                 }
             }
 
-            delegate.switchToEditMode(gestureMode == .knob1
-                ? .gradientColor1
-                : .gradientColor2)
+            delegate.switchToEditMode(
+                gestureMode == .knob1
+                    ? .gradientColor1
+                    : .gradientColor2,
+            )
             knobView1.isSelected = gestureMode == .knob1
             knobView2.isSelected = gestureMode == .knob2
 
@@ -1438,9 +1444,11 @@ private class CustomColorPreviewView: UIView {
                 hideTooltip()
                 return
             }
-            let knobView = (knobView1.frame.y < knobView2.frame.y
-                ? knobView1
-                : knobView2)
+            let knobView = (
+                knobView1.frame.y < knobView2.frame.y
+                    ? knobView1
+                    : knobView2,
+            )
             self.customColorTooltip = CustomColorTooltip.present(
                 fromView: self,
                 widthReferenceView: self,

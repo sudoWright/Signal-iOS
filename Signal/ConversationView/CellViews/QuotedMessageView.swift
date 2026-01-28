@@ -489,9 +489,11 @@ public class QuotedMessageView: ManualStackViewWithLayer {
             referenceView: componentDelegate.view,
         )
         bubbleView.addSubviewToFillSuperviewEdges(chatColorView)
-        tintView.backgroundColor = (conversationStyle.isDarkThemeEnabled
-            ? UIColor(white: 0, alpha: 0.4)
-            : UIColor(white: 1, alpha: 0.6))
+        tintView.backgroundColor = (
+            conversationStyle.isDarkThemeEnabled
+                ? UIColor(white: 0, alpha: 0.4)
+                : UIColor(white: 1, alpha: 0.6),
+        )
         bubbleView.addSubviewToFillSuperviewMargins(tintView)
         // For incoming messages, manipulate leading margin
         // to render stripe.
@@ -833,12 +835,14 @@ public class QuotedMessageView: ManualStackViewWithLayer {
         let quotedReactionRect = configurator.quotedReactionRect
         let quotedReplyModel = configurator.quotedReplyModel
 
-        var maxLabelWidth = (maxWidth - (configurator.stripeThickness +
+        var maxLabelWidth = (maxWidth - (
+            configurator.stripeThickness +
                 hStackConfig.spacing * 2 +
                 hStackConfig.layoutMargins.totalWidth +
                 innerVStackConfig.layoutMargins.totalWidth +
                 outerVStackConfig.layoutMargins.totalWidth +
-                outerStackConfig.layoutMargins.totalWidth))
+                outerStackConfig.layoutMargins.totalWidth
+        ))
         if hasQuotedThumbnail {
             maxLabelWidth -= quotedAttachmentSize.width
             if hasReaction { maxLabelWidth -= quotedReactionRect.width / 2 }

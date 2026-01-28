@@ -1300,8 +1300,10 @@ public class CVComponentMessage: CVComponentBase, CVRootComponent {
         //
         // We only place the spacing on "nested" stacks.
         // So one of the two sections should be nested.
-        owsAssertDebug(topSectionItem.sectionType.isNestedSection ||
-            bottomSectionItem.sectionType.isNestedSection)
+        owsAssertDebug(
+            topSectionItem.sectionType.isNestedSection ||
+                bottomSectionItem.sectionType.isNestedSection,
+        )
         // If two "nested" sections are adjacent, we don't want to create the
         // margin on both stacks, that would double the spacing.
         if
@@ -1561,8 +1563,10 @@ public class CVComponentMessage: CVComponentBase, CVRootComponent {
         }
 
         owsAssertDebug(conversationStyle.maxMediaMessageWidth <= conversationStyle.maxMessageWidth)
-        let shouldUseNarrowMaxWidth = (bodyMedia != nil ||
-            linkPreview != nil)
+        let shouldUseNarrowMaxWidth = (
+            bodyMedia != nil ||
+                linkPreview != nil,
+        )
         if shouldUseNarrowMaxWidth {
             contentMaxWidth = max(0, min(conversationStyle.maxMediaMessageWidth, contentMaxWidth))
         } else {
@@ -2403,9 +2407,11 @@ public class CVComponentMessage: CVComponentBase, CVRootComponent {
             slowOffset: CGPoint,
         ) {
             for swipeToReplyWrapper in swipeToReplyWrappers {
-                let offset = (swipeToReplyWrapper.useSlowOffset
-                    ? slowOffset
-                    : fastOffset)
+                let offset = (
+                    swipeToReplyWrapper.useSlowOffset
+                        ? slowOffset
+                        : fastOffset,
+                )
                 swipeToReplyWrapper.offset = offset
             }
         }

@@ -230,9 +230,11 @@ public class SendPaymentCompletionActionSheet: ActionSheetController {
 
         updateHeader(canCancel: false)
 
-        let animationName = (Theme.isDarkThemeEnabled
-            ? "payments_spinner_dark"
-            : "payments_spinner")
+        let animationName = (
+            Theme.isDarkThemeEnabled
+                ? "payments_spinner_dark"
+                : "payments_spinner",
+        )
         let animationView = LottieAnimationView(name: animationName)
         animationView.backgroundBehavior = .pauseAndRestore
         animationView.loopMode = .loop

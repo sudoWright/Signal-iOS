@@ -123,9 +123,11 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
     }
 
     private var innerStackConfig: CVStackViewConfig {
-        let layoutMargins: UIEdgeInsets = (isBorderlessWithWallpaper
-            ? UIEdgeInsets(hMargin: 12, vMargin: 3)
-            : .zero)
+        let layoutMargins: UIEdgeInsets = (
+            isBorderlessWithWallpaper
+                ? UIEdgeInsets(hMargin: 12, vMargin: 3)
+                : .zero,
+        )
         return CVStackViewConfig(
             axis: .horizontal,
             alignment: .center,
@@ -140,8 +142,10 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
     public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
-        let maxWidth = maxWidth - (outerStackConfig.layoutMargins.totalWidth +
-            innerStackConfig.layoutMargins.totalWidth)
+        let maxWidth = maxWidth - (
+            outerStackConfig.layoutMargins.totalWidth +
+                innerStackConfig.layoutMargins.totalWidth
+        )
 
         var subviewInfos: [ManualStackSubviewInfo] = []
         var maxSenderNameWidth = maxWidth

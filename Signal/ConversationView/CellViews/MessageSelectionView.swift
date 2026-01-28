@@ -56,8 +56,10 @@ public class MessageSelectionView: ManualLayoutView {
             selectedView.tintColor = .ows_white
             unselectedView.layer.borderColor = UIColor.ows_white.cgColor
             backgroundView.backgroundColor = UIColor.ows_black.withAlphaComponent(0.2)
-            backgroundView.isHidden = (!conversationStyle.hasWallpaper ||
-                !conversationStyle.isWallpaperPhoto)
+            backgroundView.isHidden = (
+                !conversationStyle.hasWallpaper ||
+                    !conversationStyle.isWallpaperPhoto,
+            )
         } else {
             selectedView.tintColor = .ows_accentBlue
             unselectedView.layer.borderColor = UIColor.ows_gray25.cgColor

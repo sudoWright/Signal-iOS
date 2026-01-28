@@ -400,14 +400,20 @@ extension VideoTimelineView {
 
         // Our gesture handling is permissive, trim gestures can start
         // a little bit outside the visible "trim handles".
-        let couldBeTrimStart = (dataSource.canBeTrimmed &&
-            location.x >= (outerTrimRect.minX - Constants.extraHotArea) &&
-            location.x <= (innerTrimRect.minX + Constants.extraHotArea))
-        let couldBeTrimEnd = (dataSource.canBeTrimmed &&
-            location.x >= (innerTrimRect.maxX - Constants.extraHotArea) &&
-            location.x <= (outerTrimRect.maxX + Constants.extraHotArea))
-        let couldBeScrub = (location.x >= innerTrimRect.minX &&
-            location.x <= innerTrimRect.maxX)
+        let couldBeTrimStart = (
+            dataSource.canBeTrimmed &&
+                location.x >= (outerTrimRect.minX - Constants.extraHotArea) &&
+                location.x <= (innerTrimRect.minX + Constants.extraHotArea),
+        )
+        let couldBeTrimEnd = (
+            dataSource.canBeTrimmed &&
+                location.x >= (innerTrimRect.maxX - Constants.extraHotArea) &&
+                location.x <= (outerTrimRect.maxX + Constants.extraHotArea),
+        )
+        let couldBeScrub = (
+            location.x >= innerTrimRect.minX &&
+                location.x <= innerTrimRect.maxX,
+        )
 
         // Prefer trimming to scrubbing.
         if couldBeTrimStart, couldBeTrimEnd {

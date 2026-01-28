@@ -358,15 +358,17 @@ class PaymentsDetailViewController: OWSTableViewController2 {
             )
         }
 
-        let footerText = (paymentItem.isDefragmentation
-            ? OWSLocalizedString(
-                "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION",
-                comment: "Footer string for the status section of the payment details view in the app settings for defragmentation transactions.",
-            )
-            : OWSLocalizedString(
-                "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER",
-                comment: "Footer string for the status section of the payment details view in the app settings.",
-            ))
+        let footerText = (
+            paymentItem.isDefragmentation
+                ? OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER_DEFRAGMENTATION",
+                    comment: "Footer string for the status section of the payment details view in the app settings for defragmentation transactions.",
+                )
+                : OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_PAYMENT_DETAILS_STATUS_FOOTER",
+                    comment: "Footer string for the status section of the payment details view in the app settings.",
+                ),
+        )
         let footerLabel = PaymentsViewUtils.buildTextWithLearnMoreLinkTextView(
             text: footerText,
             font: .dynamicTypeCaption1Clamped,

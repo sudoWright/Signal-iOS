@@ -165,9 +165,11 @@ public class GroupsV2OutgoingChanges {
             accessForAddFromInviteLink = .unsatisfiable
             inviteLinkPasswordMode = .ignore
         case .enabledWithoutApproval, .enabledWithApproval:
-            accessForAddFromInviteLink = (linkMode == .enabledWithoutApproval
-                ? .any
-                : .administrator)
+            accessForAddFromInviteLink = (
+                linkMode == .enabledWithoutApproval
+                    ? .any
+                    : .administrator,
+            )
             inviteLinkPasswordMode = .ensureValid
         }
     }

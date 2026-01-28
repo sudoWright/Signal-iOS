@@ -348,8 +348,10 @@ public class CLVLoadCoordinator {
         // app is foreground and active.  Therefore we need to make an
         // exception and update the view contents; otherwise, the home
         // view will briefly appear empty after launch.
-        let shouldForceLoad = (!viewController.hasEverAppeared &&
-            viewController.tableDataSource.renderState.visibleThreadCount == 0)
+        let shouldForceLoad = (
+            !viewController.hasEverAppeared &&
+                viewController.tableDataSource.renderState.visibleThreadCount == 0,
+        )
 
         loadIfNecessary(suppressAnimations: true, shouldForceLoad: shouldForceLoad)
     }

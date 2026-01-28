@@ -66,9 +66,11 @@ public class PaymentModelCell: UITableViewCell {
         statusLabel.textColor = .Signal.tertiaryLabel
 
         amountLabel.font = .dynamicTypeBodyClamped
-        amountLabel.textColor = (paymentItem.isIncoming
-            ? UIColor.ows_accentGreen
-            : Theme.primaryTextColor)
+        amountLabel.textColor = (
+            paymentItem.isIncoming
+                ? UIColor.ows_accentGreen
+                : Theme.primaryTextColor,
+        )
 
         var avatarView: UIView
         if let address = paymentItem.address {

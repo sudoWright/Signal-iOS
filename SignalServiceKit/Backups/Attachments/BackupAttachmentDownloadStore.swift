@@ -249,8 +249,10 @@ public class BackupAttachmentDownloadStore {
         tx: DBWriteTransaction,
     ) {
         let query = QueuedBackupAttachmentDownload
-            .filter(Column(QueuedBackupAttachmentDownload.CodingKeys.state) ==
-                QueuedBackupAttachmentDownload.State.ready.rawValue)
+            .filter(
+                Column(QueuedBackupAttachmentDownload.CodingKeys.state) ==
+                    QueuedBackupAttachmentDownload.State.ready.rawValue,
+            )
             .filter(Column(QueuedBackupAttachmentDownload.CodingKeys.canDownloadFromMediaTier) == true)
             .filter(Column(QueuedBackupAttachmentDownload.CodingKeys.maxOwnerTimestamp) != nil)
             .filter(Column(QueuedBackupAttachmentDownload.CodingKeys.maxOwnerTimestamp) < timestamp)
@@ -269,8 +271,10 @@ public class BackupAttachmentDownloadStore {
     /// Marks all ineligible rows as ready (no filtering applied).
     public func markAllIneligibleReady(tx: DBWriteTransaction) {
         let query = QueuedBackupAttachmentDownload
-            .filter(Column(QueuedBackupAttachmentDownload.CodingKeys.state) ==
-                QueuedBackupAttachmentDownload.State.ineligible.rawValue)
+            .filter(
+                Column(QueuedBackupAttachmentDownload.CodingKeys.state) ==
+                    QueuedBackupAttachmentDownload.State.ineligible.rawValue,
+            )
 
         failIfThrows {
             try query.updateAll(
@@ -286,8 +290,10 @@ public class BackupAttachmentDownloadStore {
     /// Marks all ready rows as ineligible (no filtering applied).
     public func markAllReadyIneligible(tx: DBWriteTransaction) {
         let query = QueuedBackupAttachmentDownload
-            .filter(Column(QueuedBackupAttachmentDownload.CodingKeys.state) ==
-                QueuedBackupAttachmentDownload.State.ready.rawValue)
+            .filter(
+                Column(QueuedBackupAttachmentDownload.CodingKeys.state) ==
+                    QueuedBackupAttachmentDownload.State.ready.rawValue,
+            )
 
         failIfThrows {
             try query.updateAll(
@@ -316,8 +322,10 @@ public class BackupAttachmentDownloadStore {
         }
 
         let query = QueuedBackupAttachmentDownload
-            .filter(Column(QueuedBackupAttachmentDownload.CodingKeys.state) ==
-                QueuedBackupAttachmentDownload.State.done.rawValue)
+            .filter(
+                Column(QueuedBackupAttachmentDownload.CodingKeys.state) ==
+                    QueuedBackupAttachmentDownload.State.done.rawValue,
+            )
 
         failIfThrows {
             try query.deleteAll(tx.database)

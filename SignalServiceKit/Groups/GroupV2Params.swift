@@ -176,9 +176,11 @@ public extension GroupV2Params {
 
     func encryptDisappearingMessagesTimer(_ token: DisappearingMessageToken) throws -> Data {
         do {
-            let duration = (token.isEnabled
-                ? token.durationSeconds
-                : 0)
+            let duration = (
+                token.isEnabled
+                    ? token.durationSeconds
+                    : 0,
+            )
             var blobBuilder = GroupsProtoGroupAttributeBlob.builder()
             blobBuilder.setContent(GroupsProtoGroupAttributeBlobOneOfContent.disappearingMessagesDuration(duration))
             let blobData = try blobBuilder.buildSerializedData()

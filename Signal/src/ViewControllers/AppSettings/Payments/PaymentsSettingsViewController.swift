@@ -774,15 +774,17 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
         bodyLabel.lineBreakMode = .byWordWrapping
         bodyLabel.textAlignment = .center
 
-        let buttonTitle = (SUIEnvironment.shared.paymentsRef.paymentsEntropy != nil
-            ? OWSLocalizedString(
-                "SETTINGS_PAYMENTS_OPT_IN_REACTIVATE_BUTTON",
-                comment: "Label for 'activate' button in the 'payments opt-in' view in the app settings.",
-            )
-            : OWSLocalizedString(
-                "SETTINGS_PAYMENTS_OPT_IN_ACTIVATE_BUTTON",
-                comment: "Label for 'activate' button in the 'payments opt-in' view in the app settings.",
-            ))
+        let buttonTitle = (
+            SUIEnvironment.shared.paymentsRef.paymentsEntropy != nil
+                ? OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_OPT_IN_REACTIVATE_BUTTON",
+                    comment: "Label for 'activate' button in the 'payments opt-in' view in the app settings.",
+                )
+                : OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_OPT_IN_ACTIVATE_BUTTON",
+                    comment: "Label for 'activate' button in the 'payments opt-in' view in the app settings.",
+                ),
+        )
         let activateButton = OWSFlatButton.button(
             title: buttonTitle,
             font: UIFont.dynamicTypeHeadline,
@@ -993,9 +995,11 @@ public class PaymentsSettingsViewController: OWSTableViewController2 {
                 )
                 dismissIconView.autoSetDimensions(to: .square(10))
                 let dismissButton = OWSLayerView.circleView()
-                dismissButton.backgroundColor = (Theme.isDarkThemeEnabled
-                    ? .ows_gray65
-                    : .ows_gray02)
+                dismissButton.backgroundColor = (
+                    Theme.isDarkThemeEnabled
+                        ? .ows_gray65
+                        : .ows_gray02,
+                )
                 dismissButton.addTapGesture { [weak self] in
                     self?.dismissHelpCard(helpCard)
                 }

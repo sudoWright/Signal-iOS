@@ -199,7 +199,8 @@ public class CVMediaView: ManualLayoutViewWithLayer {
         } else {
             createNewReusableMediaView(
                 mediaViewAdapter: MediaViewAdapterLoopingVideo(
-                    attachmentStream: attachmentStream),
+                    attachmentStream: attachmentStream,
+                ),
                 isAnimated: true,
             )
         }

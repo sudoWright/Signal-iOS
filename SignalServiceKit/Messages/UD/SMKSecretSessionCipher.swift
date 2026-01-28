@@ -298,7 +298,8 @@ public class SMKSecretSessionCipher: NSObject {
             plaintextData = plaintextMessage.body
         case let unknownType:
             throw SMKError.assertionError(
-                description: "[\(type(of: self))] Not prepared to handle this message type: \(unknownType.rawValue)")
+                description: "[\(type(of: self))] Not prepared to handle this message type: \(unknownType.rawValue)",
+            )
         }
         return plaintextData
     }

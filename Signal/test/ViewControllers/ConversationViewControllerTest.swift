@@ -25,7 +25,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
         )
         XCTAssertEqual(
             CVCBottomViewType.messageRequestView(
@@ -37,7 +38,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
             CVCBottomViewType.messageRequestView(
                 messageRequestType: MessageRequestType(
                     isGroupV1Thread: true,
@@ -47,7 +49,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
         )
         XCTAssertNotEqual(
             CVCBottomViewType.messageRequestView(
@@ -59,7 +62,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
             CVCBottomViewType.messageRequestView(
                 messageRequestType: MessageRequestType(
                     isGroupV1Thread: true,
@@ -69,7 +73,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
         )
         XCTAssertEqual(
             CVCBottomViewType.messageRequestView(
@@ -81,7 +86,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
             CVCBottomViewType.messageRequestView(
                 messageRequestType: MessageRequestType(
                     isGroupV1Thread: true,
@@ -91,7 +97,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
         )
         XCTAssertNotEqual(
             CVCBottomViewType.messageRequestView(
@@ -103,7 +110,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
             CVCBottomViewType.messageRequestView(
                 messageRequestType: MessageRequestType(
                     isGroupV1Thread: true,
@@ -113,7 +121,8 @@ class ConversationViewControllerTest: SignalBaseTest {
                     isThreadFromHiddenRecipient: false,
                     hasReportedSpam: false,
                     isLocalUserInvitedMember: false,
-                )),
+                ),
+            ),
         )
     }
 }

@@ -77,8 +77,10 @@ public class OrphanedBackupAttachmentStore {
         let mediaNameQuery = OrphanedBackupAttachment
             // Records for thumbnails are enqueued with the fullsize's media name
             .filter(Column(OrphanedBackupAttachment.CodingKeys.mediaName) == fullsizeMediaName)
-            .filter(Column(OrphanedBackupAttachment.CodingKeys.type)
-                == OrphanedBackupAttachment.SizeType.thumbnail.rawValue)
+            .filter(
+                Column(OrphanedBackupAttachment.CodingKeys.type)
+                    == OrphanedBackupAttachment.SizeType.thumbnail.rawValue,
+            )
 
         let mediaIdQuery = OrphanedBackupAttachment
             // No need to filter by type; matching the mediaId is sufficient
@@ -100,8 +102,10 @@ public class OrphanedBackupAttachmentStore {
     ) {
         let mediaNameQuery = OrphanedBackupAttachment
             .filter(Column(OrphanedBackupAttachment.CodingKeys.mediaName) == mediaName)
-            .filter(Column(OrphanedBackupAttachment.CodingKeys.type)
-                == OrphanedBackupAttachment.SizeType.fullsize.rawValue)
+            .filter(
+                Column(OrphanedBackupAttachment.CodingKeys.type)
+                    == OrphanedBackupAttachment.SizeType.fullsize.rawValue,
+            )
         let mediaIdQuery = OrphanedBackupAttachment
             // No need to filter by type; matching the mediaId is sufficient
             .filter(Column(OrphanedBackupAttachment.CodingKeys.mediaId) == fullsizeMediaId)

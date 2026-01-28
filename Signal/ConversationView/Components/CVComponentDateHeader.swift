@@ -90,9 +90,11 @@ public class CVComponentDateHeader: CVComponentBase, CVRootComponent {
         let hasWallpaper = conversationStyle.hasWallpaper
         let wallpaperModeHasChanged = hasWallpaper != componentView.hasWallpaper
 
-        let isReusing = (componentView.rootView.superview != nil &&
-            !themeHasChanged &&
-            !wallpaperModeHasChanged)
+        let isReusing = (
+            componentView.rootView.superview != nil &&
+                !themeHasChanged &&
+                !wallpaperModeHasChanged,
+        )
         if !isReusing {
             componentView.reset(resetReusableState: true)
         }
@@ -255,8 +257,10 @@ public class CVComponentDateHeader: CVComponentBase, CVRootComponent {
         let availableWidth = max(
             0,
             maxWidth -
-                (innerStackConfig.layoutMargins.totalWidth +
-                    outerStackConfig.layoutMargins.totalWidth),
+                (
+                    innerStackConfig.layoutMargins.totalWidth +
+                        outerStackConfig.layoutMargins.totalWidth
+                ),
         )
         let labelSize = CVText.measureLabel(config: titleLabelConfigForPlainContentView, maxWidth: availableWidth)
 

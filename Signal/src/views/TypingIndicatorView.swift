@@ -181,9 +181,11 @@ class TypingIndicatorView: ManualStackView {
         fileprivate func startAnimation() {
             stopAnimation()
 
-            let baseColor = (Theme.isDarkThemeEnabled
-                ? UIColor(rgbHex: 0xBBBDBE)
-                : UIColor(rgbHex: 0x636467))
+            let baseColor = (
+                Theme.isDarkThemeEnabled
+                    ? UIColor(rgbHex: 0xBBBDBE)
+                    : UIColor(rgbHex: 0x636467),
+            )
             let timeIncrement: CFTimeInterval = 0.15
             var colorValues = [CGColor]()
             var pathValues = [CGPath]()

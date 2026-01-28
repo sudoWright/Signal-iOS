@@ -476,9 +476,11 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
     }
 
     private var labelConfigForRemotelyDeleted: CVLabelConfig {
-        let text = (isIncoming
-            ? OWSLocalizedString("THIS_MESSAGE_WAS_DELETED", comment: "text indicating the message was remotely deleted")
-            : OWSLocalizedString("YOU_DELETED_THIS_MESSAGE", comment: "text indicating the message was remotely deleted by you"))
+        let text = (
+            isIncoming
+                ? OWSLocalizedString("THIS_MESSAGE_WAS_DELETED", comment: "text indicating the message was remotely deleted")
+                : OWSLocalizedString("YOU_DELETED_THIS_MESSAGE", comment: "text indicating the message was remotely deleted by you"),
+        )
         return CVLabelConfig(
             text: .text(text),
             displayConfig: .forUnstyledText(font: textMessageFont.italic(), textColor: bodyTextColor),
@@ -544,9 +546,11 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
     private var linkifyStyle: CVTextLabel.LinkifyStyle { .underlined(bodyTextColor: bodyTextColor) }
 
     private func textViewConfig(displayableText: DisplayableText) -> CVTextViewConfig {
-        let textAlignment = (isTextExpanded
-            ? displayableText.fullTextNaturalAlignment
-            : displayableText.displayTextNaturalAlignment)
+        let textAlignment = (
+            isTextExpanded
+                ? displayableText.fullTextNaturalAlignment
+                : displayableText.displayTextNaturalAlignment,
+        )
 
         let text = displayableText.textValue(isTextExpanded: isTextExpanded)
         let linkItems = bodyTextState.items

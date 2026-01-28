@@ -818,8 +818,10 @@ public class GroupMembership: NSObject, NSSecureCoding {
         // MARK: Build
 
         public func build() -> GroupMembership {
-            owsAssertDebug(Set(bannedMembers.keys.lazy.map { SignalServiceAddress($0) })
-                .isDisjoint(with: Set(memberStates.keys)))
+            owsAssertDebug(
+                Set(bannedMembers.keys.lazy.map { SignalServiceAddress($0) })
+                    .isDisjoint(with: Set(memberStates.keys)),
+            )
 
             // TODO: Why is this here? Uggh.
             let memberStates = self.memberStates.filter {

@@ -1504,7 +1504,8 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
                     RegistrationEnterAccountEntropyPoolState(
                         canShowBackButton: persistedState.accountIdentity == nil,
                         canShowNoKeyHelpButton: true,
-                    ))
+                    ),
+                )
             case .skipRestore:
                 return await updateRestoreMethod(method: .declined).awaitable()
             case .tryAgain, .restartQuickRestore, .none:
@@ -1818,7 +1819,8 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
                     tier: registrationMessage.tier ?? .free,
                     lastBackupDate: registrationMessage.backupTimestamp.map(Date.init(millisecondsSince1970:)),
                     lastBackupSizeBytes: registrationMessage.backupSizeBytes.map(UInt.init),
-                ))
+                ),
+            )
         case .declined:
             // We shouldn't get back into the QuickRestore pathway after declining, so warn about it
             owsFailDebug("Quick restore declined, but attempting to ask for restore method again.")
@@ -1846,7 +1848,8 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
             RegistrationEnterAccountEntropyPoolState(
                 canShowBackButton: persistedState.accountIdentity == nil,
                 canShowNoKeyHelpButton: true,
-            ))
+            ),
+        )
     }
 
     private func splashStepToShow() -> RegistrationStep? {
@@ -1894,7 +1897,8 @@ public class RegistrationCoordinatorImpl: RegistrationCoordinator {
                 RegistrationEnterAccountEntropyPoolState(
                     canShowBackButton: persistedState.accountIdentity == nil,
                     canShowNoKeyHelpButton: true,
-                ))
+                ),
+            )
         }
 
         // Attempt to register right away with the password.

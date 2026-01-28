@@ -152,15 +152,17 @@ extension ConversationViewController {
 
     public func showUnknownThreadWarningAlert() {
         // TODO: Finalize this copy.
-        let message = (thread.isGroupThread
-            ? OWSLocalizedString(
-                "ALERT_UNKNOWN_THREAD_WARNING_GROUP_MESSAGE",
-                comment: "Message for UI warning about an unknown group thread.",
-            )
-            : OWSLocalizedString(
-                "ALERT_UNKNOWN_THREAD_WARNING_CONTACT_MESSAGE",
-                comment: "Message for UI warning about an unknown contact thread.",
-            ))
+        let message = (
+            thread.isGroupThread
+                ? OWSLocalizedString(
+                    "ALERT_UNKNOWN_THREAD_WARNING_GROUP_MESSAGE",
+                    comment: "Message for UI warning about an unknown group thread.",
+                )
+                : OWSLocalizedString(
+                    "ALERT_UNKNOWN_THREAD_WARNING_CONTACT_MESSAGE",
+                    comment: "Message for UI warning about an unknown contact thread.",
+                ),
+        )
         let actionSheet = ActionSheetController(message: message)
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(

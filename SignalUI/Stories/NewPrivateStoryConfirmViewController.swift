@@ -146,7 +146,8 @@ public class NewPrivateStoryConfirmViewController: OWSTableViewController2 {
                         cell.configure(configuration: configuration, transaction: transaction)
                     }
                     return cell
-                }))
+                },
+            ))
         }
         contents.add(viewersSection)
 

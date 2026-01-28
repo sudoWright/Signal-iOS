@@ -577,26 +577,30 @@ extension ConversationSettingsViewController {
                 var customColor: UIColor?
                 if self.threadViewModel.isBlocked {
                     cellTitle =
-                        (self.thread.isGroupThread
-                            ? OWSLocalizedString(
-                                "CONVERSATION_SETTINGS_UNBLOCK_GROUP",
-                                comment: "Label for 'unblock group' action in conversation settings view.",
-                            )
-                            : OWSLocalizedString(
-                                "CONVERSATION_SETTINGS_UNBLOCK_USER",
-                                comment: "Label for 'unblock user' action in conversation settings view.",
-                            ))
+                        (
+                            self.thread.isGroupThread
+                                ? OWSLocalizedString(
+                                    "CONVERSATION_SETTINGS_UNBLOCK_GROUP",
+                                    comment: "Label for 'unblock group' action in conversation settings view.",
+                                )
+                                : OWSLocalizedString(
+                                    "CONVERSATION_SETTINGS_UNBLOCK_USER",
+                                    comment: "Label for 'unblock user' action in conversation settings view.",
+                                ),
+                        )
                 } else {
                     cellTitle =
-                        (self.thread.isGroupThread
-                            ? OWSLocalizedString(
-                                "CONVERSATION_SETTINGS_BLOCK_GROUP",
-                                comment: "Label for 'block group' action in conversation settings view.",
-                            )
-                            : OWSLocalizedString(
-                                "CONVERSATION_SETTINGS_BLOCK_USER",
-                                comment: "Label for 'block user' action in conversation settings view.",
-                            ))
+                        (
+                            self.thread.isGroupThread
+                                ? OWSLocalizedString(
+                                    "CONVERSATION_SETTINGS_BLOCK_GROUP",
+                                    comment: "Label for 'block group' action in conversation settings view.",
+                                )
+                                : OWSLocalizedString(
+                                    "CONVERSATION_SETTINGS_BLOCK_USER",
+                                    comment: "Label for 'block user' action in conversation settings view.",
+                                ),
+                        )
                     customColor = UIColor.ows_accentRed
                 }
                 let cell = OWSTableItem.buildCell(
@@ -871,9 +875,11 @@ extension ConversationSettingsViewController {
     ) {
         let section = OWSTableSection()
 
-        let groupLinkStatus = (groupModelV2.isGroupInviteLinkEnabled
-            ? CommonStrings.switchOn
-            : CommonStrings.switchOff)
+        let groupLinkStatus = (
+            groupModelV2.isGroupInviteLinkEnabled
+                ? CommonStrings.switchOn
+                : CommonStrings.switchOff,
+        )
         section.add(
             OWSTableItem.disclosureItem(
                 icon: .groupInfoGroupLink,

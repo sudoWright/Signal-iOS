@@ -389,10 +389,12 @@ struct CVItemModelBuilder: CVItemBuilding {
                 // ...but always show the "disappearing messages" animation...
                 // ...and always show the "tap to read more" footer.
                 let nextTimestampText = DateUtil.formatTimestampShort(nextIncomingMessage.timestamp)
-                itemViewState.shouldHideFooter = (timestampText == nextTimestampText &&
-                    !isDisappearingMessage &&
-                    incomingMessage.editState == .none &&
-                    !tapForMoreState.shouldShowFooter)
+                itemViewState.shouldHideFooter = (
+                    timestampText == nextTimestampText &&
+                        !isDisappearingMessage &&
+                        incomingMessage.editState == .none &&
+                        !tapForMoreState.shouldShowFooter,
+                )
             } else {
                 itemViewState.isLastInCluster = true
             }

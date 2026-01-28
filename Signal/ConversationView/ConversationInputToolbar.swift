@@ -2323,9 +2323,11 @@ public class ConversationInputToolbar: UIView, QuotedReplyPreviewDelegate {
 
             // Set initial scroll position in the list.
             stickersListView.contentOffset = CGPoint(
-                x: -(CurrentAppContext().isRTL
-                    ? stickersListView.frame.width - stickersListView.contentSize.width - StickerLayout.listViewPadding.right
-                    : StickerLayout.listViewPadding.left),
+                x: -(
+                    CurrentAppContext().isRTL
+                        ? stickersListView.frame.width - stickersListView.contentSize.width - StickerLayout.listViewPadding.right
+                        : StickerLayout.listViewPadding.left
+                ),
                 y: -StickerLayout.listViewPadding.top,
             )
         }

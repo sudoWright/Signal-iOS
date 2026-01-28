@@ -1031,9 +1031,11 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         )
         iconView.autoSetDimensions(to: .square(24))
         let iconCircleView = OWSLayerView.circleView(size: CGFloat(Self.paymentsBannerAvatarSize))
-        iconCircleView.backgroundColor = (Theme.isDarkThemeEnabled
-            ? .ows_gray80
-            : .ows_gray95)
+        iconCircleView.backgroundColor = (
+            Theme.isDarkThemeEnabled
+                ? .ows_gray80
+                : .ows_gray95,
+        )
         iconCircleView.addSubview(iconView)
         iconView.autoCenterInSuperview()
 
@@ -1083,13 +1085,17 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         paymentsBannerView.autoPinEdgesToSuperviewEdges()
 
         if UIDevice.current.isIPad {
-            paymentsReminderView.backgroundColor = (Theme.isDarkThemeEnabled
-                ? .ows_gray75
-                : .ows_gray05)
+            paymentsReminderView.backgroundColor = (
+                Theme.isDarkThemeEnabled
+                    ? .ows_gray75
+                    : .ows_gray05,
+            )
         } else {
-            paymentsReminderView.backgroundColor = (Theme.isDarkThemeEnabled
-                ? .ows_gray90
-                : .ows_gray02)
+            paymentsReminderView.backgroundColor = (
+                Theme.isDarkThemeEnabled
+                    ? .ows_gray90
+                    : .ows_gray02,
+            )
         }
 
         avatarView.setCompressionResistanceHigh()
@@ -1110,9 +1116,11 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         textStack.alignment = .leading
 
         let dismissButton = OWSLayerView.circleView(size: 20)
-        dismissButton.backgroundColor = (Theme.isDarkThemeEnabled
-            ? .ows_gray65
-            : .ows_gray05)
+        dismissButton.backgroundColor = (
+            Theme.isDarkThemeEnabled
+                ? .ows_gray65
+                : .ows_gray05,
+        )
         dismissButton.setCompressionResistanceHigh()
         dismissButton.setContentHuggingHigh()
 

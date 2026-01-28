@@ -110,13 +110,19 @@ public class CVComponentBodyMedia: CVComponentBase, CVComponent {
                 footerFrame.x += conversationStyle.textInsetHorizontal
                 footerFrame.width -= conversationStyle.textInsetHorizontal * 2
                 // Ensure footer height fits within text insets.
-                let maxFooterHeight = (view.bounds.height -
-                    (conversationStyle.textInsetTop + conversationStyle.textInsetBottom))
+                let maxFooterHeight = (
+                    view.bounds.height -
+                        (conversationStyle.textInsetTop + conversationStyle.textInsetBottom),
+                )
                 footerFrame.height = min(maxFooterHeight, footerSize.height)
                 // Bottom align.
-                footerFrame.y = (view.bounds.height -
-                    (footerFrame.height +
-                        conversationStyle.textInsetBottom))
+                footerFrame.y = (
+                    view.bounds.height -
+                        (
+                            footerFrame.height +
+                                conversationStyle.textInsetBottom
+                        ),
+                )
                 footerRootView.frame = footerFrame
             }
 
@@ -177,17 +183,19 @@ public class CVComponentBodyMedia: CVComponentBase, CVComponent {
                 subviewInfos.append(CGSize.square(20).asManualSubviewInfo(hasFixedSize: true))
 
                 let downloadLabel = CVLabel()
-                let downloadFormat = (areAllItemsImages
-                    ? OWSLocalizedString(
-                        "MEDIA_GALLERY_ITEM_IMAGE_COUNT_%d",
-                        tableName: "PluralAware",
-                        comment: "Format for an indicator of the number of image items in a media gallery. Embeds {{ the number of items in the media gallery }}.",
-                    )
-                    : OWSLocalizedString(
-                        "MEDIA_GALLERY_ITEM_MIXED_COUNT_%d",
-                        tableName: "PluralAware",
-                        comment: "Format for an indicator of the number of image or video items in a media gallery. Embeds {{ the number of items in the media gallery }}.",
-                    ))
+                let downloadFormat = (
+                    areAllItemsImages
+                        ? OWSLocalizedString(
+                            "MEDIA_GALLERY_ITEM_IMAGE_COUNT_%d",
+                            tableName: "PluralAware",
+                            comment: "Format for an indicator of the number of image items in a media gallery. Embeds {{ the number of items in the media gallery }}.",
+                        )
+                        : OWSLocalizedString(
+                            "MEDIA_GALLERY_ITEM_MIXED_COUNT_%d",
+                            tableName: "PluralAware",
+                            comment: "Format for an indicator of the number of image or video items in a media gallery. Embeds {{ the number of items in the media gallery }}.",
+                        ),
+                )
                 downloadStack.addArrangedSubview(downloadLabel)
                 let downloadLabelConfig = CVLabelConfig(
                     text: .text(String.localizedStringWithFormat(downloadFormat, items.count)),
@@ -289,9 +297,11 @@ public class CVComponentBodyMedia: CVComponentBase, CVComponent {
                     stackView.addSubview(downloadSizeView)
                     stackView.addLayoutBlock { view in
                         let hInset: CGFloat = 16
-                        let x = (CurrentAppContext().isRTL
-                            ? view.width - (downloadSizeViewSize.width - hInset)
-                            : hInset)
+                        let x = (
+                            CurrentAppContext().isRTL
+                                ? view.width - (downloadSizeViewSize.width - hInset)
+                                : hInset,
+                        )
                         downloadSizeView.frame = CGRect(
                             x: x,
                             y: 9,

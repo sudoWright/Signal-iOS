@@ -190,9 +190,11 @@ public class CVMediaAlbumView: ManualStackViewWithLayer {
             itemView.addSubview(iconView)
             itemView.addLayoutBlock { view in
                 let inset: CGFloat = 6
-                let x = (CurrentAppContext().isRTL
-                    ? view.width - (icon.size.width + inset)
-                    : inset)
+                let x = (
+                    CurrentAppContext().isRTL
+                        ? view.width - (icon.size.width + inset)
+                        : inset,
+                )
                 iconView.frame = CGRect(
                     x: x,
                     y: inset,
@@ -582,9 +584,11 @@ public class CVMediaAlbumView: ManualStackViewWithLayer {
             width: viewSizePoints.height * mediaSizePoints.width / mediaSizePoints.height,
             height: viewSizePoints.height,
         )
-        let renderSizePoints = (renderSizeByWidth.width > renderSizeByHeight.width
-            ? renderSizeByWidth
-            : renderSizeByHeight)
+        let renderSizePoints = (
+            renderSizeByWidth.width > renderSizeByHeight.width
+                ? renderSizeByWidth
+                : renderSizeByHeight,
+        )
         let renderDimensionPoints = renderSizePoints.largerAxis
         let quality: AttachmentThumbnailQuality = {
             // Find the smallest quality of acceptable size.

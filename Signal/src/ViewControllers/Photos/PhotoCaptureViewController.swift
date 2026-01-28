@@ -796,19 +796,22 @@ extension PhotoCaptureViewController {
         if bottomBar.isCompactHeightLayout {
             // On devices without top and bottom safe areas buttons are placed above CAMERA | TEXT controls.
             textEditoriPhoneConstraints.append(
-                textEditorToolbar.bottomAnchor.constraint(equalTo: bottomBar.controlButtonsLayoutGuide.topAnchor))
+                textEditorToolbar.bottomAnchor.constraint(equalTo: bottomBar.controlButtonsLayoutGuide.topAnchor),
+            )
         } else {
             // On devices with bottom safe area buttons are pinned to the bottom edge of the colored background,
             // which always clears CAMERA | TEXT controls.
             textEditoriPhoneConstraints.append(
-                textEditorToolbar.bottomAnchor.constraint(equalTo: textStoryComposerView.bottomAnchor, constant: -16))
+                textEditorToolbar.bottomAnchor.constraint(equalTo: textStoryComposerView.bottomAnchor, constant: -16),
+            )
         }
 
         // This constraint defines bottom edge of the area that contains text view and link preview inside of the `textStoryComposerView`.
         // Initially the bottom edge is pinned to the top of `textEditorToolbar`.
         // If on-screen keyboard appears the constraint is updated so that content clears the keyboard.
         textStoryComposerContentLayoutGuideBottomIphone = textStoryComposerView.contentLayoutGuide.bottomAnchor.constraint(
-            equalTo: textEditorToolbar.bottomAnchor)
+            equalTo: textEditorToolbar.bottomAnchor,
+        )
         textEditoriPhoneConstraints.append(textStoryComposerContentLayoutGuideBottomIphone!)
 
         if isIPadUIInRegularMode {
@@ -846,7 +849,8 @@ extension PhotoCaptureViewController {
 
         // Background and Add Link buttons are vertically centered with CAMERA|TEXT switch and Proceed button.
         textEditoriPadConstraints.append(
-            textEditorToolbar.centerYAnchor.constraint(equalTo: bottomBar.controlButtonsLayoutGuide.centerYAnchor))
+            textEditorToolbar.centerYAnchor.constraint(equalTo: bottomBar.controlButtonsLayoutGuide.centerYAnchor),
+        )
 
         // Additional constraint that will at least 20 dp between Add Link button and CAMERA|TEXT switch.
         // This constraint will override

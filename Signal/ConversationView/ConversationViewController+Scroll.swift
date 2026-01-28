@@ -654,8 +654,10 @@ extension ConversationViewController {
                 // Only offset if the reference interaction is not last.
                 if lastIndexPath != referenceIndexPath {
                     owsAssertDebug(lastLayoutAttributes.frame.maxY > referenceLayoutAttributes.frame.maxY)
-                    let distanceToLastInteraction = (lastLayoutAttributes.frame.maxY -
-                        referenceLayoutAttributes.frame.maxY)
+                    let distanceToLastInteraction = (
+                        lastLayoutAttributes.frame.maxY -
+                            referenceLayoutAttributes.frame.maxY,
+                    )
                     contentOffset.y -= distanceToLastInteraction
                 }
             } else {

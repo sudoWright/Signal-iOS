@@ -233,9 +233,11 @@ public class ConversationViewLayout: UICollectionViewLayout {
         let collectionViewSize = collectionView.bounds.size
         let contentOffset = collectionView.contentOffset
         let contentInset = collectionView.contentInset
-        let didChange = (translatedLayoutInfo.collectionViewSize != collectionViewSize ||
-            translatedLayoutInfo.contentOffset != contentOffset ||
-            translatedLayoutInfo.contentInset != contentInset)
+        let didChange = (
+            translatedLayoutInfo.collectionViewSize != collectionViewSize ||
+                translatedLayoutInfo.contentOffset != contentOffset ||
+                translatedLayoutInfo.contentInset != contentInset,
+        )
         guard didChange else {
             return
         }
@@ -895,9 +897,11 @@ public class ConversationViewLayout: UICollectionViewLayout {
         //
         // Honor the scroll continuity bias. If we prefer continuity with regard
         // to the bottom of the viewport, start with the last items.
-        let visibleUniqueIds = (isRelativeToTop
-            ? scrollContinuityToken.visibleUniqueIds
-            : scrollContinuityToken.visibleUniqueIds.reversed())
+        let visibleUniqueIds = (
+            isRelativeToTop
+                ? scrollContinuityToken.visibleUniqueIds
+                : scrollContinuityToken.visibleUniqueIds.reversed(),
+        )
         for visibleUniqueId in visibleUniqueIds {
             guard
                 let beforeItemLayout = beforeItemLayoutMap[visibleUniqueId],
@@ -913,9 +917,11 @@ public class ConversationViewLayout: UICollectionViewLayout {
 
         // Fail over to trying to use any interaction in the before & after
         // load windows.  Again, honor the scroll continuity bias.
-        let afterItemLayouts = (isRelativeToTop
-            ? layoutInfoAfterUpdate.itemLayouts
-            : layoutInfoAfterUpdate.itemLayouts.reversed())
+        let afterItemLayouts = (
+            isRelativeToTop
+                ? layoutInfoAfterUpdate.itemLayouts
+                : layoutInfoAfterUpdate.itemLayouts.reversed(),
+        )
 
         for afterItemLayout in afterItemLayouts {
             guard let beforeItemLayout = beforeItemLayoutMap[afterItemLayout.interactionUniqueId] else {

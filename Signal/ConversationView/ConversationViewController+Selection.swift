@@ -50,10 +50,12 @@ public struct CVSelectionItem {
         self.interactionId = interaction.uniqueId
         self.interactionType = interaction.interactionType
         if let message = interaction as? TSMessage {
-            self.isForwardable = (hasRenderableContent &&
-                !message.isViewOnceMessage &&
-                !message.wasRemotelyDeleted &&
-                !message.isPoll)
+            self.isForwardable = (
+                hasRenderableContent &&
+                    !message.isViewOnceMessage &&
+                    !message.wasRemotelyDeleted &&
+                    !message.isPoll,
+            )
         } else {
             self.isForwardable = false
         }
@@ -488,16 +490,20 @@ extension ConversationViewController {
         selectionToolbar.updateContent()
 
         if let deleteButton = selectionToolbar.buttonItem(for: .delete) {
-            deleteButton.isEnabled = (uiMode == .selection &&
-                selectionState.selectionCanBeDeleted)
+            deleteButton.isEnabled = (
+                uiMode == .selection &&
+                    selectionState.selectionCanBeDeleted,
+            )
         } else {
             owsFailDebug("deleteButton was unexpectedly nil")
             return
         }
 
         if let forwardButton = selectionToolbar.buttonItem(for: .forward) {
-            forwardButton.isEnabled = (uiMode == .selection &&
-                selectionState.selectionCanBeForwarded)
+            forwardButton.isEnabled = (
+                uiMode == .selection &&
+                    selectionState.selectionCanBeForwarded,
+            )
         } else {
             owsFailDebug("forwardButton was unexpectedly nil")
             return

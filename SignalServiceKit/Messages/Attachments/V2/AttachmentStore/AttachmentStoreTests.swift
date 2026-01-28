@@ -415,7 +415,8 @@ class AttachmentStoreTests: XCTestCase {
                             orderInMessage: 0,
                             idInOwner: nil,
                             isViewOnce: false,
-                        )))),
+                        ))),
+                    ),
                     tx: tx,
                 )
             }
@@ -442,7 +443,8 @@ class AttachmentStoreTests: XCTestCase {
                                 isPastEditRevision: false,
                                 stickerPackId: packId,
                                 stickerId: stickerId,
-                            )))),
+                            ))),
+                        ),
                         tx: tx,
                     )
 
@@ -487,7 +489,8 @@ class AttachmentStoreTests: XCTestCase {
                             orderInMessage: 0,
                             idInOwner: nil,
                             isViewOnce: false,
-                        )))),
+                        ))),
+                    ),
                     tx: tx,
                 )
             }
@@ -522,7 +525,8 @@ class AttachmentStoreTests: XCTestCase {
                                     isPastEditRevision: false,
                                     stickerPackId: packId,
                                     stickerId: stickerId,
-                                )))),
+                                ))),
+                            ),
                             tx: tx,
                         )
                     }

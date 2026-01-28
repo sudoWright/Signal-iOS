@@ -228,15 +228,17 @@ class RegistrationChangePhoneNumberViewController: OWSTableViewController2 {
     }
 
     private func showInvalidPhoneNumberAlert(isOldValue: Bool) {
-        let message = (isOldValue
-            ? OWSLocalizedString(
-                "CHANGE_PHONE_NUMBER_INVALID_PHONE_NUMBER_ALERT_MESSAGE_OLD",
-                comment: "Error indicating that the user's old phone number is not valid.",
-            )
-            : OWSLocalizedString(
-                "CHANGE_PHONE_NUMBER_INVALID_PHONE_NUMBER_ALERT_MESSAGE_NEW",
-                comment: "Error indicating that the user's new phone number is not valid.",
-            ))
+        let message = (
+            isOldValue
+                ? OWSLocalizedString(
+                    "CHANGE_PHONE_NUMBER_INVALID_PHONE_NUMBER_ALERT_MESSAGE_OLD",
+                    comment: "Error indicating that the user's old phone number is not valid.",
+                )
+                : OWSLocalizedString(
+                    "CHANGE_PHONE_NUMBER_INVALID_PHONE_NUMBER_ALERT_MESSAGE_NEW",
+                    comment: "Error indicating that the user's new phone number is not valid.",
+                ),
+        )
         OWSActionSheets.showActionSheet(title: nil, message: message)
     }
 

@@ -26,9 +26,11 @@ public class NewGroupMembersViewController: BaseGroupMemberViewController {
 
     private func updateBarButtons() {
         let hasMembers = !newGroupState.recipientSet.isEmpty
-        let buttonTitle = (hasMembers
-            ? CommonStrings.nextButton
-            : CommonStrings.skipButton)
+        let buttonTitle = (
+            hasMembers
+                ? CommonStrings.nextButton
+                : CommonStrings.skipButton,
+        )
         let rightBarButtonItem = UIBarButtonItem(
             title: buttonTitle,
             style: .plain,

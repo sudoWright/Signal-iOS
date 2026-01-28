@@ -249,17 +249,19 @@ public class ColorAndWallpaperSettingsViewController: OWSTableViewController2 {
             title: OWSLocalizedString(
                 "WALLPAPER_SETTINGS_RESET_DEFAULT_WALLPAPER",
                 comment: "Label for 'reset default wallpaper' action in the global wallpaper settings.",
-            )) { [weak self] _ in
-                self?.resetWallpaper()
-            })
+            ),
+        ) { [weak self] _ in
+            self?.resetWallpaper()
+        })
 
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
                 "WALLPAPER_SETTINGS_RESET_ALL_WALLPAPERS",
                 comment: "Label for 'reset all wallpapers' action in the global wallpaper settings.",
-            )) { [weak self] _ in
-                self?.resetAllWallpapers()
-            })
+            ),
+        ) { [weak self] _ in
+            self?.resetAllWallpapers()
+        })
 
         actionSheet.addAction(OWSActionSheets.cancelAction)
 
@@ -358,17 +360,19 @@ public class ColorAndWallpaperSettingsViewController: OWSTableViewController2 {
             title: OWSLocalizedString(
                 "WALLPAPER_SETTINGS_RESET_DEFAULT_CHAT_COLOR",
                 comment: "Label for 'reset default chat color' action in the global wallpaper settings.",
-            )) { [weak self] _ in
-                self?.resetChatColor()
-            })
+            ),
+        ) { [weak self] _ in
+            self?.resetChatColor()
+        })
 
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
                 "WALLPAPER_SETTINGS_RESET_ALL_CHAT_COLORS",
                 comment: "Label for 'reset all chat colors' action in the global wallpaper settings.",
-            )) { [weak self] _ in
-                self?.resetAllChatColors()
-            })
+            ),
+        ) { [weak self] _ in
+            self?.resetAllChatColors()
+        })
 
         actionSheet.addAction(OWSActionSheets.cancelAction)
 

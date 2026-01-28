@@ -241,9 +241,11 @@ public class CVColorOrGradientView: ManualLayoutViewWithLayer {
             if sharpCorners == .allCorners || sharpCorners == [] {
                 // If all of the corners have the same radius, don't
                 // bother using a mask layer.
-                layer.cornerRadius = (sharpCorners == []
-                    ? bubbleConfig.wideCornerRadius
-                    : bubbleConfig.sharpCornerRadius)
+                layer.cornerRadius = (
+                    sharpCorners == []
+                        ? bubbleConfig.wideCornerRadius
+                        : bubbleConfig.sharpCornerRadius,
+                )
                 layer.mask = nil
                 layer.masksToBounds = true
             } else {

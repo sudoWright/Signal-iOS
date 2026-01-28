@@ -1869,7 +1869,8 @@ public class GroupsV2Impl: GroupsV2 {
                     profileKeyCredential: localProfileKeyCredential,
                     role: role.asProtoRole,
                     groupV2Params: try GroupV2Params(groupSecretParams: secretParams),
-                ))
+                ),
+            )
             actionsBuilder.addAddMembers(actionBuilder.buildInfallibly())
         case .asRequestingMember:
             var actionBuilder = GroupsProtoGroupChangeActionsAddRequestingMemberAction.builder()
@@ -1877,7 +1878,8 @@ public class GroupsV2Impl: GroupsV2 {
                 try GroupsV2Protos.buildRequestingMemberProto(
                     profileKeyCredential: localProfileKeyCredential,
                     groupV2Params: try GroupV2Params(groupSecretParams: secretParams),
-                ))
+                ),
+            )
             actionsBuilder.addAddRequestingMembers(actionBuilder.buildInfallibly())
         }
 

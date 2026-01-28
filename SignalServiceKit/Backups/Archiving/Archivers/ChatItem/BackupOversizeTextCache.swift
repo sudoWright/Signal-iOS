@@ -419,7 +419,8 @@ class BackupArchiveInlinedOversizeTextArchiver {
                     .select(Column(BackupOversizeTextCache.CodingKeys.attachmentRowId))
                     .filter(
                         SQL(stringLiteral: "\(Attachment.Record.databaseTableName).\(Attachment.Record.CodingKeys.sqliteId.rawValue)")
-                            == Column(BackupOversizeTextCache.CodingKeys.attachmentRowId))
+                            == Column(BackupOversizeTextCache.CodingKeys.attachmentRowId),
+                    )
                     .exists(),
             )
             .select(Column(Attachment.Record.CodingKeys.sqliteId))

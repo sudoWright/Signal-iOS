@@ -61,8 +61,10 @@ public class OWSMessageDecrypter {
         let lastNullMessageDate = store.getDate(senderId, transaction: transaction)
         let timeSinceNullMessage = abs(lastNullMessageDate?.timeIntervalSinceNow ?? .infinity)
         guard timeSinceNullMessage > RemoteConfig.current.automaticSessionResetAttemptInterval else {
-            Logger.warn("Skipping null message after undecryptable message from \(senderId), " +
-                "last null message sent \(lastNullMessageDate!.ows_millisecondsSince1970).")
+            Logger.warn(
+                "Skipping null message after undecryptable message from \(senderId), " +
+                    "last null message sent \(lastNullMessageDate!.ows_millisecondsSince1970).",
+            )
             return
         }
 
@@ -84,15 +86,21 @@ public class OWSMessageDecrypter {
                         message: preparedMessage,
                         transaction: transaction,
                     ).done(on: DispatchQueue.global()) {
-                        Logger.info("Successfully sent null message after session reset " +
-                            "for undecryptable message from \(senderId)")
+                        Logger.info(
+                            "Successfully sent null message after session reset " +
+                                "for undecryptable message from \(senderId)",
+                        )
                     }.catch(on: DispatchQueue.global()) { error in
                         if error is UntrustedIdentityError {
-                            Logger.info("Failed to send null message after session reset for " +
-                                "for undecryptable message from \(senderId) (\(error))")
+                            Logger.info(
+                                "Failed to send null message after session reset for " +
+                                    "for undecryptable message from \(senderId) (\(error))",
+                            )
                         } else {
-                            owsFailDebug("Failed to send null message after session reset " +
-                                "for undecryptable message from \(senderId) (\(error))")
+                            owsFailDebug(
+                                "Failed to send null message after session reset " +
+                                    "for undecryptable message from \(senderId) (\(error))",
+                            )
                         }
                     }
                 }
@@ -372,8 +380,10 @@ public class OWSMessageDecrypter {
             trySendNullMessage(in: contactThread, senderId: senderId, transaction: transaction)
             return true
         } else {
-            Logger.warn("Skipping session reset for undecryptable message from \(senderId), " +
-                "already reset during this batch")
+            Logger.warn(
+                "Skipping session reset for undecryptable message from \(senderId), " +
+                    "already reset during this batch",
+            )
             return false
         }
     }

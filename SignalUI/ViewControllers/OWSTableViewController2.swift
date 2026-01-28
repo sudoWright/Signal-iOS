@@ -364,9 +364,11 @@ open class OWSTableViewController2: OWSViewController {
 
         var shouldReload = shouldReload
         if shouldDeferInitialLoad {
-            shouldReload = (shouldReload &&
-                self.isViewLoaded &&
-                tableView.width > 0)
+            shouldReload = (
+                shouldReload &&
+                    self.isViewLoaded &&
+                    tableView.width > 0,
+            )
         }
 
         if shouldReload {

@@ -96,10 +96,14 @@ public class CVContactShareView: ManualStackView {
     ) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
-        var maxContentWidth = (maxWidth -
-            (Self.avatarSize +
-                disclosureIconSize.width +
-                outerStackConfig.spacing * 2))
+        var maxContentWidth = (
+            maxWidth -
+                (
+                    Self.avatarSize +
+                        disclosureIconSize.width +
+                        outerStackConfig.spacing * 2
+                ),
+        )
         maxContentWidth = max(0, maxContentWidth)
 
         let labelConfig = self.contactNameLabelConfig(state: state)

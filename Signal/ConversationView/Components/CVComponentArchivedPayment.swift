@@ -116,9 +116,11 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
 
     private func createLoadingSpinner() -> CustomView {
         // Recreate each time in-case theme changes
-        let animationName = (isIncoming && !isDarkThemeEnabled
-            ? "indeterminate_spinner_blue"
-            : "indeterminate_spinner_white")
+        let animationName = (
+            isIncoming && !isDarkThemeEnabled
+                ? "indeterminate_spinner_blue"
+                : "indeterminate_spinner_white",
+        )
 
         let animationView = mediaCache.buildLottieAnimationView(name: animationName)
         owsAssertDebug(animationView.animation != nil)
@@ -256,10 +258,12 @@ public class CVComponentArchivedPayment: CVComponentBase, CVComponent {
 
         let maxBigLabelWidth: CGFloat = {
             let nonLabelWidth =
-                (hStackConfig.layoutMargins.totalWidth
-                    + messageStatus.hStackCumulativeSpacing
-                    + vStackConfig.layoutMargins.totalWidth
-                    + messageStatus.spacersTotalWidth)
+                (
+                    hStackConfig.layoutMargins.totalWidth
+                        + messageStatus.hStackCumulativeSpacing
+                        + vStackConfig.layoutMargins.totalWidth
+                        + messageStatus.spacersTotalWidth,
+                )
 
             return max(0, maxWidth - nonLabelWidth)
         }()

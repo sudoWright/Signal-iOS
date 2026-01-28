@@ -120,7 +120,8 @@ extension SpamCaptchaViewController {
                 ActionSheetAction(
                     title: OWSLocalizedString("SPAM_CAPTCHA_SKIP_VERIFICATION_ACTION", comment: "Action to skip verification"),
                     style: .destructive,
-                ))
+                ),
+            )
             confirmationSheet.addAction(
                 ActionSheetAction(
                     title: CommonStrings.cancelButton,
@@ -128,7 +129,8 @@ extension SpamCaptchaViewController {
                     handler: { _ in
                         presentActionSheet(from: fromVC)
                     },
-                ))
+                ),
+            )
             fromVC.present(confirmationSheet, animated: true, completion: nil)
         }
 
@@ -138,7 +140,8 @@ extension SpamCaptchaViewController {
         }
 
         stackView.autoPinEdgesToSuperviewMargins(
-            with: UIEdgeInsets(hMargin: 24, vMargin: 16))
+            with: UIEdgeInsets(hMargin: 24, vMargin: 16),
+        )
         continueButton.autoPinWidthToSuperviewMargins()
 
         fromVC.present(sheet, animated: true, completion: nil)
@@ -152,7 +155,8 @@ extension SpamCaptchaViewController {
                     text: OWSLocalizedString(
                         "SPAM_CAPTCHA_COMPLETED_TOAST",
                         comment: "Text for toast presented after spam verification has been completed",
-                    ))
+                    ),
+                )
                 SSKEnvironment.shared.spamChallengeResolverRef.handleIncomingCaptchaChallengeToken(token)
             }
             vc.dismiss(animated: true)

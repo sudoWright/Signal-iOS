@@ -66,8 +66,10 @@ extension GroupViewHelper {
         }
         let isLocalUserAdmin = groupThread.groupModel.groupMembership.isFullMemberAndAdministrator(localAddress)
         let groupMembership = groupThread.groupModel.groupMembership
-        let canBecomeAdmin = (groupMembership.isFullMember(address) &&
-            !groupMembership.isFullMemberAndAdministrator(address))
+        let canBecomeAdmin = (
+            groupMembership.isFullMember(address) &&
+                !groupMembership.isFullMemberAndAdministrator(address),
+        )
         return canEditConversationMembership && isLocalUserAdmin && canBecomeAdmin
     }
 

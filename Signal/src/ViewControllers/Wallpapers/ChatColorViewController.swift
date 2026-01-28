@@ -179,7 +179,8 @@ class ChatColorViewController: OWSTableViewController2 {
             result.append(
                 contentsOf: DependenciesBridge.shared.chatColorSettingStore
                     .fetchCustomValues(tx: tx)
-                    .map { .chatColor(.custom($0.key, $0.value)) })
+                    .map { .chatColor(.custom($0.key, $0.value)) },
+            )
             result.append(.addNewOption)
             return result
         }

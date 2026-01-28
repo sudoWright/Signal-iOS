@@ -163,15 +163,17 @@ public class SendPaymentViewController: OWSViewController {
                 "PAYMENTS_RECIPIENT_MISSING_PROFILE_KEY_TITLE",
                 comment: "Title for error alert indicating that a given user cannot receive payments because of a pending message request.",
             )
-            let message = (hasSentMessagesToRecipient
-                ? OWSLocalizedString(
-                    "PAYMENTS_RECIPIENT_MISSING_PROFILE_KEY_MESSAGE_W_MESSAGES",
-                    comment: "Message for error alert indicating that a given user cannot receive payments because of a pending message request for a recipient that they have sent messages to.",
-                )
-                : OWSLocalizedString(
-                    "PAYMENTS_RECIPIENT_MISSING_PROFILE_KEY_MESSAGE_WO_MESSAGES",
-                    comment: "Message for error alert indicating that a given user cannot receive payments because of a pending message request for a recipient that they have not sent message to.",
-                ))
+            let message = (
+                hasSentMessagesToRecipient
+                    ? OWSLocalizedString(
+                        "PAYMENTS_RECIPIENT_MISSING_PROFILE_KEY_MESSAGE_W_MESSAGES",
+                        comment: "Message for error alert indicating that a given user cannot receive payments because of a pending message request for a recipient that they have sent messages to.",
+                    )
+                    : OWSLocalizedString(
+                        "PAYMENTS_RECIPIENT_MISSING_PROFILE_KEY_MESSAGE_WO_MESSAGES",
+                        comment: "Message for error alert indicating that a given user cannot receive payments because of a pending message request for a recipient that they have not sent message to.",
+                    ),
+            )
 
             let actionSheet = ActionSheetController(title: title, message: message)
 
@@ -540,28 +542,30 @@ public class SendPaymentViewController: OWSViewController {
         }
 
         rootStack.removeAllSubviews()
-        rootStack.addArrangedSubviews([
-            spacerFactory.buildVSpacer(),
-            spacerFactory.buildVSpacer(),
-            spacerFactory.buildVSpacer(),
-            bigAmountRow,
-            smallAmountRow,
-            spacerFactory.buildVSpacer(),
-            spacerFactory.buildVSpacer(),
-            memoStack,
-            spacerFactory.buildVSpacer(),
-            spacerFactory.buildVSpacer(),
-            spacerFactory.buildVSpacer(),
-        ] +
-            keyboardViews.allRows
-            + [
+        rootStack.addArrangedSubviews(
+            [
                 spacerFactory.buildVSpacer(),
                 spacerFactory.buildVSpacer(),
                 spacerFactory.buildVSpacer(),
-                amountButtons,
+                bigAmountRow,
+                smallAmountRow,
                 spacerFactory.buildVSpacer(),
-                balanceLabel,
-            ])
+                spacerFactory.buildVSpacer(),
+                memoStack,
+                spacerFactory.buildVSpacer(),
+                spacerFactory.buildVSpacer(),
+                spacerFactory.buildVSpacer(),
+            ] +
+                keyboardViews.allRows
+                + [
+                    spacerFactory.buildVSpacer(),
+                    spacerFactory.buildVSpacer(),
+                    spacerFactory.buildVSpacer(),
+                    amountButtons,
+                    spacerFactory.buildVSpacer(),
+                    balanceLabel,
+                ],
+        )
 
         spacerFactory.finalizeSpacers()
 
@@ -606,9 +610,11 @@ public class SendPaymentViewController: OWSViewController {
                 let buttonSize = buttonFont.lineHeight * 1.7
                 button.autoSetDimension(.height, toSize: buttonSize)
 
-                let downStateColor = (Theme.isDarkThemeEnabled
-                    ? UIColor.ows_gray90
-                    : UIColor.ows_gray02)
+                let downStateColor = (
+                    Theme.isDarkThemeEnabled
+                        ? UIColor.ows_gray90
+                        : UIColor.ows_gray02,
+                )
                 let downStateImage = UIImage.image(
                     color: downStateColor,
                     size: CGSize(width: 1, height: 1),
@@ -757,12 +763,14 @@ public class SendPaymentViewController: OWSViewController {
 
         func hideConversionLabelOrShowWarning() {
             let shouldHaveValidValue = (!isZero && currentCurrencyConversion != nil)
-            smallAmountLabel.text = (shouldHaveValidValue
-                ? OWSLocalizedString(
-                    "PAYMENTS_NEW_PAYMENT_INVALID_AMOUNT",
-                    comment: "Label for the 'invalid amount' button.",
-                )
-                : " ")
+            smallAmountLabel.text = (
+                shouldHaveValidValue
+                    ? OWSLocalizedString(
+                        "PAYMENTS_NEW_PAYMENT_INVALID_AMOUNT",
+                        comment: "Label for the 'invalid amount' button.",
+                    )
+                    : " ",
+            )
             smallAmountLabel.textColor = UIColor.ows_accentRed
             currencyConversionInfoView.tintColor = .clear
         }

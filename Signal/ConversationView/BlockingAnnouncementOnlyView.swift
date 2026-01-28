@@ -120,9 +120,11 @@ class MessageUserSubsetSheet: OWSTableSheetViewController {
 
         tableViewController.forceDarkMode = forceDarkMode
 
-        tableViewController.defaultSeparatorInsetLeading = (OWSTableViewController2.cellHInnerMargin +
-            CGFloat(AvatarBuilder.smallAvatarSizePoints) +
-            ContactCellView.avatarTextHSpacing)
+        tableViewController.defaultSeparatorInsetLeading = (
+            OWSTableViewController2.cellHInnerMargin +
+                CGFloat(AvatarBuilder.smallAvatarSizePoints) +
+                ContactCellView.avatarTextHSpacing,
+        )
 
         tableViewController.tableView.register(
             ContactTableViewCell.self,

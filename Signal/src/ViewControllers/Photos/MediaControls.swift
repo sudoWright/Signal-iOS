@@ -1492,7 +1492,8 @@ class CameraBottomBar: UIView {
                 contentsOf: [
                     controlButtonsLayoutGuide.topAnchor.constraint(equalTo: captureControl.bottomAnchor, constant: 8),
                     controlButtonsLayoutGuide.bottomAnchor.constraint(equalTo: bottomAnchor),
-                ])
+                ],
+            )
         } else {
             // • control buttons are vertically centered with the shutter button.
             // • shutter button control takes the entire view height.
@@ -1500,7 +1501,8 @@ class CameraBottomBar: UIView {
                 contentsOf: [
                     controlButtonsLayoutGuide.centerYAnchor.constraint(equalTo: captureControl.shutterButtonLayoutGuide.centerYAnchor),
                     captureControl.bottomAnchor.constraint(equalTo: bottomAnchor),
-                ])
+                ],
+            )
         }
 
         // Regular Height:

@@ -303,9 +303,11 @@ class LongTextViewController: OWSViewController {
 
     private func forwardButtonPressed() {
         // Only forward text.
-        let selectionType: CVSelectionType = (itemViewModel.componentState.hasPrimaryAndSecondaryContentForSelection
-            ? .secondaryContent
-            : .allContent)
+        let selectionType: CVSelectionType = (
+            itemViewModel.componentState.hasPrimaryAndSecondaryContentForSelection
+                ? .secondaryContent
+                : .allContent,
+        )
         let selectionItem = CVSelectionItem(
             interactionId: itemViewModel.interaction.uniqueId,
             interactionType: itemViewModel.interaction.interactionType,

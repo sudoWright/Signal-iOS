@@ -526,7 +526,8 @@ private class ConversationBannerView: UIView {
                     ), image: .listBullet) { [weak self] _ in
                         self?.pinnedMessageInteractionDelegate?.presentSeeAllMessages()
                     },
-                ])
+                ],
+            )
             return UIMenu(children: actions)
         }
 

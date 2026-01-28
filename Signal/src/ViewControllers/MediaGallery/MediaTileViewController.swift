@@ -1102,7 +1102,8 @@ class MediaTileViewController: UICollectionViewController, MediaGalleryDelegate,
             let journal = update.commit()
 
             var updater = MediaGalleryCollectionViewUpdater(
-                itemCounts: oldItemCounts)
+                itemCounts: oldItemCounts,
+            )
             updater.delegate = self
             updater.update(journal)
 

@@ -229,10 +229,12 @@ struct GalleryDate: Hashable, Comparable, Equatable {
 
     static func <(lhs: GalleryDate, rhs: GalleryDate) -> Bool {
         // Check for incorrectly-overlapping ranges.
-        owsAssertDebug(lhs.interval == rhs.interval ||
-            !lhs.interval.intersects(rhs.interval) ||
-            lhs.interval.start == rhs.interval.end ||
-            lhs.interval.end == rhs.interval.start)
+        owsAssertDebug(
+            lhs.interval == rhs.interval ||
+                !lhs.interval.intersects(rhs.interval) ||
+                lhs.interval.start == rhs.interval.end ||
+                lhs.interval.end == rhs.interval.start,
+        )
         return lhs.interval.start < rhs.interval.start
     }
 }

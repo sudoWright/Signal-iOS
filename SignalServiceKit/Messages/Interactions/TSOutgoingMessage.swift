@@ -589,7 +589,8 @@ extension TSOutgoingMessage {
         }
 
         let signature = pniIdentityKeyPair.identityKeyPair.signAlternateIdentity(
-            aciIdentityKeyPair.identityKeyPair.identityKey)
+            aciIdentityKeyPair.identityKeyPair.identityKey,
+        )
 
         let builder = SSKProtoPniSignatureMessage.builder()
         builder.setPni(pni.rawUUID.data)

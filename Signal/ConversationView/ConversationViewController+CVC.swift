@@ -773,10 +773,14 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         let navigationViewWidth = navigationController.view.width
         let navigationSafeAreaInsets = navigationController.view.safeAreaInsets
 
-        let isMissingSafeAreaInsets = (viewSafeAreaInsets == .zero &&
-            navigationSafeAreaInsets != .zero)
-        let hasInvalidWidth = (collectionViewWidth > navigationViewWidth ||
-            rootViewWidth > navigationViewWidth)
+        let isMissingSafeAreaInsets = (
+            viewSafeAreaInsets == .zero &&
+                navigationSafeAreaInsets != .zero,
+        )
+        let hasInvalidWidth = (
+            collectionViewWidth > navigationViewWidth ||
+                rootViewWidth > navigationViewWidth,
+        )
         let hasValidStyle = !isMissingSafeAreaInsets && !hasInvalidWidth
         if hasValidStyle {
             // No need to rewrite style; style is already valid.

@@ -19,9 +19,11 @@ public enum PaymentsFormat {
         numberFormatter.numberStyle = .decimal
         numberFormatter.minimumIntegerDigits = 1
         numberFormatter.minimumFractionDigits = 1
-        numberFormatter.maximumFractionDigits = (isShortForm
-            ? 4
-            : Int(PaymentsConstants.maxMobDecimalDigits))
+        numberFormatter.maximumFractionDigits = (
+            isShortForm
+                ? 4
+                : Int(PaymentsConstants.maxMobDecimalDigits),
+        )
         numberFormatter.usesSignificantDigits = false
         if isShortForm {
             numberFormatter.roundingMode = .halfEven

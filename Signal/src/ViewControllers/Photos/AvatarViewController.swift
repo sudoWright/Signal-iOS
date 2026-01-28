@@ -39,9 +39,11 @@ class AvatarViewController: OWSViewController, InteractivelyDismissableViewContr
     }
 
     init?(thread: TSThread, renderLocalUserAsNoteToSelf: Bool, readTx: DBReadTransaction) {
-        let localUserDisplayMode: LocalUserDisplayMode = (renderLocalUserAsNoteToSelf
-            ? .noteToSelf
-            : .asUser)
+        let localUserDisplayMode: LocalUserDisplayMode = (
+            renderLocalUserAsNoteToSelf
+                ? .noteToSelf
+                : .asUser,
+        )
         guard
             let avatarImage = SSKEnvironment.shared.avatarBuilderRef.avatarImage(
                 forThread: thread,

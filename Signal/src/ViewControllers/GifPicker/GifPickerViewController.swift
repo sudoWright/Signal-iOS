@@ -270,9 +270,11 @@ class GifPickerViewController: OWSViewController, UISearchBarDelegate, UICollect
 
     private func createViews() {
 
-        let backgroundColor = (Theme.isDarkThemeEnabled
-            ? UIColor(white: 0.08, alpha: 1.0)
-            : Theme.backgroundColor)
+        let backgroundColor = (
+            Theme.isDarkThemeEnabled
+                ? UIColor(white: 0.08, alpha: 1.0)
+                : Theme.backgroundColor,
+        )
         self.view.backgroundColor = backgroundColor
 
         self.collectionView.delegate = self

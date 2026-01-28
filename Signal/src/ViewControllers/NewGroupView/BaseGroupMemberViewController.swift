@@ -91,11 +91,13 @@ public class BaseGroupMemberViewController: BaseMemberViewController {
             })
             presentActionSheet(actionSheet)
         } else {
-            message += ("\n\n"
-                + OWSLocalizedString(
-                    "GROUPS_TOO_MANY_MEMBERS_CONFIRM",
-                    comment: "Message asking the user to confirm that they want to add a member to the group.",
-                ))
+            message += (
+                "\n\n"
+                    + OWSLocalizedString(
+                        "GROUPS_TOO_MANY_MEMBERS_CONFIRM",
+                        comment: "Message asking the user to confirm that they want to add a member to the group.",
+                    )
+            )
             let actionSheet = ActionSheetController(title: title, message: message)
 
             actionSheet.addAction(ActionSheetAction(title: CommonStrings.addButton) { [weak self] _ in

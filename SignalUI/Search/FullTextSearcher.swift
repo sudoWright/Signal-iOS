@@ -649,8 +649,10 @@ public class FullTextSearcher: NSObject {
                     }
                     mergedMessageBody = MessageBody(text: matchStyleApplied.string, ranges: .init(mentions: [:], styles: singleStyles))
                 }
-                return .messageBody(mergedMessageBody
-                    .hydrating(mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: transaction)))
+                return .messageBody(
+                    mergedMessageBody
+                        .hydrating(mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: transaction)),
+                )
             }()
             appendMessage(message, snippet: styledSnippet)
         }

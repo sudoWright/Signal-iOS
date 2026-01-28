@@ -104,9 +104,11 @@ class MessageRequestView: ConversationBottomPanelView {
         }
 
         if let groupThread = thread as? TSGroupThread, groupThread.isGroupV2Thread {
-            self.mode = (groupThread.groupModel.groupMembership.isLocalUserInvitedMember
-                ? .groupInviteRequest
-                : .contactOrGroupRequest)
+            self.mode = (
+                groupThread.groupModel.groupMembership.isLocalUserInvitedMember
+                    ? .groupInviteRequest
+                    : .contactOrGroupRequest,
+            )
         } else {
             self.mode = .contactOrGroupRequest
         }

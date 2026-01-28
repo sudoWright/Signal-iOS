@@ -139,8 +139,10 @@ public class OWSPaymentsLock {
         )
 
         guard canEvaluatePolicy, authError == nil else {
-            Logger.error("could not determine if local authentication is supported: " +
-                "\(String(describing: authError))")
+            Logger.error(
+                "could not determine if local authentication is supported: " +
+                    "\(String(describing: authError))",
+            )
 
             let outcome = Self.outcomeForLAError(errorParam: authError)
             switch outcome {

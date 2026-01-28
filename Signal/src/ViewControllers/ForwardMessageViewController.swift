@@ -511,15 +511,17 @@ extension ForwardMessageViewController {
         error: Error,
         forwardedInteractionCount: Int,
     ) {
-        let genericErrorMessage = (forwardedInteractionCount > 1
-            ? OWSLocalizedString(
-                "ERROR_COULD_NOT_FORWARD_MESSAGES_N",
-                comment: "Error indicating that messages could not be forwarded.",
-            )
-            : OWSLocalizedString(
-                "ERROR_COULD_NOT_FORWARD_MESSAGES_1",
-                comment: "Error indicating that a message could not be forwarded.",
-            ))
+        let genericErrorMessage = (
+            forwardedInteractionCount > 1
+                ? OWSLocalizedString(
+                    "ERROR_COULD_NOT_FORWARD_MESSAGES_N",
+                    comment: "Error indicating that messages could not be forwarded.",
+                )
+                : OWSLocalizedString(
+                    "ERROR_COULD_NOT_FORWARD_MESSAGES_1",
+                    comment: "Error indicating that a message could not be forwarded.",
+                ),
+        )
 
         guard let forwardError = error as? ForwardError else {
             owsFailDebug("Error: \(error).")
@@ -529,15 +531,17 @@ extension ForwardMessageViewController {
 
         switch forwardError {
         case .missingInteraction:
-            let message = (forwardedInteractionCount > 1
-                ? OWSLocalizedString(
-                    "ERROR_COULD_NOT_FORWARD_MESSAGES_MISSING_N",
-                    comment: "Error indicating that messages could not be forwarded.",
-                )
-                : OWSLocalizedString(
-                    "ERROR_COULD_NOT_FORWARD_MESSAGES_MISSING_1",
-                    comment: "Error indicating that a message could not be forwarded.",
-                ))
+            let message = (
+                forwardedInteractionCount > 1
+                    ? OWSLocalizedString(
+                        "ERROR_COULD_NOT_FORWARD_MESSAGES_MISSING_N",
+                        comment: "Error indicating that messages could not be forwarded.",
+                    )
+                    : OWSLocalizedString(
+                        "ERROR_COULD_NOT_FORWARD_MESSAGES_MISSING_1",
+                        comment: "Error indicating that a message could not be forwarded.",
+                    ),
+            )
             OWSActionSheets.showErrorAlert(message: message)
         case .missingThread, .invalidInteraction:
             owsFailDebug("Error: \(error).")

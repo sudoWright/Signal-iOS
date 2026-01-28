@@ -224,114 +224,134 @@ public extension TSPaymentModel {
 
         if !isIdentifiedPayment {
             if isOutgoing {
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_COMPLETE",
-                        comment: "Status indicator for outgoing payments which are complete.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_COMPLETE",
-                        comment: "Status indicator for outgoing payments which are complete.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_COMPLETE",
+                            comment: "Status indicator for outgoing payments which are complete.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_COMPLETE",
+                            comment: "Status indicator for outgoing payments which are complete.",
+                        ),
+                )
             } else {
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_INCOMING_COMPLETE",
-                        comment: "Status indicator for incoming payments which are complete.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_COMPLETE",
-                        comment: "Status indicator for incoming payments which are complete.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_INCOMING_COMPLETE",
+                            comment: "Status indicator for incoming payments which are complete.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_COMPLETE",
+                            comment: "Status indicator for incoming payments which are complete.",
+                        ),
+                )
             }
         } else {
             switch paymentState {
             case .outgoingUnsubmitted:
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_UNSUBMITTED",
-                        comment: "Status indicator for outgoing payments which have not yet been submitted.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_UNSUBMITTED",
-                        comment: "Status indicator for outgoing payments which have not yet been submitted.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_UNSUBMITTED",
+                            comment: "Status indicator for outgoing payments which have not yet been submitted.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_UNSUBMITTED",
+                            comment: "Status indicator for outgoing payments which have not yet been submitted.",
+                        ),
+                )
             case .outgoingUnverified:
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_UNVERIFIED",
-                        comment: "Status indicator for outgoing payments which have been submitted but not yet verified.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_UNVERIFIED",
-                        comment: "Status indicator for outgoing payments which have been submitted but not yet verified.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_UNVERIFIED",
+                            comment: "Status indicator for outgoing payments which have been submitted but not yet verified.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_UNVERIFIED",
+                            comment: "Status indicator for outgoing payments which have been submitted but not yet verified.",
+                        ),
+                )
             case .outgoingVerified:
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_VERIFIED",
-                        comment: "Status indicator for outgoing payments which have been verified but not yet sent.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_VERIFIED",
-                        comment: "Status indicator for outgoing payments which have been verified but not yet sent.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_VERIFIED",
+                            comment: "Status indicator for outgoing payments which have been verified but not yet sent.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_VERIFIED",
+                            comment: "Status indicator for outgoing payments which have been verified but not yet sent.",
+                        ),
+                )
             case .outgoingSending:
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_SENDING",
-                        comment: "Status indicator for outgoing payments which are being sent.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_SENDING",
-                        comment: "Status indicator for outgoing payments which are being sent.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_SENDING",
+                            comment: "Status indicator for outgoing payments which are being sent.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_SENDING",
+                            comment: "Status indicator for outgoing payments which are being sent.",
+                        ),
+                )
             case .outgoingSent,
                  .outgoingComplete:
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_SENT",
-                        comment: "Status indicator for outgoing payments which have been sent.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_SENT",
-                        comment: "Status indicator for outgoing payments which have been sent.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_OUTGOING_SENT",
+                            comment: "Status indicator for outgoing payments which have been sent.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_OUTGOING_SENT",
+                            comment: "Status indicator for outgoing payments which have been sent.",
+                        ),
+                )
             case .outgoingFailed:
                 result = Self.description(forFailure: paymentFailure, isIncoming: false, isLongForm: isLongForm)
             case .incomingUnverified:
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_INCOMING_UNVERIFIED",
-                        comment: "Status indicator for incoming payments which have not yet been verified.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_UNVERIFIED",
-                        comment: "Status indicator for incoming payments which have not yet been verified.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_INCOMING_UNVERIFIED",
+                            comment: "Status indicator for incoming payments which have not yet been verified.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_UNVERIFIED",
+                            comment: "Status indicator for incoming payments which have not yet been verified.",
+                        ),
+                )
             case .incomingVerified,
                  .incomingComplete:
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_INCOMING_VERIFIED",
-                        comment: "Status indicator for incoming payments which have been verified.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_VERIFIED",
-                        comment: "Status indicator for incoming payments which have been verified.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_INCOMING_VERIFIED",
+                            comment: "Status indicator for incoming payments which have been verified.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_INCOMING_VERIFIED",
+                            comment: "Status indicator for incoming payments which have been verified.",
+                        ),
+                )
             case .incomingFailed:
                 result = Self.description(forFailure: paymentFailure, isIncoming: true, isLongForm: isLongForm)
             @unknown default:
-                result = (isLongForm
-                    ? OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_LONG_UNKNOWN",
-                        comment: "Status indicator for payments which had an unknown failure.",
-                    )
-                    : OWSLocalizedString(
-                        "PAYMENTS_PAYMENT_STATUS_SHORT_UNKNOWN",
-                        comment: "Status indicator for payments which had an unknown failure.",
-                    ))
+                result = (
+                    isLongForm
+                        ? OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_LONG_UNKNOWN",
+                            comment: "Status indicator for payments which had an unknown failure.",
+                        )
+                        : OWSLocalizedString(
+                            "PAYMENTS_PAYMENT_STATUS_SHORT_UNKNOWN",
+                            comment: "Status indicator for payments which had an unknown failure.",
+                        ),
+                )
             }
         }
         result.append(" ")
@@ -354,15 +374,17 @@ public extension TSPaymentModel {
         isLongForm: Bool,
     ) -> String {
 
-        let defaultDescription = (isIncoming
-            ? OWSLocalizedString(
-                "PAYMENTS_FAILURE_INCOMING_FAILED",
-                comment: "Status indicator for incoming payments which failed.",
-            )
-            : OWSLocalizedString(
-                "PAYMENTS_FAILURE_OUTGOING_FAILED",
-                comment: "Status indicator for outgoing payments which failed.",
-            ))
+        let defaultDescription = (
+            isIncoming
+                ? OWSLocalizedString(
+                    "PAYMENTS_FAILURE_INCOMING_FAILED",
+                    comment: "Status indicator for incoming payments which failed.",
+                )
+                : OWSLocalizedString(
+                    "PAYMENTS_FAILURE_OUTGOING_FAILED",
+                    comment: "Status indicator for outgoing payments which failed.",
+                ),
+        )
 
         switch failure {
         case .none:

@@ -468,7 +468,8 @@ public class RegistrationCoordinatorTest {
         // Now it should ask for the PIN to confirm the user knows it.
         #expect(
             await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode)))
+                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode)),
+        )
 
         #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable() == .done)
 
@@ -1496,7 +1497,8 @@ public class RegistrationCoordinatorTest {
                         mode: mode,
                         // TODO: [Refactor]: Is 'noExitAllowed' the correct value to expect here?
                         exitConfigOverride: .noExitAllowed,
-                    )),
+                    ),
+                ),
         )
 
         #expect(svr.hasMasterKey)
@@ -2096,7 +2098,8 @@ public class RegistrationCoordinatorTest {
         // We should get back the code entry step.
         #expect(
             await coordinator.requestVoiceCode().awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode)))
+                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode)),
+        )
         #expect(sessionManager.didRequestCode)
     }
 
