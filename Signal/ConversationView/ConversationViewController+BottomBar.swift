@@ -68,6 +68,14 @@ public extension ConversationViewController {
             if !hasViewWillAppearEverBegun {
                 return .none
             }
+            switch uiMode {
+            case .search:
+                return .search
+            case .selection:
+                return .selection
+            case .normal:
+                break
+            }
             if appExpiry.isExpired(now: Date()) {
                 return .appExpired
             }
@@ -91,21 +99,16 @@ public extension ConversationViewController {
             if hasBlockingLegacyGroup {
                 return .blockingLegacyGroup
             }
+            if userLeftGroup {
+                return .none
+            }
             if isBlockedFromSendingByAnnouncementOnlyGroup {
                 return .announcementOnlyGroup
             }
-            switch uiMode {
-            case .search:
-                return .search
-            case .selection:
-                return .selection
-            case .normal:
-                if viewState.isInPreviewPlatter || userLeftGroup {
-                    return .none
-                } else {
-                    return .inputToolbar
-                }
+            if viewState.isInPreviewPlatter {
+                return .none
             }
+            return .inputToolbar
         }()
     }
 
