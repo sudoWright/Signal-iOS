@@ -11,7 +11,7 @@ final class ReceiptMessage: TransientOutgoingMessage {
     private let receiptType: SSKProtoReceiptMessageType
 
     init(
-        thread: TSThread,
+        thread: TSContactThread,
         receiptSet: MessageReceiptSet,
         receiptType: SSKProtoReceiptMessageType,
         tx: DBReadTransaction,

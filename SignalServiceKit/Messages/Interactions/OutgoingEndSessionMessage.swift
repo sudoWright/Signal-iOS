@@ -13,7 +13,7 @@ final class OutgoingEndSessionMessage: TransientOutgoingMessage {
         super.init(coder: coder)
     }
 
-    init(thread: TSThread, tx: DBReadTransaction) {
+    init(thread: TSContactThread, tx: DBReadTransaction) {
         let messageBuilder = TSOutgoingMessageBuilder.outgoingMessageBuilder(thread: thread)
         super.init(
             outgoingMessageWith: messageBuilder,

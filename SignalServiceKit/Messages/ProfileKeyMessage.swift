@@ -12,7 +12,7 @@ public final class ProfileKeyMessage: TransientOutgoingMessage {
     let profileKey: ProfileKey?
 
     public init(
-        thread: TSThread,
+        thread: TSContactThread,
         profileKey: ProfileKey,
         tx: DBReadTransaction,
     ) {

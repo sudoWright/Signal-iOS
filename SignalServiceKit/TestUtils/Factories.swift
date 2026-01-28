@@ -160,7 +160,7 @@ public class OutgoingMessageFactory: Factory {
 
     // MARK: Dependent Factories
 
-    public var threadCreator: (DBWriteTransaction) -> TSThread = { transaction in
+    public var threadCreator: (DBWriteTransaction) -> TSContactThread = { transaction in
         ContactThreadFactory().create(transaction: transaction)
     }
 

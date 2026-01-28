@@ -13,7 +13,7 @@ final class OutgoingStaticMessage: TransientOutgoingMessage {
     let plaintextData: Data
 
     init(
-        thread: TSThread,
+        thread: TSContactThread,
         timestamp: UInt64,
         plaintextData: Data,
         tx: DBReadTransaction,
