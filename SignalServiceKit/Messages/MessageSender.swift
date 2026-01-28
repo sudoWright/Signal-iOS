@@ -670,27 +670,7 @@ public class MessageSender {
                 throw MessageSenderError.threadMissing
             }
 
-            let canSendToThread: Bool = {
-                if message is OutgoingReactionMessage {
-                    return thread.canSendReactionToThread
-                }
-                let isChatMessage = (
-                    (
-                        message.shouldBeSaved
-                            && message.insertedMessageHasRenderableContent(rowId: message.sqliteRowId!, tx: tx)
-                    )
-                        || message is OutgoingGroupCallUpdateMessage
-                        || message is OutgoingCallMessage,
-                )
-                return isChatMessage ? thread.canSendChatMessagesToThread() : thread.canSendNonChatMessagesToThread
-            }()
-            guard canSendToThread else {
-                if message.shouldBeSaved {
-                    throw OWSAssertionError("Sending to thread blocked.")
-                }
-                // Pretend to succeed for non-visible messages like read receipts, etc.
-                return nil
-            }
+            try checkIfCanSendMessage(message, toThread: thread)
 
             let proposedAddresses = try self.unsentRecipients(of: message, in: thread, localIdentifiers: localIdentifiers, tx: tx)
             let (serviceIds, phoneNumbersToFetch) = Self.partitionAddresses(proposedAddresses)
@@ -872,6 +852,34 @@ public class MessageSender {
             senderCertificates: senderCertificates,
             localIdentifiers: localIdentifiers,
         )
+    }
+
+    private func checkIfCanSendMessage(_ message: any SendableMessage, toThread thread: TSThread) throws {
+        if let thread = thread as? TSGroupThread {
+            // We can't send any messages to GV1 threads.
+            guard let groupModel = thread.groupModel as? TSGroupModelV2 else {
+                throw OWSGenericError("can't send to gv1 thread")
+            }
+            // Allow group update messages for leaving groups.
+            if !(message is OutgoingGroupUpdateMessage) {
+                // We can't send messages to GV2 threads if we're not a member.
+                guard groupModel.groupMembership.isLocalUserFullMember else {
+                    throw OWSGenericError("can't send because we're not a member")
+                }
+                // We can't send most messages to GV2 "announcement-only" threads if we're
+                // not an admin. See also `processFlaglessDataMessage`.
+                guard
+                    !groupModel.isAnnouncementsOnly
+                    || (message is OutgoingReactionMessage)
+                    || (message is OutgoingPollVoteMessage)
+                    || (message is OutgoingDeleteMessage)
+                    || groupModel.groupMembership.isLocalUserFullMemberAndAdministrator
+                else {
+                    throw OWSGenericError("can't send because we're not an admin")
+                }
+            }
+        }
+        // If we reach this point, we can send the message.
     }
 
     private func sendPreparedMessage(

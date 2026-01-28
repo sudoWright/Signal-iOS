@@ -42,22 +42,7 @@ public extension TSThread {
     }
 
     var canSendReactionToThread: Bool {
-        guard !isGroupV1Thread else {
-            return false
-        }
-        return true
-    }
-
-    var canSendNonChatMessagesToThread: Bool {
-        guard !isGroupV1Thread else {
-            return false
-        }
-        return true
-    }
-
-    @available(swift, obsoleted: 1.0)
-    func canSendChatMessagesToThread() -> Bool {
-        canSendChatMessagesToThread(ignoreAnnouncementOnly: false)
+        return !isGroupV1Thread
     }
 
     func canSendChatMessagesToThread(ignoreAnnouncementOnly: Bool = false) -> Bool {
