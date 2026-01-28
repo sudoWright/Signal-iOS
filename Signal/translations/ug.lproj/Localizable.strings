@@ -1,6 +1,9 @@
 /* Button text to dismiss missing contacts permission alert */
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "ھازىر ئەمەس";
 
+/* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
+"ABOUT_SECTION_FOOTER" = "Copyright Signal Messenger\nLicensed under the AGPLv3\nSignal is a 501c3 nonprofit";
+
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "‫Signal ھەققىدە";
 
@@ -203,10 +206,10 @@
 "APN_Message" = "يېڭى ئۇچۇرىڭىز بار";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link. */
-"APP_EXPIRED_BOTTOM" = "This version of Signal has expired. %1$@ to send and receive messages.";
+"APP_EXPIRED_BOTTOM" = "Signalنىڭ بۇ نەشرىنىڭ ۋاقتى ئ‍ۆتكەن. ئۇچۇر ئەۋەتىش ۋە قوبۇل قىلىش ئۈچۈن %1$@ ئىشلىتىڭ.";
 
 /* Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence. */
-"APP_EXPIRED_BOTTOM_UPDATE" = "Update now";
+"APP_EXPIRED_BOTTOM_UPDATE" = "ھازىر يېڭىلاڭ";
 
 /* Default message for the 'app launch failed' alert. */
 "APP_LAUNCH_FAILURE_ALERT_MESSAGE" = "‫Signal قوزغىلالمىدى. support@signal.org غا سازلاش خاتىرىسى ئەۋەتىپ بۇ كاشىلىنى ھەل قىلىشىمىزغا ياردەم قىلىڭ.";
@@ -1388,19 +1391,22 @@
 "CALL_QUALITY_SURVEY_CUSTOM_ISSUE_PLACEHOLDER" = "بايقىغان مەسىلىنى تەسۋىرلەڭ";
 
 /* Footer text explaining what debug logs contain in the call quality survey */
-"CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER" = "Information shared with us contains low level app information and does not include the contents of your calls.";
+"CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER" = "بىز بىلەن ئورتاقلاشقان ئۇچۇرلار تۆۋەن دەرىجىلىك ئەپ ئۇچۇرلىرىنى ئۆز ئىچىگە ئالىدۇ ئەمما سىز تېلېفونلاشقاندىكى مەزمۇنلارنى ئۆز ئىچىگە ئالمايدۇ.";
 
-/* Header text explaining the purpose of sharing debug logs in the call quality survey */
-"CALL_QUALITY_SURVEY_DEBUG_LOG_HEADER" = "Submitting will share your feedback along with diagnostic information about your call. You can optionally share a debug log to help us improve call quality.";
+/* Header text explaining the purpose of sharing debug logs in the call quality survey. The text inside the <link> tags is tappable for viewing the diagnostic information. */
+"CALL_QUALITY_SURVEY_DEBUG_LOG_HEADER" = "Submitting will share your feedback along with <link>diagnostic information about your call</link>. You can optionally share a debug log to help us improve call quality.";
 
 /* Link text to open a preview of debug logs in the call quality survey. Appended to CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER */
-"CALL_QUALITY_SURVEY_DEBUG_LOG_PREVIEW_LINK" = "View debug log";
+"CALL_QUALITY_SURVEY_DEBUG_LOG_PREVIEW_LINK" = "كاشىلا ھەل قىلىش خاتىرىسىنى كۆرۈش";
 
 /* Title for the debug log sharing screen in the call quality survey */
 "CALL_QUALITY_SURVEY_DEBUG_LOG_TITLE" = "بىزنىڭ تېخىمۇ ياخشىلىنىشىمىزغا ياردەم قىلىڭ";
 
 /* Label for the toggle to share debug log in the call quality survey */
 "CALL_QUALITY_SURVEY_DEBUG_LOG_TOGGLE" = "كاشىلا ھەل قىلىش خاتىرىسىنى ئورتاقلىشىش";
+
+/* Title for preview of the call diagnostic info that will be sent with the survey */
+"CALL_QUALITY_SURVEY_DIAGNOSTICS_TITLE" = "Diagnostic Information";
 
 /* Button label for indicating the call did not have issues in the call quality survey */
 "CALL_QUALITY_SURVEY_GREAT_BUTTON" = "ناھايىتى ياخشى";
@@ -2291,7 +2297,7 @@
 "CONVERSATION_SETTINGS_MEMBER_REQUESTS_AND_INVITES" = "ئىلتىماس ۋە تەكلىپ";
 
 /* Label for 'member label' action in conversation settings view. */
-"CONVERSATION_SETTINGS_MEMBER_TAG" = "Member Label";
+"CONVERSATION_SETTINGS_MEMBER_TAG" = "ئەزا بەلگىسى";
 
 /* label for 'always' option for mention notifications in conversation settings */
 "CONVERSATION_SETTINGS_MENTION_MODE_AlWAYS" = "ھەمىشە ئەسكەرت";
@@ -2585,10 +2591,10 @@
 "DEBUG_LOG_INFO_BUTTON" = "سازلاش خاتىرىسى ھەققىدىكى ئۇچۇر";
 
 /* Header text displayed above the debug log preview */
-"DEBUG_LOG_PREVIEW_HEADER" = "When submitted, your log will be posted online for 30 days at a unique, unpublished URL.";
+"DEBUG_LOG_PREVIEW_HEADER" = "يوللانغاندىن كېيىن، خاتىرىڭىز توردا 30 كۈن ئۆزگىچە ۋە نەشىر قىلىنمىغان URL ئادرېسىدا ئېلان قىلىنىدۇ.";
 
 /* Title for the debug log preview screen */
-"DEBUG_LOG_PREVIEW_TITLE" = "Debug Log";
+"DEBUG_LOG_PREVIEW_TITLE" = "سازلاش خاتىرىسى";
 
 /* info message text in conversation view */
 "DECLINED_VIDEO_CALL" = "بىر ۋىدېيولۇق چاقىرىقنى رەت قىلدىڭىز";
@@ -3064,17 +3070,17 @@
 /* A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}. */
 "DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "%1$@ سىزنىڭ ئورنىڭىزدا Signal غا ئىئانە قىلدى! Signal غا بولغان قوللىشىڭىزنى ئارخىپىڭىزدا نامايەن قىلىڭ.";
 
-/* There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_1" = "ئۇچۇرلىشىش بىخەتەر. ئېلان يوق، ئىز قوغلاش يوق، نازارەت يوق.";
+/* Body text for a sheet discussing donating to Signal. */
+"DONATION_READ_MORE_SHEET_BODY" = "As an independent nonprofit, Signal is committed to private messaging and calls. No ads, no trackers, no surveillance. Donate today to support Signal.";
 
-/* There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_2" = "Signal نىڭ بارلىق تىرىشچانلىقى سىزنىڭ مەخپىيەتلىكىڭىز ئۈچۈن. Signal سىزنىڭ سانلىق مەلۇماتىڭىزنى دەپ ئەمەس، سىزنى دەپ قۇرۇلغان؛ Signal پايدا بىلەن ئەمەس، ئىئانە بىلەن يۈرۈشىدۇ.";
+/* Bullet point for a sheet discussing donating to Signal. */
+"DONATION_READ_MORE_SHEET_BULLET_1" = "Get an optional badge on your profile when you donate";
 
-/* There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen. */
-"DONATION_READ_MORE_SCREEN_PARAGRAPH_3" = "ئەگەر شارائىتىڭىز يار بەرسە، Signal نى قىزىقارلىق، ئىشەنچىلىك، ئاممىباب قىلىش ئۈچۈن بۈگۈنلا ئىئانە قىلىڭ.";
+/* Bullet point for a sheet discussing donating to Signal. */
+"DONATION_READ_MORE_SHEET_BULLET_2" = "Your privacy is our mission";
 
-/* There is a screen where users can read more about their donation to Signal. This is the title of that screen. */
-"DONATION_READ_MORE_SCREEN_TITLE" = "Signal باشقىچە.";
+/* Bullet point for a sheet discussing donating to Signal. For non-English languages, skip the word 501c3, and skip the language about US donations being tax deductible. */
+"DONATION_READ_MORE_SHEET_BULLET_3" = "Signal is a 501c3 nonprofit. US donations are tax deductible.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "سومما";
@@ -3125,13 +3131,13 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "ئىئانە قىلىڭ";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "بىخەتەر ئۇچۇرلىشىش - سىزنىڭ ياردىمىڭىزدە. ئېلان ۋە ئىز قوغلاشقا ھېچقانداق يول يوق. Signal نى قوللاش ئۈچۈن ئىئانە قىلىڭ.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Donate to support private messaging. Keep Signal independent and ad-free.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "تېخىمۇ كۆپ";
 
 /* On donation screens, a small amount of information text is shown. This is the title for that text. */
-"DONATION_SCREENS_HEADER_TITLE" = "پايدا ئەمەس، مەخپىيەتلىك مۇھىم";
+"DONATION_SCREENS_HEADER_TITLE" = "Proudly Nonprofit";
 
 /* Button title confirming the user wants to begin a new donation. */
 "DONATION_SETTINGS_CANCEL_DONATION_AWAITING_AUTHORIZATION_DONATE_ACTION" = "ئىئانە قىلىڭ";
@@ -3217,14 +3223,8 @@
 /* Text describing to the user that they're going to pay a monthly donation to Signal */
 "DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL" = "Signal غا ئايلىق ئىئانە قىلىش";
 
-/* Title for the 'more' section on the donation screen */
-"DONATION_VIEW_MORE_SECTION_TITLE" = "تېخىمۇ كۆپ";
-
 /* Title for the 'my support' section in the donation view */
 "DONATION_VIEW_MY_SUPPORT_TITLE" = "قوللىشىم";
-
-/* Title for the \"other ways to donate\" section on the donation view. */
-"DONATION_VIEW_OTHER_WAYS_TO_DONATE_TITLE" = "باشقا يول بىلەن ئىئانە قىلىش";
 
 /* Title on the 'Donate to Signal' screen */
 "DONATION_VIEW_TITLE" = "‫Signal غا ئىئانە قىلىڭ";
@@ -3548,19 +3548,19 @@
 "GENERIC_INCOMING_MESSAGE_NOTIFICATION" = "يېڭى ئۇچۇر!";
 
 /* Title for the 'Get Started' banner */
-"GET_STARTED_BANNER_TITLE" = "ئىشلىتىشكە باشلاش";
-
-/* 'Get Started' button directing users to appearance */
-"GET_STARTED_CARD_APPEARANCE" = "كۆرۈنۈش";
+"GET_STARTED_BANNER_TITLE" = "Get Started";
 
 /* 'Get Started' button direction users to avatar builder */
 "GET_STARTED_CARD_AVATAR_BUILDER" = "رەسىم قوشۇش";
 
+/* 'Get Started' button directing users to Chat Color settings */
+"GET_STARTED_CARD_CHAT_COLOR" = "Chat Color";
+
 /* 'Get Started' button directing users to invite friends */
-"GET_STARTED_CARD_INVITE_FRIENDS" = "دوست تەكلىپى";
+"GET_STARTED_CARD_INVITE_FRIENDS" = "Invite Friends";
 
 /* 'Get Started' button directing users to create a group */
-"GET_STARTED_CARD_NEW_GROUP" = "يېڭى گۇرۇپپا";
+"GET_STARTED_CARD_NEW_GROUP" = "New Group";
 
 /* Error displayed when there is a failure fetching a GIF from the remote service. */
 "GIF_PICKER_ERROR_FETCH_FAILURE" = "ئىلتىماس قىلغان GIF نى ئوقۇيالمىدى. تورغا باغلانغانلىقىڭىزنى دەلىللەڭ.";
@@ -4994,22 +4994,22 @@
 "MEGAPHONE_WILL_REMIND_LATER" = "كېيىنرەك سىزنى قايتا ئەسكەرتىمىز.";
 
 /* Label for an action to add a member label */
-"MEMBER_LABEL_ADD" = "Add a Member Label";
+"MEMBER_LABEL_ADD" = "ئەزا بەلگىسى قوشۇش";
 
 /* Heading shown above the preview of a message bubble with the edited member label. */
-"MEMBER_LABEL_PREVIEW_HEADING" = "Preview";
+"MEMBER_LABEL_PREVIEW_HEADING" = "ئالدىن كۆر";
 
 /* Text shown in the preview message bubble when a user is editing their member label. */
-"MEMBER_LABEL_VIEW_MESSAGE_PREVIEW_TEXT" = "Hello!";
+"MEMBER_LABEL_VIEW_MESSAGE_PREVIEW_TEXT" = "ياخشىمۇسىز!";
 
 /* Placeholder text in text field where user can edit their member label. */
-"MEMBER_LABEL_VIEW_PLACEHOLDER_TEXT" = "Add your label";
+"MEMBER_LABEL_VIEW_PLACEHOLDER_TEXT" = "ئەزالىق رولىڭىزنى قوشۇڭ";
 
 /* Subtitle for a view where users can edit and preview their member label. */
-"MEMBER_LABEL_VIEW_SUBTITLE" = "Set a member label to describe yourself or your role in this group. Member labels are only visible within this group.";
+"MEMBER_LABEL_VIEW_SUBTITLE" = "بۇ گۇرۇپپىدا ئۆزىڭىزنى ياكى رولىڭىزنى تەسۋىرلەش ئۈچۈن ئەزا بەلگىسىنى تەڭشەڭ. ئەزا بەلگىلىرى پەقەت بۇ گۇرۇپپىدىلا كۆرۈنىدۇ.";
 
 /* Title for a view where users can edit and preview their member label. */
-"MEMBER_LABEL_VIEW_TITLE" = "Member Label";
+"MEMBER_LABEL_VIEW_TITLE" = "ئەزا بەلگىسى";
 
 /* Action sheet button title */
 "MESSAGE_ACTION_COPY_TEXT" = "ئۇچۇر تېكىستىنى كۆچۈرۈڭ";
@@ -5609,16 +5609,16 @@
 "NO_OTHER_GROUPS_IN_COMMON" = "باشقا ئورتاق گۇرۇپپا يوق";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link. */
-"NOT_LINKED_BOTTOM" = "This device is no longer linked. %1$@ to continue using Signal on this device.";
+"NOT_LINKED_BOTTOM" = "بۇ ئۈسكۈنە ئەمدى ئۇلانمايدۇ. بۇ ئۈسكۈنىدە Signalنى ئىشلىتىشنى داۋاملاشتۇرۇش ئۈچۈن %1$@ بېسىڭ.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
-"NOT_LINKED_BOTTOM_RELINK" = "Re-link";
+"NOT_LINKED_BOTTOM_RELINK" = "قايتا باغلاڭ";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link. */
-"NOT_REGISTERED_BOTTOM" = "This device is no longer registered. %1$@ to continue using Signal.";
+"NOT_REGISTERED_BOTTOM" = "بۇ ئۈسكۈنە تىزىملاشتىن قالغان. Signalنى ئىشلىتىشنى داۋاملاشتۇرۇش ئۈچۈن %1$@ بېسىڭ.";
 
 /* Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence. */
-"NOT_REGISTERED_BOTTOM_REREGISTER" = "Re-register";
+"NOT_REGISTERED_BOTTOM_REREGISTER" = "قايتا تىزىملىتىش";
 
 /* Label for 1:1 conversation with yourself. */
 "NOTE_TO_SELF" = "ئۆزۈمگە ئەسلەتمە";
@@ -5865,6 +5865,9 @@
 
 /* Title for the 'have my old device' choice of the 'Restore or Transfer' prompt */
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "مېنىڭ كونا تېلېفونىم بار";
+
+/* Text indicating Signal is a nonprofit on the 'onboarding splash' view. For non-English languages, exclude the word '501c3'. */
+"ONBOARDING_SPLASH_NONPROFIT" = "Signal is a 501c3 nonprofit";
 
 /* Button for restoring or transferring account in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "ھېساباتنى ئەسلىگە كەلتۈرۈش ياكى يۆتكەش";
@@ -8007,9 +8010,6 @@
 
 /* No comment provided by engineer. */
 "SETTINGS_CLEAR_HISTORY" = "سۆھبەت خاتىرەسىنى تازىلا";
-
-/* Footer for the 'about' help section */
-"SETTINGS_COPYRIGHT" = "‫Signal Messenger نەشر ھوقۇقىغا ئىگە\nGPLv3 ئىجازىتىدە تارقىتىلدى";
 
 /* Label for the 'data' section of the app settings. */
 "SETTINGS_DATA" = "مەلۇمات ئىشلىتىلىشى";
