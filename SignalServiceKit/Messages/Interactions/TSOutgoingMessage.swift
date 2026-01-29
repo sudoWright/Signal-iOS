@@ -116,9 +116,9 @@ extension TSOutgoingMessage {
 
     /// Records a successful send to a one recipient.
     func updateWithSentRecipients(
-        _ serviceIds: [ServiceId],
+        _ serviceIds: some Sequence<ServiceId>,
         wasSentByUD: Bool,
-        transaction tx: DBWriteTransaction,
+        tx: DBWriteTransaction,
     ) {
         anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
             for serviceId in serviceIds {
@@ -205,16 +205,16 @@ extension TSOutgoingMessage {
 
     /// Records failed sends to the given recipients.
     func updateWithFailedRecipients(
-        _ recipientErrors: some Collection<(serviceId: ServiceId, error: Error)>,
+        _ recipientErrors: some Sequence<(serviceId: ServiceId, error: Error)>,
         tx: DBWriteTransaction,
     ) {
-        let fatalErrors = recipientErrors.lazy.filter { !MessageSender.isRetryableError($0.error) }
-        let retryableErrors = recipientErrors.lazy.filter { MessageSender.isRetryableError($0.error) }
+        let fatalErrors = recipientErrors.filter { !MessageSender.isRetryableError($0.error) }
+        let retryableErrors = recipientErrors.filter { MessageSender.isRetryableError($0.error) }
 
         if fatalErrors.isEmpty {
-            Logger.warn("Couldn't send \(self.timestamp), but all errors are retryable: \(Array(retryableErrors))")
+            Logger.warn("Couldn't send \(self.timestamp), but all errors are retryable: \(retryableErrors)")
         } else {
-            Logger.warn("Couldn't send \(self.timestamp): \(Array(fatalErrors)); retryable errors: \(Array(retryableErrors))")
+            Logger.warn("Couldn't send \(self.timestamp): \(fatalErrors); retryable errors: \(retryableErrors)")
         }
 
         self.anyUpdateOutgoingMessage(transaction: tx) {

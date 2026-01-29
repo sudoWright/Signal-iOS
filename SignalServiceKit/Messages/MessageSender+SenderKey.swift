@@ -328,7 +328,7 @@ extension MessageSender {
             message.updateWithSentRecipients(
                 sendResult.success.map(\.serviceId),
                 wasSentByUD: true,
-                transaction: tx,
+                tx: tx,
             )
 
             return failedRecipients

@@ -51,9 +51,9 @@ protocol SendableMessage {
 
     func updateWithSkippedRecipients(_ skippedRecipients: some Sequence<SignalServiceAddress>, tx: DBWriteTransaction)
 
-    func updateWithFailedRecipients(_ recipientErrors: some Collection<(serviceId: ServiceId, error: Error)>, tx: DBWriteTransaction)
+    func updateWithFailedRecipients(_ recipientErrors: some Sequence<(serviceId: ServiceId, error: Error)>, tx: DBWriteTransaction)
 
-    func updateWithSentRecipients(_ serviceIds: [ServiceId], wasSentByUD: Bool, transaction: DBWriteTransaction)
+    func updateWithSentRecipients(_ serviceIds: some Sequence<ServiceId>, wasSentByUD: Bool, tx: DBWriteTransaction)
 
     // TODO: Add SyncTranscriptableMessage protocol for these properties.
 
