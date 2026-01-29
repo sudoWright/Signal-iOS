@@ -577,7 +577,7 @@ public struct AttachmentStore {
         let sql = """
             UPDATE \(MessageAttachmentReferenceRecord.databaseTableName)
             SET \(receivedAtTimestampColumn.name) = ?
-            "WHERE \(ownerTypeColumn.name) = ? AND \(ownerRowIdColumn.name) = ?
+            WHERE \(ownerTypeColumn.name) = ? AND \(ownerRowIdColumn.name) = ?
         """
 
         failIfThrows {
