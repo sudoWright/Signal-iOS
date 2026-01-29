@@ -145,9 +145,12 @@ final class ThreadMerger {
         }
 
         let oldConfig = configPair.intoValue
-        let newConfig = oldConfig.copyAsEnabledWith(durationSeconds: resolvedValue, timerVersion: resolvedVersion)
+        var newConfig = oldConfig
+        newConfig.isEnabled = true
+        newConfig.durationSeconds = resolvedValue
+        newConfig.timerVersion = resolvedVersion
 
-        if newConfig == oldConfig {
+        if newConfig.asVersionedToken == oldConfig.asVersionedToken {
             return
         }
 

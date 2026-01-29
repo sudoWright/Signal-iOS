@@ -11,7 +11,7 @@ import Foundation
 /// At time of writing, used by 1:1 conversations (TSContactThread) which are subject to races in
 /// setting their DM timer config. Group conversations don't have the same races, as they use shared
 /// and version-controlled group state, so they use unversioned ``DisappearingMessageToken``s.
-public struct VersionedDisappearingMessageToken {
+public struct VersionedDisappearingMessageToken: Equatable {
 
     /// Consider disabled if duration is zero.
     public var isEnabled: Bool {

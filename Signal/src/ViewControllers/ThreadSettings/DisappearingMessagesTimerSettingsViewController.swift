@@ -147,18 +147,10 @@ class DisappearingMessagesTimerSettingsViewController: HostingController<Disappe
 
 extension DisappearingMessagesTimerSettingsViewController: DisappearingMessagesTimerSettingsViewModel.ActionsDelegate {
     fileprivate func updateForSelection(_ durationSeconds: UInt32) {
-        if durationSeconds == 0 {
-            selectedConfiguration = initialConfiguration.copyWith(
-                isEnabled: false,
-                timerVersion: initialConfiguration.timerVersion + 1,
-            )
-        } else {
-            selectedConfiguration = initialConfiguration.copyAsEnabledWith(
-                durationSeconds: durationSeconds,
-                timerVersion: initialConfiguration.timerVersion + 1,
-            )
-        }
-
+        selectedConfiguration = initialConfiguration
+        selectedConfiguration.isEnabled = durationSeconds != 0
+        selectedConfiguration.durationSeconds = durationSeconds
+        selectedConfiguration.timerVersion = initialConfiguration.timerVersion + 1
         updateNavigationItem()
     }
 

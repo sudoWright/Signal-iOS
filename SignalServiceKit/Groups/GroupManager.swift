@@ -285,7 +285,7 @@ public class GroupManager: NSObject {
         let setTokenResult = DependenciesBridge.shared.disappearingMessagesConfigurationStore
             .set(token: newToken, for: groupThread, tx: tx)
 
-        if setTokenResult.newConfiguration != setTokenResult.oldConfiguration {
+        if setTokenResult.newConfiguration.asToken != setTokenResult.oldConfiguration.asToken {
             SSKEnvironment.shared.databaseStorageRef.touch(thread: groupThread, shouldReindex: false, tx: tx)
         }
 
@@ -348,7 +348,7 @@ public class GroupManager: NSObject {
             )
 
         // Skip redundant updates.
-        if !result.newConfiguration.hasSameDurationAs(result.oldConfiguration) {
+        if result.newConfiguration.asToken != result.oldConfiguration.asToken {
             let remoteContactName: String? = {
                 if
                     let changeAuthor,
@@ -383,7 +383,7 @@ public class GroupManager: NSObject {
         contactThread: TSContactThread,
         transaction: DBWriteTransaction,
     ) {
-        guard updateResult.newConfiguration != updateResult.oldConfiguration else {
+        guard updateResult.newConfiguration.asVersionedToken != updateResult.oldConfiguration.asVersionedToken else {
             // The update was redundant, don't send an update message.
             return
         }
@@ -1066,7 +1066,7 @@ public class GroupManager: NSObject {
 
         let hasUserFacingUpdate: Bool = (
             newGroupModel.hasUserFacingChangeCompared(to: oldGroupModel)
-                || updateDMResult.newConfiguration != updateDMResult.oldConfiguration,
+                || updateDMResult.newConfiguration.asVersionedToken != updateDMResult.oldConfiguration.asVersionedToken,
         )
 
         groupThread.update(

@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import GRDB
 
 public protocol DisappearingMessagesConfigurationStore {
     typealias SetTokenResult = (
@@ -28,7 +29,7 @@ public protocol DisappearingMessagesConfigurationStore {
     /// that becomes delinked, if a new primary device registers from an empty DB
     /// its DM timer versions will all reset to 0. They should override ours so we
     /// have to reset ourselves.
-    func resetAllDMTimerVersions(tx: DBWriteTransaction) throws
+    func resetAllDMTimerVersions(tx: DBWriteTransaction)
 }
 
 extension DisappearingMessagesConfigurationStore {
@@ -105,21 +106,22 @@ extension DisappearingMessagesConfigurationStore {
 }
 
 class DisappearingMessagesConfigurationStoreImpl: DisappearingMessagesConfigurationStore {
+    private func baseQuery(forScope scope: DisappearingMessagesConfigurationScope) -> QueryInterfaceRequest<DisappearingMessagesConfigurationRecord> {
+        return DisappearingMessagesConfigurationRecord
+            .filter(Column(DisappearingMessagesConfigurationRecord.CodingKeys.threadUniqueId.rawValue) == scope.persistenceKey)
+    }
+
     func fetch(for scope: DisappearingMessagesConfigurationScope, tx: DBReadTransaction) -> DisappearingMessagesConfigurationRecord? {
-        guard
-            let config = DisappearingMessagesConfigurationRecord.anyFetch(
-                uniqueId: scope.persistenceKey,
-                transaction: tx,
-            )
-        else {
+        let fetchQuery = baseQuery(forScope: scope)
+        guard var result = failIfThrows(block: { try fetchQuery.fetchOne(tx.database) }) else {
             return nil
         }
         // What's in the database may have a nonzero duration but isEnabled=false.
         // Normalize so if isEnabled is false, duration is 0.
-        if !config.isEnabled, config.durationSeconds != 0 {
-            return config.copyWith(durationSeconds: 0, timerVersion: config.timerVersion)
+        if !result.isEnabled {
+            result.durationSeconds = 0
         }
-        return config
+        return result
     }
 
     @discardableResult
@@ -128,39 +130,44 @@ class DisappearingMessagesConfigurationStoreImpl: DisappearingMessagesConfigurat
         for scope: DisappearingMessagesConfigurationScope,
         tx: DBWriteTransaction,
     ) -> SetTokenResult {
-        let oldConfiguration = fetchOrBuildDefault(for: scope, tx: tx)
-        if
-            token.version > 0,
-            case let .thread(thread) = scope,
-            thread is TSContactThread
-        {
+        var configuration = fetchOrBuildDefault(for: scope, tx: tx)
+        let oldConfiguration = configuration
+        if token.version > 0, case let .thread(thread) = scope, thread is TSContactThread {
             // We got a dm timer; check against the version we have locally and reject if lower.
             if token.version < oldConfiguration.timerVersion {
                 Logger.info("Dropping DM timer update with outdated version")
                 return (oldConfiguration, oldConfiguration)
             }
         }
-        let newVersion = token.version == 0 ? oldConfiguration.timerVersion : token.version
-        let newConfiguration = (
-            token.isEnabled
-                ? oldConfiguration.copyAsEnabledWith(durationSeconds: token.durationSeconds, timerVersion: newVersion)
-                : oldConfiguration.copyWith(isEnabled: false, timerVersion: newVersion),
-        )
-        if newConfiguration.grdbId == nil || newConfiguration != oldConfiguration {
-            newConfiguration.anyUpsert(transaction: tx)
+        if token.version != 0 {
+            configuration.timerVersion = token.version
         }
-        return (oldConfiguration, newConfiguration)
+        configuration.isEnabled = token.isEnabled
+        configuration.durationSeconds = token.durationSeconds
+        if configuration.id == nil {
+            failIfThrows {
+                try configuration.insert(tx.database)
+            }
+        } else if configuration.asVersionedToken != token {
+            failIfThrows {
+                try configuration.update(tx.database)
+            }
+        }
+        return (oldConfiguration, configuration)
     }
 
     func remove(for thread: TSThread, tx: DBWriteTransaction) {
-        fetch(for: .thread(thread), tx: tx)?.anyRemove(transaction: tx)
+        failIfThrows {
+            try baseQuery(forScope: .thread(thread)).deleteAll(tx.database)
+        }
     }
 
-    func resetAllDMTimerVersions(tx: DBWriteTransaction) throws {
-        try tx.database.execute(sql: """
-            UPDATE \(DisappearingMessagesConfigurationRecord.databaseTableName)
-            SET \(DisappearingMessagesConfigurationRecord.CodingKeys.timerVersion.rawValue) = 1
-        """)
+    func resetAllDMTimerVersions(tx: DBWriteTransaction) {
+        failIfThrows {
+            try DisappearingMessagesConfigurationRecord.updateAll(tx.database, [
+                Column(DisappearingMessagesConfigurationRecord.CodingKeys.timerVersion.rawValue).set(to: 1),
+            ])
+        }
     }
 }
 
@@ -195,10 +202,10 @@ class MockDisappearingMessagesConfigurationStore: DisappearingMessagesConfigurat
         values[thread.uniqueId] = nil
     }
 
-    func resetAllDMTimerVersions(tx: DBWriteTransaction) throws {
+    func resetAllDMTimerVersions(tx: DBWriteTransaction) {
         values.forEach { key, value in
             values[key] = DisappearingMessagesConfigurationRecord(
-                threadUniqueId: value.uniqueId,
+                threadUniqueId: value.threadUniqueId,
                 isEnabled: value.isEnabled,
                 durationSeconds: value.durationSeconds,
                 timerVersion: 1,

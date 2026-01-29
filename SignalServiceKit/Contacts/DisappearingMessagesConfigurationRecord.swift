@@ -75,17 +75,14 @@ public final class DisappearingMessageToken: NSObject, NSSecureCoding, NSCopying
 
 // MARK: -
 
-@objc(OWSDisappearingMessagesConfiguration)
-public final class DisappearingMessagesConfigurationRecord: NSObject, SDSCodableModel, Decodable, NSSecureCoding, NSCopying {
-    public static var databaseTableName: String = "model_OWSDisappearingMessagesConfiguration"
-    public static var recordType: UInt = SDSRecordType.disappearingMessagesConfiguration.rawValue
+public struct DisappearingMessagesConfigurationRecord: FetchableRecord, MutablePersistableRecord, Codable {
+    public static let databaseTableName = "model_OWSDisappearingMessagesConfiguration"
 
-    public var id: Int64?
+    public private(set) var id: Int64?
     public let threadUniqueId: String
-    public var uniqueId: String { threadUniqueId }
-    public let durationSeconds: UInt32
-    public let isEnabled: Bool
-    public let timerVersion: UInt32
+    public var durationSeconds: UInt32
+    public var isEnabled: Bool
+    public var timerVersion: UInt32
 
     public enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
         case id
@@ -108,67 +105,15 @@ public final class DisappearingMessagesConfigurationRecord: NSObject, SDSCodable
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(self.id, forKey: .id)
-        try container.encode(Self.recordType, forKey: .recordType)
+        try container.encode(SDSRecordType.disappearingMessagesConfiguration.rawValue, forKey: .recordType)
         try container.encode(self.threadUniqueId, forKey: .threadUniqueId)
         try container.encode(self.durationSeconds, forKey: .durationSeconds)
         try container.encode(self.isEnabled, forKey: .isEnabled)
         try container.encode(self.timerVersion, forKey: .timerVersion)
     }
 
-    public static var supportsSecureCoding: Bool { true }
-
-    public func encode(with coder: NSCoder) {
-        if let id {
-            coder.encode(NSNumber(value: id), forKey: "grdbId")
-        }
-        coder.encode(self.threadUniqueId, forKey: "uniqueId")
-        coder.encode(NSNumber(value: self.durationSeconds), forKey: "durationSeconds")
-        coder.encode(NSNumber(value: self.isEnabled), forKey: "enabled")
-        coder.encode(NSNumber(value: self.timerVersion), forKey: "timerVersion")
-    }
-
-    public init?(coder: NSCoder) {
-        self.id = coder.decodeObject(of: NSNumber.self, forKey: "grdbId")?.int64Value ?? 0
-        guard let threadUniqueId = coder.decodeObject(of: NSString.self, forKey: "uniqueId") as String? else {
-            return nil
-        }
-        self.threadUniqueId = threadUniqueId
-        self.durationSeconds = coder.decodeObject(of: NSNumber.self, forKey: "durationSeconds")?.uint32Value ?? 0
-        self.isEnabled = coder.decodeObject(of: NSNumber.self, forKey: "enabled")?.boolValue ?? false
-        self.timerVersion = coder.decodeObject(of: NSNumber.self, forKey: "timerVersion")?.uint32Value ?? 0
-    }
-
-    override public var hash: Int {
-        var hasher = Hasher()
-        hasher.combine(self.id)
-        hasher.combine(self.threadUniqueId)
-        hasher.combine(self.durationSeconds)
-        hasher.combine(self.isEnabled)
-        // [Mantle] TODO: It's wrong to include this based on isEqual:'s implementation.
-        hasher.combine(self.timerVersion)
-        return hasher.finalize()
-    }
-
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? Self else { return false }
-        // [Mantle] TODO: This is wrong because it ignores id & uniqueId.
-        guard self.isEnabled == object.isEnabled else { return false }
-        // Don't bother comparing durationSeconds if not enabled.
-        // [Mantle] TODO: This is wrong because it violates the requirements for hash.
-        guard self.isEnabled else { return true }
-        guard self.durationSeconds == object.durationSeconds else { return false }
-        guard self.timerVersion == object.timerVersion else { return false }
-        return true
-    }
-
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return Self(
-            id: self.id,
-            threadUniqueId: self.threadUniqueId,
-            isEnabled: self.isEnabled,
-            durationSeconds: self.durationSeconds,
-            timerVersion: self.timerVersion,
-        )
+    public mutating func didInsert(with rowID: Int64, for column: String?) {
+        self.id = rowID
     }
 
     init(
@@ -200,41 +145,6 @@ public final class DisappearingMessagesConfigurationRecord: NSObject, SDSCodable
 
     public func durationString() -> String {
         return String.formatDurationLossless(durationSeconds: self.durationSeconds)
-    }
-
-    public func copyWith(isEnabled: Bool, timerVersion: UInt32) -> Self {
-        return Self(
-            id: self.id,
-            threadUniqueId: self.threadUniqueId,
-            isEnabled: isEnabled,
-            durationSeconds: isEnabled ? self.durationSeconds : 0,
-            timerVersion: timerVersion,
-        )
-    }
-
-    func copyWith(durationSeconds: UInt32, timerVersion: UInt32) -> Self {
-        return Self(
-            id: self.id,
-            threadUniqueId: self.threadUniqueId,
-            isEnabled: self.isEnabled,
-            durationSeconds: durationSeconds,
-            timerVersion: timerVersion,
-        )
-    }
-
-    public func copyAsEnabledWith(durationSeconds: UInt32, timerVersion: UInt32) -> Self {
-        return Self(
-            id: self.id,
-            threadUniqueId: self.threadUniqueId,
-            isEnabled: true,
-            durationSeconds: durationSeconds,
-            timerVersion: timerVersion,
-        )
-    }
-
-    /// Returns true if two configs have the same duration and enabled state, regardless of timer version.
-    func hasSameDurationAs(_ other: DisappearingMessagesConfigurationRecord) -> Bool {
-        return self.isEnabled == other.isEnabled && self.durationSeconds == other.durationSeconds
     }
 
     public var asToken: DisappearingMessageToken {

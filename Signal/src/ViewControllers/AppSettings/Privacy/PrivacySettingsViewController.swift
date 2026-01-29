@@ -126,7 +126,16 @@ class PrivacySettingsViewController: OWSTableViewController2 {
                 ) { configuration in
                     if self != nil {
                         SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                            configuration.anyUpsert(transaction: transaction)
+                            var configuration = configuration
+                            if configuration.id == nil {
+                                failIfThrows {
+                                    try configuration.insert(transaction.database)
+                                }
+                            } else {
+                                failIfThrows {
+                                    try configuration.update(transaction.database)
+                                }
+                            }
                         }
                         SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
                     }

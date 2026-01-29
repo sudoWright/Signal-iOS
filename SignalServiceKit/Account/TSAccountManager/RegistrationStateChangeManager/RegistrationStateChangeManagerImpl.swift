@@ -188,11 +188,7 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
             // up via contact sync.
             switch tsAccountManager.registrationState(tx: tx) {
             case .delinked:
-                do {
-                    try dmConfigurationStore.resetAllDMTimerVersions(tx: tx)
-                } catch {
-                    owsFailDebug("Failed to reset dm timer versions \(error.grdbErrorForLogging)")
-                }
+                dmConfigurationStore.resetAllDMTimerVersions(tx: tx)
             default:
                 break
             }
