@@ -563,11 +563,12 @@ public class MessageSender {
         }
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         _ = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
-        if message.shouldBeSaved {
-            let latestCopy = SSKEnvironment.shared.databaseStorageRef.read { tx in
-                TSInteraction.anyFetch(uniqueId: message.uniqueId, transaction: tx) as? TSOutgoingMessage
+        if let message = message as? TSOutgoingMessage, !(message is TransientOutgoingMessage) {
+            let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+            let latestCopy = databaseStorage.read { tx in
+                return TSInteraction.anyFetch(uniqueId: message.uniqueId, transaction: tx) as? TSOutgoingMessage
             }
-            guard let latestCopy, latestCopy.wasRemotelyDeleted.negated else {
+            guard let latestCopy, !latestCopy.wasRemotelyDeleted else {
                 throw MessageDeletedBeforeSentError()
             }
         }
