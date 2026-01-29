@@ -148,7 +148,7 @@ class DisappearingMessagesConfigurationStoreImpl: DisappearingMessagesConfigurat
             failIfThrows {
                 try configuration.insert(tx.database)
             }
-        } else if configuration.asVersionedToken != token {
+        } else if oldConfiguration.asVersionedToken != configuration.asVersionedToken {
             failIfThrows {
                 try configuration.update(tx.database)
             }
