@@ -53,12 +53,6 @@ public enum BuildFlags {
         public static let performListMediaIntegrityChecks = build <= .beta
     }
 
-    public static let runTSAttachmentMigrationInMainAppBackground = true
-    public static let runTSAttachmentMigrationBlockingOnLaunch = true
-
-    public static let pollSend = true
-    public static let pollReceive = true
-
     public static let callQualitySurvey = true
 
     static let netBuildVariant: Net.BuildVariant = build <= .beta ? .beta : .production

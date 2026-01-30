@@ -195,9 +195,6 @@ class AttachmentFormatPickerView: UIView {
         }
 
         private static var groupCases: [AttachmentType] {
-            if !RemoteConfig.current.pollCreate {
-                return cases(except: [.payment, .poll])
-            }
             return cases(except: [.payment])
         }
 

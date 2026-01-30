@@ -399,13 +399,6 @@ public final class MessageReceiver {
                     return
                 }
 
-                if dataMessage.pollCreate != nil || dataMessage.pollTerminate != nil || dataMessage.pollVote != nil {
-                    guard RemoteConfig.current.pollReceive else {
-                        Logger.warn("Polls not supported on this device")
-                        return
-                    }
-                }
-
                 if dataMessage.pinMessage != nil || dataMessage.unpinMessage != nil {
                     guard BuildFlags.PinnedMessages.receive else {
                         Logger.warn("Pinned messages are not supported on this device")
@@ -1301,13 +1294,6 @@ public final class MessageReceiver {
                     Logger.warn("Couldn't find story message; discarding group story reply")
                     return nil
                 }
-            }
-        }
-
-        if dataMessage.pollCreate != nil || dataMessage.pollTerminate != nil || dataMessage.pollVote != nil {
-            guard RemoteConfig.current.pollReceive else {
-                Logger.warn("Polls not supported on this device")
-                return nil
             }
         }
 

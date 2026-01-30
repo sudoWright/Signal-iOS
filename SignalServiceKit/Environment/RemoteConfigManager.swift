@@ -304,20 +304,6 @@ public class RemoteConfig {
         return !isEnabled(.ringrtcNwPathMonitorTrialKillSwitch, defaultValue: false)
     }
 
-    public var pollCreate: Bool {
-        guard BuildFlags.pollSend else {
-            return false
-        }
-        return !isEnabled(.pollCreateKillSwitch)
-    }
-
-    public var pollReceive: Bool {
-        guard BuildFlags.pollReceive else {
-            return false
-        }
-        return !isEnabled(.pollReceiveKillSwitch)
-    }
-
     public var pinnedMessageLimit: UInt {
         return getUIntValue(
             forFlag: .pinnedMessageLimit,
@@ -532,8 +518,6 @@ private enum IsEnabledFlag: String, FlagType {
     case paypalGiftDonationKillSwitch = "ios.paypalGiftDonationKillSwitch"
     case paypalMonthlyDonationKillSwitch = "ios.paypalMonthlyDonationKillSwitch"
     case paypalOneTimeDonationKillSwitch = "ios.paypalOneTimeDonationKillSwitch"
-    case pollCreateKillSwitch = "ios.pollCreateKillSwitch"
-    case pollReceiveKillSwitch = "ios.pollReceiveKillSwitch"
     case ringrtcNwPathMonitorTrialKillSwitch = "ios.ringrtcNwPathMonitorTrialKillSwitch"
     case serviceExtensionFailureKillSwitch = "ios.serviceExtensionFailureKillSwitch"
 
@@ -559,8 +543,6 @@ private enum IsEnabledFlag: String, FlagType {
         case .paypalGiftDonationKillSwitch: false
         case .paypalMonthlyDonationKillSwitch: false
         case .paypalOneTimeDonationKillSwitch: false
-        case .pollCreateKillSwitch: true
-        case .pollReceiveKillSwitch: true
         case .ringrtcNwPathMonitorTrialKillSwitch: true // cached during launch, so not hot-swapped in practice
         case .serviceExtensionFailureKillSwitch: true
 
