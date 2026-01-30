@@ -7582,6 +7582,24 @@
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
 "SAFETY_NUMBER_SHARE_FORMAT" = "Our Signal Safety Number:\n%@";
 
+/* Title for a button offering automatic key verification. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY" = "Verify Automatically";
+
+/* Title for a button when automatic key verification fails. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY_FAILURE" = "Auto-Verification Unavailable";
+
+/* Title for a button when automatic key verification succeeds. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY_SUCCESS" = "Encryption Verified";
+
+/* Title for a button while automatic key verification is ongoing. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Verifying Encryption…";
+
+/* Footer explaining that automatic verification is not available for all chats */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FOOTER" = "Auto-verification is not available for all chats.";
+
+/* Header for automatic key verification */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Automatic Key Verification";
+
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "Safety Tips";
 

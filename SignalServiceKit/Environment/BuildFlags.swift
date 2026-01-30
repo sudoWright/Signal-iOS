@@ -85,6 +85,10 @@ public enum BuildFlags {
         public static let receive = build <= .dev
         public static let send = build <= .dev
     }
+
+    public enum KeyTransparency {
+        public static let enabled = build <= .dev
+    }
 }
 
 // MARK: -

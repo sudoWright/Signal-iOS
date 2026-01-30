@@ -519,3 +519,56 @@ public extension UIToolbar {
         return toolbar
     }
 }
+
+// MARK: -
+
+#if DEBUG
+
+private class ButtonPreviewViewController: UIViewController {
+    private let buttonConfiguration: UIButton.Configuration
+
+    init(_ buttonConfiguration: UIButton.Configuration) {
+        self.buttonConfiguration = buttonConfiguration
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) { fatalError("") }
+
+    override func viewDidLoad() {
+        let button = UIButton(configuration: buttonConfiguration)
+        view.addSubview(button)
+        button.autoCenterInSuperviewMargins()
+    }
+}
+
+@available(iOS 17, *)
+#Preview("Large Primary") {
+    return ButtonPreviewViewController(.largePrimary(title: "Large Primary"))
+}
+
+@available(iOS 17, *)
+#Preview("Large Secondary") {
+    return ButtonPreviewViewController(.largeSecondary(title: "Large Secondary"))
+}
+
+@available(iOS 17, *)
+#Preview("Medium Secondary") {
+    return ButtonPreviewViewController(.mediumSecondary(title: "Medium Secondary"))
+}
+
+@available(iOS 17, *)
+#Preview("Medium Borderless") {
+    return ButtonPreviewViewController(.mediumBorderless(title: "Medium Borderless"))
+}
+
+@available(iOS 17, *)
+#Preview("Small Secondary") {
+    return ButtonPreviewViewController(.smallSecondary(title: "Small Secondary"))
+}
+
+@available(iOS 17, *)
+#Preview("Small Borderless") {
+    return ButtonPreviewViewController(.smallBorderless(title: "Small Borderless"))
+}
+
+#endif
