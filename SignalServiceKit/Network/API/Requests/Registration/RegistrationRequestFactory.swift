@@ -346,6 +346,7 @@ public enum RegistrationRequestFactory {
         let parameters = try! JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as! [String: Any]
 
         var result = TSRequest(url: url, method: "PUT", parameters: parameters)
+        result.headers["X-Signal-Agent"] = "OWI"
         result.auth = .identified(auth)
         return result
     }
