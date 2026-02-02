@@ -219,8 +219,14 @@ public class RemoteConfig {
         getUInt32Value(forFlag: .maxNicknameLength, defaultValue: 32)
     }
 
+    /// Most of our code uses UInt32; add a large bound smaller than that.
+    private static let attachmentHardLimit: UInt64 = 1_610_612_736
+
     public var attachmentMaxEncryptedBytes: UInt64 {
-        return getUInt64Value(forFlag: .attachmentMaxEncryptedBytes, defaultValue: 100 * 1024 * 1024)
+        return min(Self.attachmentHardLimit, getUInt64Value(
+            forFlag: .attachmentMaxEncryptedBytes,
+            defaultValue: 100 * 1024 * 1024,
+        ))
     }
 
     public var attachmentMaxEncryptedReceiveBytes: UInt64 {
@@ -228,17 +234,17 @@ public class RemoteConfig {
             return self.attachmentMaxEncryptedBytes
         }
         let maxEncryptedBytes = self.attachmentMaxEncryptedBytes
-        return getUInt64Value(
+        return min(Self.attachmentHardLimit, getUInt64Value(
             forFlag: .attachmentMaxEncryptedReceiveBytes,
             defaultValue: maxEncryptedBytes + maxEncryptedBytes / 4,
-        )
+        ))
     }
 
     public var videoAttachmentMaxEncryptedBytes: UInt64 {
-        return getUInt64Value(
+        return min(Self.attachmentHardLimit, getUInt64Value(
             forFlag: .videoAttachmentMaxEncryptedBytes,
             defaultValue: self.attachmentMaxEncryptedBytes,
-        )
+        ))
     }
 
     public var videoAttachmentMaxEncryptedReceiveBytes: UInt64 {
@@ -246,20 +252,20 @@ public class RemoteConfig {
             return self.videoAttachmentMaxEncryptedBytes
         }
         let maxEncryptedBytes = self.videoAttachmentMaxEncryptedBytes
-        return getUInt64Value(
+        return min(Self.attachmentHardLimit, getUInt64Value(
             forFlag: .videoAttachmentMaxEncryptedReceiveBytes,
             defaultValue: maxEncryptedBytes + maxEncryptedBytes / 4,
-        )
+        ))
     }
 
     public var backupAttachmentMaxEncryptedBytes: UInt64 {
         guard BuildFlags.useNewAttachmentLimits else {
             return 100_000_000
         }
-        return getUInt64Value(
+        return min(Self.attachmentHardLimit, getUInt64Value(
             forFlag: .backupAttachmentMaxEncryptedBytes,
             defaultValue: self.attachmentMaxEncryptedBytes,
-        )
+        ))
     }
 
     public var backupListMediaDefaultRefreshInterval: TimeInterval {
