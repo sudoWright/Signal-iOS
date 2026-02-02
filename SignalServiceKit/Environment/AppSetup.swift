@@ -600,6 +600,7 @@ extension AppSetup.GlobalsContinuation {
             backupAttachmentUploadEraStore: backupAttachmentUploadEraStore,
             dateProvider: dateProvider,
             interactionStore: interactionStore,
+            remoteConfigProvider: remoteConfigProvider,
         )
 
         let backupListMediaStore = BackupListMediaStore()

@@ -234,6 +234,16 @@ public class RemoteConfig {
         )
     }
 
+    public var backupAttachmentMaxEncryptedBytes: UInt64 {
+        guard BuildFlags.useNewAttachmentLimits else {
+            return 100_000_000
+        }
+        return getUInt64Value(
+            forFlag: .backupAttachmentMaxEncryptedBytes,
+            defaultValue: self.attachmentMaxEncryptedBytes,
+        )
+    }
+
     public var backupListMediaDefaultRefreshInterval: TimeInterval {
         let defaultValue: UInt64
         if BuildFlags.Backups.useLowerDefaultListMediaRefreshInterval {
@@ -560,6 +570,7 @@ private enum ValueFlag: String, FlagType {
     case attachmentMaxEncryptedReceiveBytes = "global.attachments.maxReceiveBytes"
     case automaticSessionResetAttemptInterval = "ios.automaticSessionResetAttemptInterval"
     case backgroundRefreshInterval = "ios.backgroundRefreshInterval"
+    case backupAttachmentMaxEncryptedBytes = "ios.backupAttachments.maxBytes"
     case callQualitySurveyPPM = "ios.callQualitySurveyPPM"
     case cdsSyncInterval = "cds.syncInterval.seconds"
     case clientExpiration = "ios.clientExpiration"
@@ -596,6 +607,7 @@ private enum ValueFlag: String, FlagType {
         case .attachmentMaxEncryptedReceiveBytes: true
         case .automaticSessionResetAttemptInterval: true
         case .backgroundRefreshInterval: true
+        case .backupAttachmentMaxEncryptedBytes: true
         case .callQualitySurveyPPM: true
         case .cdsSyncInterval: false
         case .clientExpiration: true

@@ -104,6 +104,7 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
     private let backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore
     private let dateProvider: DateProvider
     private let interactionStore: InteractionStore
+    private let remoteConfigProvider: any RemoteConfigProvider
 
     public init(
         attachmentStore: AttachmentStore,
@@ -111,12 +112,14 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
         backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore,
         dateProvider: @escaping DateProvider,
         interactionStore: InteractionStore,
+        remoteConfigProvider: any RemoteConfigProvider,
     ) {
         self.attachmentStore = attachmentStore
         self.backupAttachmentUploadStore = backupAttachmentUploadStore
         self.backupAttachmentUploadEraStore = backupAttachmentUploadEraStore
         self.dateProvider = dateProvider
         self.interactionStore = interactionStore
+        self.remoteConfigProvider = remoteConfigProvider
     }
 
     public func isEligibleToUpload(
@@ -128,9 +131,10 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
         guard let stream = attachment.asStream() else {
             return false
         }
-        let eligibility = Eligibility(
+        let eligibility = Eligibility.forAttachment(
             stream,
             currentUploadEra: currentUploadEra,
+            remoteConfig: remoteConfigProvider.currentConfig(),
         )
         if fullsize, !eligibility.needsUploadFullsize {
             return false
@@ -165,9 +169,10 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
 
         let currentUploadEra = backupAttachmentUploadEraStore.currentUploadEra(tx: tx)
 
-        let eligibility = Eligibility(
+        let eligibility = Eligibility.forAttachment(
             stream,
             currentUploadEra: currentUploadEra,
+            remoteConfig: remoteConfigProvider.currentConfig(),
         )
         guard eligibility.needsUploadFullsize || eligibility.needsUploadThumbnail else {
             if let file, let function, let line {
@@ -234,9 +239,10 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
 
         let currentUploadEra = backupAttachmentUploadEraStore.currentUploadEra(tx: tx)
 
-        let eligibility = Eligibility(
+        let eligibility = Eligibility.forAttachment(
             stream,
             currentUploadEra: currentUploadEra,
+            remoteConfig: remoteConfigProvider.currentConfig(),
         )
         guard eligibility.needsUploadFullsize || eligibility.needsUploadThumbnail else {
             if let file, let function, let line {
@@ -285,12 +291,13 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
         let needsUploadFullsize: Bool
         let needsUploadThumbnail: Bool
 
-        init(
+        static func forAttachment(
             _ attachment: AttachmentStream,
             currentUploadEra: String,
-        ) {
-            self.needsUploadFullsize = {
-                if attachment.encryptedByteCount > OWSMediaUtils.kMaxAttachmentUploadSizeBytes {
+            remoteConfig: RemoteConfig,
+        ) -> Self {
+            let needsUploadFullsize = { () -> Bool in
+                if attachment.encryptedByteCount > remoteConfig.backupAttachmentMaxEncryptedBytes {
                     Logger.info("Skipping upload of too-large attachment \(attachment.id), \(attachment.encryptedByteCount) bytes")
                     return false
                 }
@@ -300,13 +307,17 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
                     return true
                 }
             }()
-            self.needsUploadThumbnail = {
+            let needsUploadThumbnail = { () -> Bool in
                 if let thumbnailMediaTierInfo = attachment.attachment.thumbnailMediaTierInfo {
                     return !thumbnailMediaTierInfo.isUploaded(currentUploadEra: currentUploadEra)
                 } else {
                     return AttachmentBackupThumbnail.canBeThumbnailed(attachment.attachment)
                 }
             }()
+            return Self(
+                needsUploadFullsize: needsUploadFullsize,
+                needsUploadThumbnail: needsUploadThumbnail,
+            )
         }
     }
 

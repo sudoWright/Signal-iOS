@@ -145,9 +145,6 @@ public enum OWSMediaUtils {
      */
     public static let kMaxFileSizeAnimatedImage: UInt64 = 25 * 1024 * 1024
     public static let kMaxFileSizeImage: UInt64 = 8 * 1024 * 1024
-    // Cloudflare limits uploads to 100 MB. To avoid hitting those limits,
-    // we use limits that are 5% lower for the unencrypted content.
-    public static let kMaxAttachmentUploadSizeBytes: UInt64 = 100_000_000
 
     public static let kMaxVideoDimensions: CGFloat = 4096 // 4k video width
     public static let kMaxImageDimensions: CGFloat = 12 * 1024
