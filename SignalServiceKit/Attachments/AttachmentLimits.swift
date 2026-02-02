@@ -22,7 +22,7 @@ public struct IncomingAttachmentLimits {
     }
 
     public var maxEncryptedVideoBytes: UInt64 {
-        return self.maxEncryptedBytes
+        return remoteConfig.videoAttachmentMaxEncryptedReceiveBytes
     }
 
     public var maxEncryptedImageBytes: UInt64 {
@@ -69,7 +69,8 @@ public struct OutgoingAttachmentLimits {
         guard BuildFlags.useNewAttachmentLimits else {
             return 95_000_000
         }
-        return maxPlaintextBytes
+        let maxEncryptedBytes = remoteConfig.videoAttachmentMaxEncryptedBytes
+        return PaddingBucket.forEncryptedSizeLimit(maxEncryptedBytes).plaintextSize
     }
 
     public var maxPlaintextAudioBytes: UInt64 {

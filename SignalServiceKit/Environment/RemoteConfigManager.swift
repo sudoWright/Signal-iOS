@@ -234,6 +234,24 @@ public class RemoteConfig {
         )
     }
 
+    public var videoAttachmentMaxEncryptedBytes: UInt64 {
+        return getUInt64Value(
+            forFlag: .videoAttachmentMaxEncryptedBytes,
+            defaultValue: self.attachmentMaxEncryptedBytes,
+        )
+    }
+
+    public var videoAttachmentMaxEncryptedReceiveBytes: UInt64 {
+        guard BuildFlags.useNewAttachmentLimits else {
+            return self.videoAttachmentMaxEncryptedBytes
+        }
+        let maxEncryptedBytes = self.videoAttachmentMaxEncryptedBytes
+        return getUInt64Value(
+            forFlag: .videoAttachmentMaxEncryptedReceiveBytes,
+            defaultValue: maxEncryptedBytes + maxEncryptedBytes / 4,
+        )
+    }
+
     public var backupAttachmentMaxEncryptedBytes: UInt64 {
         guard BuildFlags.useNewAttachmentLimits else {
             return 100_000_000
@@ -591,6 +609,8 @@ private enum ValueFlag: String, FlagType {
     case replaceableInteractionExpiration = "ios.replaceableInteractionExpiration"
     case sepaEnabledRegions = "global.donations.sepaEnabledRegions"
     case standardMediaQualityLevel = "ios.standardMediaQualityLevel"
+    case videoAttachmentMaxEncryptedBytes = "ios.videoAttachments.maxBytes"
+    case videoAttachmentMaxEncryptedReceiveBytes = "ios.videoAttachments.maxReceiveBytes"
     case backupListMediaDefaultRefreshIntervalMs = "ios.backupListMediaDefaultRefreshIntervalMs"
     case backupListMediaOutOfQuotaRefreshIntervalMs = "ios.backupListMediaOutOfQuotaRefreshIntervalMs"
     case pinnedMessageLimit = "global.pinned_message_limit"
@@ -628,6 +648,8 @@ private enum ValueFlag: String, FlagType {
         case .replaceableInteractionExpiration: false
         case .sepaEnabledRegions: true
         case .standardMediaQualityLevel: true
+        case .videoAttachmentMaxEncryptedBytes: true
+        case .videoAttachmentMaxEncryptedReceiveBytes: true
         case .backupListMediaDefaultRefreshIntervalMs: true
         case .backupListMediaOutOfQuotaRefreshIntervalMs: true
         case .pinnedMessageLimit: true
