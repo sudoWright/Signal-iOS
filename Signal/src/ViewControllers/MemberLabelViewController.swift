@@ -327,7 +327,6 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
 
     @objc
     func textDidChange(_ textField: UITextField) {
-        textField.text = textField.text?.filter { !$0.unicodeScalars.containsOnlyEmoji() }
         updatedMemberLabel = textField.text == "" ? nil : textField.text?.filterStringForDisplay()
         reloadDoneButtonStatus()
         reloadMessagePreview()

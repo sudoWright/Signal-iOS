@@ -296,7 +296,6 @@ public extension GroupV2Params {
     func decryptMemberLabel(_ ciphertext: Data) throws -> String? {
         do {
             let decryptedLabel = try decryptString(ciphertext)
-            owsAssertDebug(!decryptedLabel.containsEmoji)
             guard decryptedLabel.lengthOfBytes(using: .utf8) <= 96 else {
                 throw OWSAssertionError("member label is too long.")
             }
@@ -308,7 +307,6 @@ public extension GroupV2Params {
     }
 
     func encryptMemberLabel(_ value: String) throws -> Data {
-        owsAssertDebug(!value.containsEmoji)
         do {
             return try encryptString(value)
         } catch {
