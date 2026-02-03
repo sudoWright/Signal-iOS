@@ -6,6 +6,8 @@
 import SignalServiceKit
 import SignalUI
 
+#if USE_DEBUG_UI
+
 final class DebugUIKeyTransparency: DebugUIPage {
     let name = "Key Transparency"
 
@@ -23,3 +25,5 @@ final class DebugUIKeyTransparency: DebugUIPage {
         return OWSTableSection(items: items)
     }
 }
+
+#endif
