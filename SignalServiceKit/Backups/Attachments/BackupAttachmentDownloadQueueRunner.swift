@@ -205,6 +205,17 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
         private let statusManager: BackupAttachmentDownloadQueueStatusManager
         private let tsAccountManager: TSAccountManager
 
+        private lazy var availableDiskSpaceCheck = DebouncedEvents.build(
+            mode: .lastOnly,
+            maxFrequencySeconds: 1.0,
+            onQueue: .sharedUserInitiated,
+            notifyBlock: { [weak self] in
+                Task {
+                    await self?.statusManager.checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: false)
+                }
+            },
+        )
+
         let store: TaskStore
 
         private let mode: BackupAttachmentDownloadQueueMode
@@ -258,7 +269,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             struct NeedsInternetError: Error {}
             struct NeedsToBeRegisteredError: Error {}
 
-            await statusManager.checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: false)
+            availableDiskSpaceCheck.requestNotify()
 
             let (status, statusToken) = await statusManager.currentStatusAndToken(for: mode)
             switch status {
