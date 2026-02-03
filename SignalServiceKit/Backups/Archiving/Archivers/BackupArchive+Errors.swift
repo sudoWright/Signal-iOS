@@ -626,6 +626,9 @@ extension BackupArchive {
                 /// An invalid member (group, distribution list, etc) was specified as a distribution list member.  Includes the offending proto
                 case invalidDistributionListMember(protoClass: Any.Type)
 
+                /// An invalid member label was associated with a group member.
+                case invalidMemberLabel
+
                 /// The backup tier in account settings was set but not able to be parsed by libsignal.
                 case invalidBackupTier
 
@@ -939,6 +942,7 @@ extension BackupArchive {
                     .invalidProfileKey,
                     .invalidContactIdentityKey,
                     .invalidDistributionListMember,
+                    .invalidMemberLabel,
                     .contactWithoutIdentifiers,
                     .otherContactWithLocalIdentifiers,
                     .chatItemInvalidDateSent,
@@ -1053,6 +1057,7 @@ extension BackupArchive {
                     .invalidProfileKey,
                     .invalidContactIdentityKey,
                     .invalidDistributionListMember,
+                    .invalidMemberLabel,
                     .invalidBackupTier,
                     .contactWithoutIdentifiers,
                     .otherContactWithLocalIdentifiers,

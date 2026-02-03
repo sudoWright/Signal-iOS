@@ -174,7 +174,7 @@ public class BackupArchiveGroupRecipientArchiver: BackupArchiveProtoStreamWriter
                     return nil
                 }
 
-                return .build(serviceId: aci, role: role)
+                return .build(serviceId: aci, role: role, memberLabel: groupMembership.memberLabel(for: aci))
             }
             groupSnapshot.membersPendingProfileKey = groupMembership.invitedMembers.compactMap { address -> BackupProto_Group.MemberPendingProfileKey? in
                 guard
@@ -194,6 +194,7 @@ public class BackupArchiveGroupRecipientArchiver: BackupArchiveProtoStreamWriter
                 invitedMemberProto.member = .build(
                     serviceId: serviceId,
                     role: role,
+                    memberLabel: nil,
                 )
                 return invitedMemberProto
             }
@@ -314,6 +315,26 @@ public class BackupArchiveGroupRecipientArchiver: BackupArchiveProtoStreamWriter
             )
         }
 
+        var partialErrors = [BackupArchive.RestoreFrameError<RecipientId>]()
+
+        for member in groupSnapshot.members {
+            guard let aci = try? Aci.parseFrom(serviceIdBinary: member.userID) else {
+                return restoreFrameError(.invalidProtoData(.invalidAci(protoClass: BackupProto_Group.Member.self)))
+            }
+            if !member.labelString.isEmpty {
+                guard
+                    member.labelString.lengthOfBytes(using: .utf8) <= 96,
+                    member.labelString.count <= 24,
+                    member.labelEmoji.lengthOfBytes(using: .utf8) <= 48
+                else {
+                    partialErrors.append(.restoreFrameError(.invalidProtoData(.invalidMemberLabel), recipient.recipientId))
+                    continue
+                }
+                let emoji: String? = member.labelEmoji.isEmpty ? nil : member.labelEmoji
+                groupMembershipBuilder.setMemberLabel(label: MemberLabel(label: member.labelString, labelEmoji: emoji), aci: aci)
+            }
+        }
+
         var groupModelBuilder = TSGroupModelBuilder(secretParams: groupContextInfo.groupSecretParams)
         groupModelBuilder.groupV2Revision = groupSnapshot.version
         groupModelBuilder.name = groupSnapshot.extractTitle
@@ -384,8 +405,6 @@ public class BackupArchiveGroupRecipientArchiver: BackupArchiveProtoStreamWriter
         if groupProto.blocked {
             blockingManager.addBlockedGroupId(groupContextInfo.groupId.serialize(), tx: context.tx)
         }
-
-        var partialErrors = [BackupArchive.RestoreFrameError<RecipientId>]()
 
         if
             groupProto.hasAvatarColor,
@@ -497,12 +516,19 @@ private extension BackupProto_Group.Member {
     static func build(
         serviceId: ServiceId,
         role: TSGroupMemberRole,
+        memberLabel: MemberLabel?,
     ) -> BackupProto_Group.Member {
         // iOS doesn't track the joinedAtRevision, so we'll default-populate it.
         var member = BackupProto_Group.Member()
         member.userID = serviceId.serviceIdBinary
         member.role = role.asBackupProtoRole
         member.joinedAtVersion = 0
+        if let labelString = memberLabel?.label {
+            member.labelString = labelString
+        }
+        if let labelEmoji = memberLabel?.labelEmoji {
+            member.labelEmoji = labelEmoji
+        }
         return member
     }
 }

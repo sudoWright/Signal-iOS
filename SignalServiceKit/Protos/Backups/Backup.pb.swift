@@ -1554,6 +1554,10 @@ public struct BackupProto_Group: @unchecked Sendable {
 
     public var joinedAtVersion: UInt32 = 0
 
+    public var labelEmoji: String = String()
+
+    public var labelString: String = String()
+
     public var unknownFields = SwiftProtobuf.UnknownStorage()
 
     public enum Role: SwiftProtobuf.Enum, Swift.CaseIterable {
@@ -8075,7 +8079,7 @@ extension BackupProto_Group.GroupAttributeBlob: SwiftProtobuf.Message, SwiftProt
 
 extension BackupProto_Group.Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = BackupProto_Group.protoMessageName + ".Member"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}role\0\u{2}\u{3}joinedAtVersion\0\u{c}\u{3}\u{1}\u{c}\u{4}\u{1}")
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}role\0\u{2}\u{3}joinedAtVersion\0\u{3}label_emoji\0\u{3}label_string\0\u{c}\u{3}\u{1}\u{c}\u{4}\u{1}")
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -8086,6 +8090,8 @@ extension BackupProto_Group.Member: SwiftProtobuf.Message, SwiftProtobuf._Messag
       case 1: try { try decoder.decodeSingularBytesField(value: &self.userID) }()
       case 2: try { try decoder.decodeSingularEnumField(value: &self.role) }()
       case 5: try { try decoder.decodeSingularUInt32Field(value: &self.joinedAtVersion) }()
+      case 6: try { try decoder.decodeSingularStringField(value: &self.labelEmoji) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self.labelString) }()
       default: break
       }
     }
@@ -8101,6 +8107,12 @@ extension BackupProto_Group.Member: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if self.joinedAtVersion != 0 {
       try visitor.visitSingularUInt32Field(value: self.joinedAtVersion, fieldNumber: 5)
     }
+    if !self.labelEmoji.isEmpty {
+      try visitor.visitSingularStringField(value: self.labelEmoji, fieldNumber: 6)
+    }
+    if !self.labelString.isEmpty {
+      try visitor.visitSingularStringField(value: self.labelString, fieldNumber: 7)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -8108,6 +8120,8 @@ extension BackupProto_Group.Member: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if lhs.userID != rhs.userID {return false}
     if lhs.role != rhs.role {return false}
     if lhs.joinedAtVersion != rhs.joinedAtVersion {return false}
+    if lhs.labelEmoji != rhs.labelEmoji {return false}
+    if lhs.labelString != rhs.labelString {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
