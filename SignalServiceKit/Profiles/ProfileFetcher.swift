@@ -16,10 +16,20 @@ public struct ProfileFetchContext {
     /// If true, the fetch must try to fetch a new credential.
     public var mustFetchNewCredential: Bool
 
-    public init(groupId: GroupIdentifier? = nil, isOpportunistic: Bool = false, mustFetchNewCredential: Bool = false) {
+    /// The nature of the user profile fetch.  This determines side-effect behavior
+    /// such as if storage service is updated after the write.
+    public var userProfileWriter: UserProfileWriter
+
+    public init(
+        groupId: GroupIdentifier? = nil,
+        isOpportunistic: Bool = false,
+        mustFetchNewCredential: Bool = false,
+        userProfileWriter: UserProfileWriter = .profileFetch,
+    ) {
         self.groupId = groupId
         self.isOpportunistic = isOpportunistic
         self.mustFetchNewCredential = mustFetchNewCredential
+        self.userProfileWriter = userProfileWriter
     }
 }
 
@@ -53,7 +63,13 @@ public enum ProfileFetcherError: Error {
 }
 
 public actor ProfileFetcherImpl: ProfileFetcher {
-    private let jobCreator: (ServiceId, GroupIdentifier?, _ mustFetchNewCredential: Bool, AuthedAccount) -> ProfileFetcherJob
+    private let jobCreator: (
+        ServiceId,
+        GroupIdentifier?,
+        _ mustFetchNewCredential: Bool,
+        AuthedAccount,
+        UserProfileWriter,
+    ) -> ProfileFetcherJob
     private let reachabilityManager: any SSKReachabilityManager
     private let tsAccountManager: any TSAccountManager
 
@@ -101,7 +117,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
     ) {
         self.reachabilityManager = reachabilityManager
         self.tsAccountManager = tsAccountManager
-        self.jobCreator = { serviceId, groupIdContext, mustFetchNewCredential, authedAccount in
+        self.jobCreator = { serviceId, groupIdContext, mustFetchNewCredential, authedAccount, userProfileWriter in
             return ProfileFetcherJob(
                 serviceId: serviceId,
                 groupIdContext: groupIdContext,
@@ -118,6 +134,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
                 tsAccountManager: tsAccountManager,
                 udManager: udManager,
                 versionedProfiles: versionedProfiles,
+                userProfileWriter: userProfileWriter,
             )
         }
         SwiftSingletons.register(self)
@@ -248,7 +265,13 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         context: ProfileFetchContext,
         authedAccount: AuthedAccount,
     ) async throws -> FetchedProfile {
-        let result = await Result { try await jobCreator(serviceId, context.groupId, context.mustFetchNewCredential, authedAccount).run() }
+        let result = await Result { try await jobCreator(
+            serviceId,
+            context.groupId,
+            context.mustFetchNewCredential,
+            authedAccount,
+            context.userProfileWriter,
+        ).run() }
         let outcome: FetchResult.Outcome
         do {
             _ = try result.get()

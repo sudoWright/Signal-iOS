@@ -205,7 +205,7 @@ public class BackupArchiveAvatarFetcher {
                     } else {
                         _ = try await profileFetcher.fetchProfileImpl(
                             for: serviceId,
-                            context: .init(isOpportunistic: true),
+                            context: .init(isOpportunistic: true, userProfileWriter: .backupRestore),
                             authedAccount: .implicit(),
                         )
                     }
