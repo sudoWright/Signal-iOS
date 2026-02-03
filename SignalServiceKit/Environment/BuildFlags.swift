@@ -178,6 +178,18 @@ public enum DebugFlags {
         details: LocalizationNotNeeded("1:1 calls will not connect to a TURN server (remote party may still use TURN)."),
     )
 
+    public static let callingForceVp9Off = TestableFlag(
+        false,
+        title: LocalizationNotNeeded("Calling: Never use VP9"),
+        details: LocalizationNotNeeded("1:1 calls will never use VP9 (overrides remote config)."),
+    )
+
+    public static let callingForceVp9On = TestableFlag(
+        false,
+        title: LocalizationNotNeeded("Calling: Always offer VP9"),
+        details: LocalizationNotNeeded("1:1 calls will always offer VP9 (overrides remote config and \"Never use VP9\")."),
+    )
+
     public static let delayedMessageResend = TestableFlag(
         false,
         title: LocalizationNotNeeded("Delayed message resend"),
@@ -197,6 +209,8 @@ public enum DebugFlags {
         return [
             callingUseTestSFU,
             callingNeverRelay,
+            callingForceVp9Off,
+            callingForceVp9On,
             delayedMessageResend,
             fastPlaceholderExpiration,
             messageSendsFail,

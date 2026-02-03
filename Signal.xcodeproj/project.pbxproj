@@ -846,6 +846,7 @@
 		50F75E312AD9F18F0032530F /* RecipientDatabaseTableTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F75E302AD9F18F0032530F /* RecipientDatabaseTableTest.swift */; };
 		50F86FC42AFEFEC20045F58B /* TimeGatedBatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F86FC32AFEFEC20045F58B /* TimeGatedBatch.swift */; };
 		50F946102AD768AF002EF293 /* MockIdentityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F9460F2AD768AF002EF293 /* MockIdentityManager.swift */; };
+		557238D32F2D53FD0033BC9A /* RingrtcVp9Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557238D22F2D53EF0033BC9A /* RingrtcVp9Config.swift */; };
 		55B753602D97304100CCC91C /* RemoteMuteToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B7535F2D97303A00CCC91C /* RemoteMuteToast.swift */; };
 		55BD355C2F16DAC0008E989C /* input_video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5531BE0E2F15B97F002AF66F /* input_video.mp4 */; };
 		5AA002E62CA24566002D1CC2 /* SessionStoreTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA002E52CA2455F002D1CC2 /* SessionStoreTest.swift */; };
@@ -4998,6 +4999,7 @@
 		50F96F3A28ECBC3200541EED /* ms */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ms; path = translations/ms.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		538291A33C75754BC577D8C3 /* Pods-SignalShareExtension.testable release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalShareExtension.testable release.xcconfig"; path = "Target Support Files/Pods-SignalShareExtension/Pods-SignalShareExtension.testable release.xcconfig"; sourceTree = "<group>"; };
 		5531BE0E2F15B97F002AF66F /* input_video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = text; path = input_video.mp4; sourceTree = "<group>"; };
+		557238D22F2D53EF0033BC9A /* RingrtcVp9Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingrtcVp9Config.swift; sourceTree = "<group>"; };
 		55B305CB99EC1478F69D91CF /* Pods-SignalUITests.profiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalUITests.profiling.xcconfig"; path = "Target Support Files/Pods-SignalUITests/Pods-SignalUITests.profiling.xcconfig"; sourceTree = "<group>"; };
 		55B7535F2D97303A00CCC91C /* RemoteMuteToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMuteToast.swift; sourceTree = "<group>"; };
 		5AA002E52CA2455F002D1CC2 /* SessionStoreTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStoreTest.swift; sourceTree = "<group>"; };
@@ -14117,6 +14119,7 @@
 				D9DB37F22B71B037007B16C8 /* OutgoingCallLogEventSyncMessage.swift */,
 				500CC1E82F15C8A7001A86F7 /* OutgoingCallMessage.swift */,
 				F945FE492984796D00C835C7 /* RingrtcFieldTrials.swift */,
+				557238D22F2D53EF0033BC9A /* RingrtcVp9Config.swift */,
 			);
 			path = Calls;
 			sourceTree = "<group>";
@@ -19292,6 +19295,7 @@
 				50C0203E2CA4A7A500BDC4EF /* Retry.swift in Sources */,
 				F9C5CDF8289453B400548EEE /* ReverseDispatchQueue.swift in Sources */,
 				F945FE4A2984796D00C835C7 /* RingrtcFieldTrials.swift in Sources */,
+				557238D32F2D53FD0033BC9A /* RingrtcVp9Config.swift in Sources */,
 				668A01332C2B6088007B8808 /* Scheduler.swift in Sources */,
 				72C905912B9ACA3D00E586B8 /* ScreenLock.swift in Sources */,
 				7255A4D22B98E2B700E95368 /* ScrubbingLogFormatter.swift in Sources */,

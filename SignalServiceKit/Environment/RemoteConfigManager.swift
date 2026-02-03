@@ -338,6 +338,10 @@ public class RemoteConfig {
         return !isEnabled(.ringrtcNwPathMonitorTrialKillSwitch, defaultValue: false)
     }
 
+    public var ringrtcVp9Enabled: Bool {
+        return isEnabled(.ringrtcVp9Enabled, defaultValue: false)
+    }
+
     public var pinnedMessageLimit: UInt {
         return getUIntValue(
             forFlag: .pinnedMessageLimit,
@@ -553,6 +557,7 @@ private enum IsEnabledFlag: String, FlagType {
     case paypalMonthlyDonationKillSwitch = "ios.paypalMonthlyDonationKillSwitch"
     case paypalOneTimeDonationKillSwitch = "ios.paypalOneTimeDonationKillSwitch"
     case ringrtcNwPathMonitorTrialKillSwitch = "ios.ringrtcNwPathMonitorTrialKillSwitch"
+    case ringrtcVp9Enabled = "ios.ringrtcVp9Enabled"
     case serviceExtensionFailureKillSwitch = "ios.serviceExtensionFailureKillSwitch"
 
 #if TESTABLE_BUILD
@@ -578,6 +583,7 @@ private enum IsEnabledFlag: String, FlagType {
         case .paypalMonthlyDonationKillSwitch: false
         case .paypalOneTimeDonationKillSwitch: false
         case .ringrtcNwPathMonitorTrialKillSwitch: true // cached during launch, so not hot-swapped in practice
+        case .ringrtcVp9Enabled: true
         case .serviceExtensionFailureKillSwitch: true
 
 #if TESTABLE_BUILD
