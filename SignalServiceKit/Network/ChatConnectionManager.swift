@@ -29,6 +29,8 @@ public protocol ChatConnectionManager {
     func setRegistrationOverride(_ chatServiceAuth: ChatServiceAuth) async
     func clearRegistrationOverride() async
 
+    func keyTransparencyClient() async throws -> KeyTransparency.Client
+
     /// Access a libsignal "service" on the active unauthenticated connection.
     ///
     /// Intended to be used with code completion; ``UnauthServiceSelector``
@@ -147,6 +149,14 @@ public class ChatConnectionManagerImpl: ChatConnectionManager {
         return connectionUnidentified.currentState
     }
 
+    // MARK: -
+
+    public func keyTransparencyClient() async throws -> KeyTransparency.Client {
+        return try await connectionUnidentified.withLibsignalConnection { connection in
+            connection.keyTransparencyClient
+        }
+    }
+
     // This method can be called from any thread.
     public func withUnauthService<Service, Output>(
         _ service: Service,
@@ -157,6 +167,8 @@ public class ChatConnectionManagerImpl: ChatConnectionManager {
             try await callback(connection as! Service.Api)
         }
     }
+
+    // MARK: -
 
     public var hasEmptiedInitialQueue: Bool {
         get async {
@@ -220,6 +232,10 @@ public class ChatConnectionManagerMock: ChatConnectionManager {
     }
 
     public func clearRegistrationOverride() async {
+    }
+
+    public func keyTransparencyClient() async throws -> KeyTransparency.Client {
+        fatalError("must override for tests")
     }
 
     public func withUnauthService<Service, Output>(

@@ -128,6 +128,7 @@ public class DependenciesBridge {
     public let individualCallRecordManager: IndividualCallRecordManager
     public let interactionDeleteManager: InteractionDeleteManager
     public let interactionStore: InteractionStore
+    public let keyTransparencyManager: KeyTransparencyManager
     public let lastVisibleInteractionStore: LastVisibleInteractionStore
     public let linkAndSyncManager: LinkAndSyncManager
     public let linkPreviewManager: LinkPreviewManager
@@ -269,6 +270,7 @@ public class DependenciesBridge {
         individualCallRecordManager: IndividualCallRecordManager,
         interactionDeleteManager: InteractionDeleteManager,
         interactionStore: InteractionStore,
+        keyTransparencyManager: KeyTransparencyManager,
         lastVisibleInteractionStore: LastVisibleInteractionStore,
         linkAndSyncManager: LinkAndSyncManager,
         linkPreviewManager: LinkPreviewManager,
@@ -409,6 +411,7 @@ public class DependenciesBridge {
         self.individualCallRecordManager = individualCallRecordManager
         self.interactionDeleteManager = interactionDeleteManager
         self.interactionStore = interactionStore
+        self.keyTransparencyManager = keyTransparencyManager
         self.lastVisibleInteractionStore = lastVisibleInteractionStore
         self.linkAndSyncManager = linkAndSyncManager
         self.linkPreviewManager = linkPreviewManager

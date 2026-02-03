@@ -317,6 +317,7 @@ public class GRDBSchemaMigrator {
         case deprecateStoredShouldStartExpireTimer
         case addSession
         case addRecipientStatus
+        case createKeyTransparencyTable
 
         // NOTE: Every time we add a migration id, consider
         // incrementing grdbSchemaVersionLatest.
@@ -440,7 +441,7 @@ public class GRDBSchemaMigrator {
     }
 
     public static let grdbSchemaVersionDefault: UInt = 0
-    public static let grdbSchemaVersionLatest: UInt = 139
+    public static let grdbSchemaVersionLatest: UInt = 140
 
     private class DatabaseMigratorWrapper {
         var migrator = DatabaseMigrator()
@@ -4992,6 +4993,11 @@ public class GRDBSchemaMigrator {
             return .success(())
         }
 
+        migrator.registerMigration(.createKeyTransparencyTable) { tx in
+            try createKeyTransparencyTable(tx: tx)
+            return .success(())
+        }
+
         // MARK: - Schema Migration Insertion Point
     }
 
@@ -7483,6 +7489,13 @@ public class GRDBSchemaMigrator {
 
         for collection in [serviceIdCollection, phoneNumberCollection] {
             try tx.database.execute(sql: "DELETE FROM keyvalue WHERE collection = ?", arguments: [collection])
+        }
+    }
+
+    static func createKeyTransparencyTable(tx: DBWriteTransaction) throws {
+        try tx.database.create(table: "KeyTransparency") { table in
+            table.column("aci", .blob).primaryKey().notNull()
+            table.column("libsignalBlob", .blob).notNull()
         }
     }
 }

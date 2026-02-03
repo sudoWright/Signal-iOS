@@ -1233,6 +1233,15 @@ extension AppSetup.GlobalsContinuation {
             whoAmIManager: whoAmIManager,
         ))
 
+        let keyTransparencyManager = KeyTransparencyManager(
+            chatConnectionManager: chatConnectionManager,
+            db: db,
+            localUsernameManager: localUsernameManager,
+            recipientDatabaseTable: recipientDatabaseTable,
+            tsAccountManager: tsAccountManager,
+            udManager: udManager,
+        )
+
         let incomingPniChangeNumberProcessor = IncomingPniChangeNumberProcessorImpl(
             identityManager: identityManager,
             pniProtocolStore: pniProtocolStore,
@@ -1711,6 +1720,7 @@ extension AppSetup.GlobalsContinuation {
             individualCallRecordManager: individualCallRecordManager,
             interactionDeleteManager: interactionDeleteManager,
             interactionStore: interactionStore,
+            keyTransparencyManager: keyTransparencyManager,
             lastVisibleInteractionStore: lastVisibleInteractionStore,
             linkAndSyncManager: linkAndSyncManager,
             linkPreviewManager: linkPreviewManager,

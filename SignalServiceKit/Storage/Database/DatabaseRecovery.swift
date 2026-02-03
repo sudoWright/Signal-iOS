@@ -338,6 +338,7 @@ public enum DatabaseRecovery {
             "PollOption",
             "PollVote",
             "PinnedMessage",
+            "KeyTransparency",
         ]
 
         private static func prepareToCopyTablesWithBestEffort(

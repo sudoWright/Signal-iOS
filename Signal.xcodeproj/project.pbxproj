@@ -3075,6 +3075,7 @@
 		D9CD40622A155C4800545803 /* TSInfoMessage+PersistableGroupUpdateItemTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CD40612A155C4800545803 /* TSInfoMessage+PersistableGroupUpdateItemTest.swift */; };
 		D9D1A6EB2DD69D0800050A85 /* DonationReceiptCredentialRedemptionJobFinderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D1A6EA2DD69CFE00050A85 /* DonationReceiptCredentialRedemptionJobFinderTest.swift */; };
 		D9D3216A2A8AC9B0004FC110 /* OutgoingGroupCallUpdateMessageTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D321692A8AC9B0004FC110 /* OutgoingGroupCallUpdateMessageTest.swift */; };
+		D9D5018A2F2B16820068EEA5 /* KeyTransparencyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D501892F2B16820068EEA5 /* KeyTransparencyManager.swift */; };
 		D9DB37EF2B7180DD007B16C8 /* CallRecordAssociatedInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DB37EE2B7180DD007B16C8 /* CallRecordAssociatedInteraction.swift */; };
 		D9DB37F32B71B037007B16C8 /* OutgoingCallLogEventSyncMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DB37F22B71B037007B16C8 /* OutgoingCallLogEventSyncMessage.swift */; };
 		D9DB37F92B72A770007B16C8 /* CallRecordDeleteAllJobQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9DB37F82B72A770007B16C8 /* CallRecordDeleteAllJobQueue.swift */; };
@@ -7257,6 +7258,7 @@
 		D9D321822A8FEA9C004FC110 /* Provisioning.proto */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.protobuf; path = Provisioning.proto; sourceTree = "<group>"; };
 		D9D321842A8FEA9D004FC110 /* svr2.proto */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.protobuf; path = svr2.proto; sourceTree = "<group>"; };
 		D9D321852A8FEA9D004FC110 /* WebSocketResources.proto */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.protobuf; path = WebSocketResources.proto; sourceTree = "<group>"; };
+		D9D501892F2B16820068EEA5 /* KeyTransparencyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyTransparencyManager.swift; sourceTree = "<group>"; };
 		D9DB37EE2B7180DD007B16C8 /* CallRecordAssociatedInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallRecordAssociatedInteraction.swift; sourceTree = "<group>"; };
 		D9DB37F22B71B037007B16C8 /* OutgoingCallLogEventSyncMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingCallLogEventSyncMessage.swift; sourceTree = "<group>"; };
 		D9DB37F82B72A770007B16C8 /* CallRecordDeleteAllJobQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallRecordDeleteAllJobQueue.swift; sourceTree = "<group>"; };
@@ -13589,6 +13591,14 @@
 			path = Specifications;
 			sourceTree = "<group>";
 		};
+		D9D501882F2B16030068EEA5 /* KeyTransparency */ = {
+			isa = PBXGroup;
+			children = (
+				D9D501892F2B16820068EEA5 /* KeyTransparencyManager.swift */,
+			);
+			path = KeyTransparency;
+			sourceTree = "<group>";
+		};
 		D9DCFDAC2A3BB22800C73C0B /* QRCodes */ = {
 			isa = PBXGroup;
 			children = (
@@ -14227,6 +14237,7 @@
 				D98BC5302EE387360052A81F /* Expiration */,
 				F9C5CBA3289453B200548EEE /* Groups */,
 				D9668B30291B033800665298 /* Jobs */,
+				D9D501882F2B16030068EEA5 /* KeyTransparency */,
 				D98CA2AE2DF170FE0060370E /* LocalDeviceAuth */,
 				D920487D28EB8201003F5371 /* Megaphones */,
 				F9C5C8B6289453B100548EEE /* Messages */,
@@ -18878,6 +18889,7 @@
 				D9B8541229137C150058F97B /* JobRecord.swift in Sources */,
 				F9C5CDEB289453B400548EEE /* JobRecordFinder.swift in Sources */,
 				505C2BC22E85D72B0009237F /* KeyedConcurrentTaskQueue.swift in Sources */,
+				D9D5018A2F2B16820068EEA5 /* KeyTransparencyManager.swift in Sources */,
 				F9C5CD2A289453B300548EEE /* KeyValueStore.swift in Sources */,
 				C198FDD62A37C905000BCAC9 /* KyberPreKeyStoreImpl.swift in Sources */,
 				504F98B12EAFFAC600DF465B /* KyberPreKeyUseRecord.swift in Sources */,
