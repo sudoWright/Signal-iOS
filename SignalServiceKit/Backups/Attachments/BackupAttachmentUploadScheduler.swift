@@ -331,6 +331,7 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
             case .oversizeText:
                 // We inline oversize text in the backup, and don't back
                 // up the corresponding attachment.
+                Logger.info("Skip: oversized text")
                 return nil
             case
                 .bodyAttachment,
@@ -372,6 +373,7 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
                 return .threadWallpaper
             }
         case .storyMessage:
+            Logger.info("Skip: story message")
             return nil
         }
     }

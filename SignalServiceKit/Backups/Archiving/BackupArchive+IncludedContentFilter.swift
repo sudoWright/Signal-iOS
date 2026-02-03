@@ -81,6 +81,7 @@ extension BackupArchive {
             if expiresInMs <= self.minExpirationTimeMs {
                 // If the expire timer was less than our minimum, we can always
                 // skip.
+                Logger.info("Skip: timer (\(expiresInMs)) less than min (\(self.minExpirationTimeMs))")
                 return true
             } else if let expireStartDate, expireStartDate > 0 {
                 // If the expiration timer has started, check whether the
@@ -88,7 +89,12 @@ extension BackupArchive {
                 let expirationDate = expireStartDate + expiresInMs
                 let minExpirationDate = currentTimestamp + self.minRemainingTimeUntilExpirationMs
 
-                return expirationDate <= minExpirationDate
+                let shouldSkip = (expirationDate <= minExpirationDate)
+                if shouldSkip {
+                    Logger.info("Skip: expiration (\(expirationDate)) occurs before cutoff (\(minExpirationDate))")
+                }
+
+                return shouldSkip
             } else {
                 return false
             }
@@ -114,6 +120,7 @@ extension BackupArchive {
                 owningMessage.isViewOnceMessage,
                 shouldTombstoneViewOnce
             {
+                Logger.info("Skip: view once")
                 return true
             }
             return false
