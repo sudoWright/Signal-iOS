@@ -325,6 +325,17 @@ public class OrphanedAttachmentCleanerImpl: OrphanedAttachmentCleaner {
         fileprivate let jobRunner: JobRunner
         private let taskScheduler: Shims.TaskScheduler
 
+        lazy var runNextCleanupJobEvent = DebouncedEvents.build(
+            mode: .lastOnly,
+            maxFrequencySeconds: 1.0,
+            onQueue: .sharedUserInitiated,
+            notifyBlock: { [weak self] in
+                self?.taskScheduler.task { [weak self] in
+                    try await self?.jobRunner.runNextCleanupJob()
+                }
+            },
+        )
+
         init(
             jobRunner: JobRunner,
             taskScheduler: Shims.TaskScheduler,
@@ -359,9 +370,7 @@ public class OrphanedAttachmentCleanerImpl: OrphanedAttachmentCleaner {
 
             // When we get a matching event, run the next job _after_ committing.
             // The job should pick up whatever new row(s) got added to the table.
-            taskScheduler.task { [jobRunner] in
-                try await jobRunner.runNextCleanupJob()
-            }
+            runNextCleanupJobEvent.requestNotify()
         }
 
         func databaseDidRollback(_ db: GRDB.Database) {}

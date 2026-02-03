@@ -60,6 +60,8 @@ class OrphanedAttachmentCleanerTest: XCTestCase {
             XCTAssertEqual(mockTaskScheduler.tasks.count, 0)
         }
 
+        await mockTaskScheduler.waitForNextTaskToSchedule()
+
         XCTAssertEqual(mockTaskScheduler.tasks.count, 1)
         _ = try await mockTaskScheduler.tasks[0].value
 
@@ -68,6 +70,63 @@ class OrphanedAttachmentCleanerTest: XCTestCase {
             mockFileSystem.deletedFiles,
             [AttachmentStream.absoluteAttachmentFileURL(relativeFilePath: localRelativeFilePath)]
                 + thumbnailFileURLs(localRelativeFilePath: localRelativeFilePath),
+        )
+
+        // And no rows left.
+        try db.read { tx in
+            XCTAssertNil(try OrphanedAttachmentRecord.fetchOne(tx.database))
+        }
+    }
+
+    func testDebounceDeleteAttachment() async throws {
+        var filenames = [String]()
+        var attachments = [Attachment]()
+
+        // Start observing; should have deleted a file _after_ we commit
+        // deletion of an attachment.
+        orphanedAttachmentCleaner.beginObserving()
+        XCTAssertEqual(mockTaskScheduler.tasks.count, 1)
+        _ = try await mockTaskScheduler.tasks[0].value
+        mockTaskScheduler.tasks = []
+
+        for _ in 0..<4 {
+            let localRelativeFilePath = UUID().uuidString
+            let attachmentParams = Attachment.ConstructionParams.mockStream(
+                streamInfo: .mock(localRelativeFilePath: localRelativeFilePath),
+            )
+            let referenceParams = AttachmentReference.ConstructionParams.mock(
+                owner: .thread(.globalThreadWallpaperImage(creationTimestamp: Date().ows_millisecondsSince1970)),
+            )
+
+            let attachment = try db.write { tx in
+                try attachmentStore.insert(
+                    attachmentParams,
+                    reference: referenceParams,
+                    tx: tx,
+                )
+            }
+
+            filenames.append(localRelativeFilePath)
+            attachments.append(attachment)
+
+            _ = try db.write { tx in
+                try Attachment.Record.deleteOne(tx.database, key: attachment.id)
+            }
+        }
+
+        await mockTaskScheduler.waitForNextTaskToSchedule()
+
+        XCTAssertEqual(mockTaskScheduler.tasks.count, 1)
+        _ = try await mockTaskScheduler.tasks[0].value
+
+        let expectedFiles = filenames.reduce(into: [URL]()) { result, element in
+            result.append(AttachmentStream.absoluteAttachmentFileURL(relativeFilePath: element))
+            result.append(contentsOf: thumbnailFileURLs(localRelativeFilePath: element))
+        }
+        // Should have deleted the one file.
+        XCTAssertEqual(
+            mockFileSystem.deletedFiles,
+            expectedFiles,
         )
 
         // And no rows left.
@@ -198,6 +257,8 @@ class OrphanedAttachmentCleanerTest: XCTestCase {
             )
             _ = OrphanedAttachmentRecord.insertRecord(record, tx: tx)
         }
+
+        await mockTaskScheduler.waitForNextTaskToSchedule()
 
         XCTAssertEqual(mockTaskScheduler.tasks.count, 1)
         _ = try await mockTaskScheduler.tasks[0].value
@@ -352,11 +413,23 @@ private class _OrphanedAttachmentCleanerImpl_TaskSchedulerMock: _OrphanedAttachm
     init() {}
 
     var tasks = [Task<Void, Error>]()
+    private var scheduleContinuation: CheckedContinuation<Void, any Error>?
+
+    func waitForNextTaskToSchedule() async {
+        try? await withCheckedThrowingContinuation { [weak self] continuation in
+            self?.scheduleContinuation = continuation
+            Task {
+                try await Task.sleep(nanoseconds: 2.clampedNanoseconds)
+                self?.scheduleContinuation.take()?.resume(throwing: CancellationError())
+            }
+        }
+    }
 
     func task(_ block: @escaping () async throws -> Void) {
         let task = Task {
             try await block()
         }
         tasks.append(task)
+        scheduleContinuation.take()?.resume()
     }
 }
