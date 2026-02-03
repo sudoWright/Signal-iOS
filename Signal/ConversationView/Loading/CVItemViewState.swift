@@ -426,6 +426,10 @@ struct CVItemModelBuilder: CVItemBuilding {
                     memberLabel = memberLabel?
                         .components(separatedBy: .whitespaces)
                         .joined(separator: SignalSymbol.LeadingCharacter.nonBreakingSpace.rawValue)
+
+                    if let memberLabel {
+                        itemViewState.accessibilityAuthorName = authorName + "," + memberLabel
+                    }
                 }
 
                 if shouldShowSenderName {

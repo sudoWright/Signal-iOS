@@ -4996,6 +4996,9 @@
 /* Label for an action to add a member label */
 "MEMBER_LABEL_ADD" = "Add a Member Label";
 
+/* Accessibility prefix for member labels. */
+"MEMBER_LABEL_AX_PREFIX" = "Member label: ";
+
 /* Heading shown above the preview of a message bubble with the edited member label. */
 "MEMBER_LABEL_PREVIEW_HEADING" = "Preview";
 

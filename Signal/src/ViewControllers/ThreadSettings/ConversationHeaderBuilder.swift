@@ -532,6 +532,10 @@ struct ConversationHeaderBuilder {
         memberLabelLabel.numberOfLines = 0
         memberLabelLabel.highlightRange = NSRange(location: 0, length: (label as NSString).length)
         memberLabelLabel.highlightFont = .dynamicTypeSubheadlineClamped
+        memberLabelLabel.axLabelPrefix = OWSLocalizedString(
+            "MEMBER_LABEL_AX_PREFIX",
+            comment: "Accessibility prefix for member labels.",
+        )
 
         subviews.append(memberLabelLabel)
         hasSubtitleLabel = true

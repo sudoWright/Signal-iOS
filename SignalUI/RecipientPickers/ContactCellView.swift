@@ -240,6 +240,10 @@ public class ContactCellView: ManualStackView {
                     memberLabelLabel.numberOfLines = 0
                     memberLabelLabel.highlightRange = NSRange(location: 0, length: (memberLabel.label as NSString).length)
                     memberLabelLabel.highlightFont = .dynamicTypeCaption1Clamped
+                    memberLabelLabel.axLabelPrefix = OWSLocalizedString(
+                        "MEMBER_LABEL_AX_PREFIX",
+                        comment: "Accessibility prefix for member labels.",
+                    )
 
                     textStackSubviews.append(memberLabelLabel)
                     let memberLabelSize = memberLabelLabel.highlightLabelSize()

@@ -765,6 +765,14 @@ open class InteractiveSheetViewController: OWSViewController {
         isInInteractiveTransition = false
         panningScrollView?.showsVerticalScrollIndicator = true
     }
+
+    override public func accessibilityPerformEscape() -> Bool {
+        if presentingViewController != nil {
+            dismiss(animated: true)
+            return true
+        }
+        return super.accessibilityPerformEscape()
+    }
 }
 
 // MARK: -

@@ -182,7 +182,7 @@ public extension ProfileDetailLabel {
                 },
             )
         }
-        return ProfileDetailLabel(
+        let detailLabelView = ProfileDetailLabel(
             title: label,
             icon: .memberLabel,
             font: .dynamicTypeBody,
@@ -191,6 +191,13 @@ public extension ProfileDetailLabel {
                 tapAction()
             },
         )
+        detailLabelView.isAccessibilityElement = true
+        detailLabelView.accessibilityLabel = OWSLocalizedString(
+            "MEMBER_LABEL_AX_PREFIX",
+            comment: "Accessibility prefix for member labels.",
+        ) + label
+
+        return detailLabelView
     }
 
     static func verified(

@@ -13,6 +13,7 @@ import SignalServiceKit
 public class CVCapsuleLabel: UILabel {
     public var highlightRange: NSRange?
     public var highlightFont: UIFont?
+    public var axLabelPrefix: String?
 
     private static let horizontalInset: CGFloat = 6
     private static let verticalInset: CGFloat = 1
@@ -93,5 +94,15 @@ public class CVCapsuleLabel: UILabel {
             width: size.width + Self.horizontalInset * 2,
             height: size.height + Self.verticalInset * 2,
         )
+    }
+
+    override public var accessibilityLabel: String? {
+        get {
+            if let axLabelPrefix, let text = self.text {
+                return axLabelPrefix + text
+            }
+            return super.accessibilityLabel
+        }
+        set { super.accessibilityLabel = newValue }
     }
 }
