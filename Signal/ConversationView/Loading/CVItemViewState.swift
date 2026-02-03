@@ -423,6 +423,9 @@ struct CVItemModelBuilder: CVItemBuilding {
                     let senderAci = incomingSenderAddress.aci
                 {
                     memberLabel = groupThread.groupModel.groupMembership.memberLabel(for: senderAci)?.labelForRendering()
+                    memberLabel = memberLabel?
+                        .components(separatedBy: .whitespaces)
+                        .joined(separator: SignalSymbol.LeadingCharacter.nonBreakingSpace.rawValue)
                 }
 
                 if shouldShowSenderName {

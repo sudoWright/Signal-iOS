@@ -234,13 +234,16 @@ public class ContactCellView: ManualStackView {
                 if
                     let memberLabel = configuration.memberLabel
                 {
-                    let memberLabelLabel = CVMemberLabel(
-                        label: memberLabel.label,
-                        font: .dynamicTypeCaption1,
-                        backgroundColor: memberLabel.groupNameColor,
-                    )
+                    let memberLabelLabel = CVCapsuleLabel()
+                    memberLabelLabel.text = memberLabel.label
+                    memberLabelLabel.textColor = memberLabel.groupNameColor
+                    memberLabelLabel.numberOfLines = 0
+                    memberLabelLabel.highlightRange = NSRange(location: 0, length: (memberLabel.label as NSString).length)
+                    memberLabelLabel.highlightFont = .dynamicTypeCaption1Clamped
+
                     textStackSubviews.append(memberLabelLabel)
-                    let memberLabelSize = memberLabelLabel.sizeThatFits(.square(.greatestFiniteMagnitude))
+                    let memberLabelSize = memberLabelLabel.highlightLabelSize()
+
                     textStackSubviewInfos.append(memberLabelSize.asManualSubviewInfo)
                 } else if let attributedSubtitle = configuration.attributedSubtitle?.nilIfEmpty {
                     subtitleLabel.attributedText = attributedSubtitle

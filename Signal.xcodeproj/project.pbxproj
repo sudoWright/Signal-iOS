@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04127D912F23B3B000B4E95B /* CVCapsuleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04127D902F23B3B000B4E95B /* CVCapsuleLabel.swift */; };
 		041A5F072E05B3F900FAED05 /* BackupEnablementMegaphone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041A5F062E05B3F000FAED05 /* BackupEnablementMegaphone.swift */; };
 		041C24ED2DF782AF0065B685 /* OutgoingGroupUpdateMessageTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BC9C6428B7C00A0077D442 /* OutgoingGroupUpdateMessageTest.swift */; };
 		042223BA2EDF30BA00158556 /* OutgoingUnpinMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042223B92EDF30B300158556 /* OutgoingUnpinMessage.swift */; };
@@ -50,7 +51,6 @@
 		04441DDC2F115CAF0095E1F4 /* chat_item_pin_message_11.binproto in Resources */ = {isa = PBXBuildFile; fileRef = 04441DAD2F115CAF0095E1F4 /* chat_item_pin_message_11.binproto */; };
 		04441DDD2F115CAF0095E1F4 /* chat_item_pin_message_14.binproto in Resources */ = {isa = PBXBuildFile; fileRef = 04441DB32F115CAF0095E1F4 /* chat_item_pin_message_14.binproto */; };
 		04441DDE2F115CAF0095E1F4 /* chat_item_pin_message_04.txtproto in Resources */ = {isa = PBXBuildFile; fileRef = 04441DA02F115CAF0095E1F4 /* chat_item_pin_message_04.txtproto */; };
-		04441DEA2F17EF6C0095E1F4 /* CVMemberLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04441DE92F17EF690095E1F4 /* CVMemberLabel.swift */; };
 		04441DED2F1816BB0095E1F4 /* MemberLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04441DEB2F18121C0095E1F4 /* MemberLabel.swift */; };
 		04441DEF2F194B800095E1F4 /* MemberLabelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04441DEE2F194B770095E1F4 /* MemberLabelViewController.swift */; };
 		04472D5E2E8AD74200D69EE0 /* OutgoingPollVote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04472D5D2E8AD73A00D69EE0 /* OutgoingPollVote.swift */; };
@@ -4041,6 +4041,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04127D902F23B3B000B4E95B /* CVCapsuleLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVCapsuleLabel.swift; sourceTree = "<group>"; };
 		041A5F062E05B3F000FAED05 /* BackupEnablementMegaphone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupEnablementMegaphone.swift; sourceTree = "<group>"; };
 		041A5F082E05D3AC00FAED05 /* BackupEnablementReminderMegaphoneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupEnablementReminderMegaphoneTests.swift; sourceTree = "<group>"; };
 		042223B92EDF30B300158556 /* OutgoingUnpinMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingUnpinMessage.swift; sourceTree = "<group>"; };
@@ -4084,7 +4085,6 @@
 		04441DB82F115CAF0095E1F4 /* chat_item_pin_message_update_01.txtproto */ = {isa = PBXFileReference; lastKnownFileType = text; path = chat_item_pin_message_update_01.txtproto; sourceTree = "<group>"; };
 		04441DB92F115CAF0095E1F4 /* chat_item_pin_message_update_02.binproto */ = {isa = PBXFileReference; lastKnownFileType = file; path = chat_item_pin_message_update_02.binproto; sourceTree = "<group>"; };
 		04441DBA2F115CAF0095E1F4 /* chat_item_pin_message_update_02.txtproto */ = {isa = PBXFileReference; lastKnownFileType = text; path = chat_item_pin_message_update_02.txtproto; sourceTree = "<group>"; };
-		04441DE92F17EF690095E1F4 /* CVMemberLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVMemberLabel.swift; sourceTree = "<group>"; };
 		04441DEB2F18121C0095E1F4 /* MemberLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberLabel.swift; sourceTree = "<group>"; };
 		04441DEE2F194B770095E1F4 /* MemberLabelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberLabelViewController.swift; sourceTree = "<group>"; };
 		04472D5D2E8AD73A00D69EE0 /* OutgoingPollVote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingPollVote.swift; sourceTree = "<group>"; };
@@ -8935,9 +8935,9 @@
 		34A95521271B510400B05242 /* ConversationView */ = {
 			isa = PBXGroup;
 			children = (
+				04127D902F23B3B000B4E95B /* CVCapsuleLabel.swift */,
 				34A95523271B510400B05242 /* CVCellMeasurement.swift */,
 				764981442A23194F00EC1287 /* CVItemViewModel.swift */,
-				04441DE92F17EF690095E1F4 /* CVMemberLabel.swift */,
 				34A95525271B510400B05242 /* CVText.swift */,
 				34A95522271B510400B05242 /* CVTextLabel.swift */,
 				34A95524271B510400B05242 /* CVUtils.swift */,
@@ -17315,9 +17315,9 @@
 				34ACA7F72733183000E47AD4 /* CountryCodeViewController.swift in Sources */,
 				508F0346296F72F4001D88D0 /* CustomCellBackgroundColor.swift in Sources */,
 				3402AA7B271D9E180084CBAE /* CustomKeyboard.swift in Sources */,
+				04127D912F23B3B000B4E95B /* CVCapsuleLabel.swift in Sources */,
 				3402AA87271D9E180084CBAE /* CVCellMeasurement.swift in Sources */,
 				764981452A23194F00EC1287 /* CVItemViewModel.swift in Sources */,
-				04441DEA2F17EF6C0095E1F4 /* CVMemberLabel.swift in Sources */,
 				3402AA92271D9E180084CBAE /* CVText.swift in Sources */,
 				3402AAB3271D9E180084CBAE /* CVTextLabel.swift in Sources */,
 				3402AA7A271D9E180084CBAE /* CVUtils.swift in Sources */,

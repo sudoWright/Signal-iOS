@@ -1,0 +1,97 @@
+//
+// Copyright 2026 Signal Messenger, LLC
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+
+import SignalServiceKit
+
+/**
+ * Given an attributed string and a highlightRange, draws a colored capsule behind the characters in highlightRange.
+ * The color of the capsule is determined by the textColor with opacity decreased.
+ * highlightFont allows for the capsule text to be a different font (e.g. bold or not bold) from the rest of the attributed text.
+ */
+public class CVCapsuleLabel: UILabel {
+    public var highlightRange: NSRange?
+    public var highlightFont: UIFont?
+
+    private static let horizontalInset: CGFloat = 6
+    private static let verticalInset: CGFloat = 1
+
+    override public func drawText(in rect: CGRect) {
+        guard let text = self.text else {
+            super.drawText(in: rect)
+            return
+        }
+
+        let attributedString = NSMutableAttributedString(string: text)
+        attributedString.addAttribute(.font, value: self.font!, range: text.entireRange)
+        attributedString.addAttribute(.foregroundColor, value: self.textColor!, range: text.entireRange)
+
+        // The highlighted text may have different font than the sender name
+        if let highlightFont, let highlightRange {
+            attributedString.addAttribute(.font, value: highlightFont, range: highlightRange)
+        }
+
+        let textStorage = NSTextStorage(attributedString: attributedString)
+        let layoutManager = NSLayoutManager()
+        let textContainer = NSTextContainer(size: rect.size)
+        textContainer.lineFragmentPadding = 0
+        textContainer.maximumNumberOfLines = self.numberOfLines
+        textContainer.lineBreakMode = self.lineBreakMode
+
+        layoutManager.addTextContainer(textContainer)
+
+        textStorage.addLayoutManager(layoutManager)
+
+        let horizontalInset: CGFloat
+        if CurrentAppContext().isRTL {
+            horizontalInset = -Self.horizontalInset
+        } else {
+            horizontalInset = Self.horizontalInset
+        }
+
+        var needsLeadingPadding = false
+        if let highlightRange {
+            needsLeadingPadding = highlightRange.location == 0 && highlightRange.length == (text as NSString).length
+            let glyphRange = layoutManager.glyphRange(forCharacterRange: highlightRange, actualCharacterRange: nil)
+
+            let highlightColor = Theme.isDarkThemeEnabled ? textColor.withAlphaComponent(0.25) : textColor.withAlphaComponent(0.1)
+            layoutManager.enumerateEnclosingRects(forGlyphRange: glyphRange, withinSelectedGlyphRange: NSRange(location: NSNotFound, length: 0), in: textContainer) { rect, _ in
+                let hOffset = needsLeadingPadding ? horizontalInset : 0
+                let roundedRect = rect.offsetBy(dx: hOffset, dy: 0).insetBy(dx: -Self.horizontalInset, dy: -Self.verticalInset)
+                let path = UIBezierPath(roundedRect: roundedRect, cornerRadius: roundedRect.height / 2)
+                highlightColor.setFill()
+                path.fill()
+            }
+        }
+
+        let textOrigin = needsLeadingPadding ? CGPoint(x: .zero + horizontalInset, y: .zero) : CGPoint.zero
+        let range = NSRange(location: 0, length: textStorage.length)
+        layoutManager.drawGlyphs(forGlyphRange: range, at: textOrigin)
+    }
+
+    public class func measureLabel(config: CVLabelConfig, maxWidth: CGFloat) -> CGSize {
+        let capsuleHPadding = horizontalInset * 2
+        let capsuleVPadding = verticalInset * 2
+        let memberLabelSize = CVText.measureLabel(config: config, maxWidth: maxWidth - capsuleHPadding)
+        return CGSize(
+            width: memberLabelSize.width + capsuleHPadding,
+            height: memberLabelSize.height + capsuleVPadding,
+        )
+    }
+
+    override public var intrinsicContentSize: CGSize {
+        return highlightLabelSize()
+    }
+
+    func highlightLabelSize() -> CGSize {
+        guard let text = self.text else { return .zero }
+        guard let fontToUse = highlightFont else { return .zero }
+        let attributes: [NSAttributedString.Key: Any] = [.font: fontToUse]
+        let size = (text as NSString).size(withAttributes: attributes)
+        return CGSize(
+            width: size.width + Self.horizontalInset * 2,
+            height: size.height + Self.verticalInset * 2,
+        )
+    }
+}

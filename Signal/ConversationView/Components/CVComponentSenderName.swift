@@ -11,7 +11,21 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
     public var componentKey: CVComponentKey { .senderName }
 
     private let state: CVComponentState.SenderName
-    private var senderName: NSAttributedString { state.senderName }
+    private var senderName: NSAttributedString {
+        // The breaking space ensures the member label can line-break from the sender name.
+        // The non-breaking spaces make sure the label doesn't get cut off if it starts a new line.
+        let padding = " " + String(repeating: SignalSymbol.LeadingCharacter.nonBreakingSpace.rawValue, count: 2)
+        if let labelString = state.memberLabel {
+            if CurrentAppContext().isRTL {
+                return NSAttributedString(string: labelString + padding) + state.senderName
+            } else {
+                return state.senderName + padding + labelString
+            }
+        } else {
+            return state.senderName
+        }
+    }
+
     private var senderNameColor: UIColor { state.senderNameColor }
     private var memberLabel: String? { state.memberLabel }
 
@@ -58,18 +72,21 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
         }
 
         labelConfig.applyForRendering(label: label)
+        if let memberLabel = state.memberLabel {
+            // Finds the first or last occurance of the member label.
+            // Since member label is appended to the end in LTR and beginning in RTL, this
+            // will work even if member label is a substring of sender name or equal to sender name.
+            var options: NSString.CompareOptions = []
+            if !CurrentAppContext().isRTL {
+                options.insert(.backwards)
+            }
+
+            label.highlightRange = (senderName.string as NSString).range(of: memberLabel, options: options)
+            label.highlightFont = .dynamicTypeFootnote
+        }
+
         var subviews: [UIView] = []
         subviews.append(label)
-
-        if let memberLabel {
-            let memberLabelLabel = CVMemberLabel(
-                label: memberLabel,
-                font: UIFont.dynamicTypeFootnote,
-                backgroundColor: senderNameColor,
-            )
-            memberLabelConfig.applyForRendering(label: memberLabelLabel)
-            subviews.append(memberLabelLabel)
-        }
 
         innerStack.configure(
             config: innerStackConfig,
@@ -148,17 +165,7 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
         )
 
         var subviewInfos: [ManualStackSubviewInfo] = []
-        var maxSenderNameWidth = maxWidth
-        if memberLabel != nil {
-            let memberLabelSize = CVMemberLabel.measureLabel(config: memberLabelConfig, maxWidth: maxWidth)
-            let memberLabelInfo = memberLabelSize.asManualSubviewInfo
-
-            // TODO: handle long profile names better
-            maxSenderNameWidth = maxWidth - memberLabelSize.width - innerStackConfig.spacing
-            subviewInfos.append(memberLabelInfo)
-        }
-
-        let labelSize = CVText.measureLabel(config: labelConfig, maxWidth: maxSenderNameWidth)
+        let labelSize = CVCapsuleLabel.measureLabel(config: labelConfig, maxWidth: maxWidth)
         let labelInfo = labelSize.asManualSubviewInfo
         subviewInfos.insert(labelInfo, at: 0)
 
@@ -185,7 +192,7 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
     // It could be the entire item or some part thereof.
     public class CVComponentViewSenderName: NSObject, CVComponentView {
 
-        fileprivate let label = CVLabel()
+        fileprivate let label = CVCapsuleLabel()
 
         fileprivate let outerStack = ManualStackView(name: "CVComponentViewSenderName.outerStack")
         fileprivate let innerStack = ManualStackView(name: "CVComponentViewSenderName.innerStack")

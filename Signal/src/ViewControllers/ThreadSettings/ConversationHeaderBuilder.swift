@@ -165,7 +165,7 @@ struct ConversationHeaderBuilder {
         )
 
         if BuildFlags.MemberLabel.display, let memberLabel {
-            let memberLabelLabel = builder.addMemberLabel(label: memberLabel.label, backgroundColor: memberLabel.groupNameColor)
+            let memberLabelLabel = builder.addMemberLabel(label: memberLabel.label, color: memberLabel.groupNameColor)
             memberLabelLabel.numberOfLines = 0
             memberLabelLabel.textAlignment = .center
         }
@@ -524,13 +524,14 @@ struct ConversationHeaderBuilder {
         return label
     }
 
-    mutating func addMemberLabel(label: String, backgroundColor: UIColor) -> UILabel {
+    mutating func addMemberLabel(label: String, color: UIColor) -> UILabel {
         subviews.append(UIView.spacer(withHeight: 4))
-        let memberLabelLabel = CVMemberLabel(
-            label: label,
-            font: .dynamicTypeSubheadlineClamped,
-            backgroundColor: backgroundColor,
-        )
+        let memberLabelLabel = CVCapsuleLabel()
+        memberLabelLabel.text = label
+        memberLabelLabel.textColor = color
+        memberLabelLabel.numberOfLines = 0
+        memberLabelLabel.highlightRange = NSRange(location: 0, length: (label as NSString).length)
+        memberLabelLabel.highlightFont = .dynamicTypeSubheadlineClamped
 
         subviews.append(memberLabelLabel)
         hasSubtitleLabel = true
