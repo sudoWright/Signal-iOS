@@ -82,7 +82,7 @@ public enum BuildFlags {
     public static let useNewAttachmentLimits = build <= .internal
 
     public enum MemberLabel {
-        public static let receive = build <= .dev
+        public static let display = build <= .dev
         public static let send = build <= .dev
     }
 

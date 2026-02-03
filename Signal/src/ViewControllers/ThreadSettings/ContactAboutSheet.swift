@@ -28,14 +28,14 @@ class ContactAboutSheet: StackSheetViewController {
     private let isLocalUser: Bool
     private let spoilerState: SpoilerRenderState
     private let context: Context
-    private let memberLabel: MemberLabel?
+    private let memberLabel: MemberLabelForRendering?
     private let groupViewHelper: GroupViewHelper?
 
     init(
         thread: TSContactThread,
         spoilerState: SpoilerRenderState,
         context: Context = .default,
-        memberLabel: MemberLabel? = nil,
+        memberLabel: MemberLabelForRendering? = nil,
         groupViewHelper: GroupViewHelper? = nil,
     ) {
         self.thread = thread
@@ -197,9 +197,23 @@ class ContactAboutSheet: StackSheetViewController {
             stackView.addArrangedSubview(label)
         }
 
+        let db = DependenciesBridge.shared.db
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         let canEditMemberLabel = groupViewHelper?.canEditConversationAttributes ?? false
-        if BuildFlags.MemberLabel.send, isLocalUser, canEditMemberLabel {
-            stackView.addArrangedSubview(ProfileDetailLabel.memberLabel(memberLabel?.label))
+        if
+            BuildFlags.MemberLabel.send,
+            isLocalUser,
+            canEditMemberLabel,
+            let localAci = db.read(block: { tx in tsAccountManager.localIdentifiers(tx: tx)?.aci }),
+            let groupModel = groupViewHelper?.delegate?.currentGroupModel,
+            let csvc = fromViewController as? ConversationSettingsViewController
+        {
+            stackView.addArrangedSubview(ProfileDetailLabel.memberLabel(memberLabel?.label, tapAction: { [weak self] in
+                let fullMemberLabel = groupModel.groupMembership.memberLabel(for: localAci)
+                let memberLabelViewController = MemberLabelViewController(memberLabel: fullMemberLabel?.label, emoji: fullMemberLabel?.labelEmoji)
+                memberLabelViewController.updateDelegate = csvc
+                self?.present(OWSNavigationController(rootViewController: memberLabelViewController), animated: true)
+            }))
         }
 
         if isVerified {

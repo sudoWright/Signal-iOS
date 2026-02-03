@@ -419,10 +419,10 @@ struct CVItemModelBuilder: CVItemBuilding {
 
                 var memberLabel: String?
                 if
-                    BuildFlags.MemberLabel.receive, let groupThread = thread as? TSGroupThread,
+                    BuildFlags.MemberLabel.display, let groupThread = thread as? TSGroupThread,
                     let senderAci = incomingSenderAddress.aci
                 {
-                    memberLabel = groupThread.groupModel.groupMembership.memberLabel(for: senderAci)
+                    memberLabel = groupThread.groupModel.groupMembership.memberLabel(for: senderAci)?.labelForRendering()
                 }
 
                 if shouldShowSenderName {

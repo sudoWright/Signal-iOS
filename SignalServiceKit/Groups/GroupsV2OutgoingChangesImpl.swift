@@ -82,6 +82,8 @@ public class GroupsV2OutgoingChanges {
     /// Non-nil if dm state changed.
     private var newDisappearingMessageToken: DisappearingMessageToken?
 
+    private var membersToChangeLabel = [Aci: MemberLabel?]()
+
     public init(groupSecretParams: GroupSecretParams) {
         self.groupSecretParams = groupSecretParams
     }
@@ -124,6 +126,10 @@ public class GroupsV2OutgoingChanges {
     public func changeRoleForMember(_ aci: Aci, role: TSGroupMemberRole) {
         owsAssertDebug(membersToChangeRole[aci] == nil)
         membersToChangeRole[aci] = role
+    }
+
+    public func changeLabelForMember(_ aci: Aci, label: MemberLabel?) {
+        membersToChangeLabel[aci] = label
     }
 
     public func setLocalShouldAcceptInvite() {
@@ -528,6 +534,34 @@ public class GroupsV2OutgoingChanges {
             actionBuilder.setRole(newRole.asProtoRole)
             actionsBuilder.addModifyMemberRoles(actionBuilder.buildInfallibly())
             didChange = true
+        }
+
+        if BuildFlags.MemberLabel.send {
+            for (aci, label) in self.membersToChangeLabel {
+                guard currentGroupMembership.isFullMember(aci) else {
+                    // User is no longer a member.
+                    throw GroupsV2Error.cannotBuildGroupChangeProto_conflictingChange
+                }
+                var actionBuilder = GroupsProtoGroupChangeActionsModifyMemberLabelAction.builder()
+                let userId = try groupV2Params.userId(for: aci)
+                actionBuilder.setUserID(userId)
+
+                if
+                    let labelString = label?.label,
+                    let encryptedLabelString = try? groupV2Params.encryptMemberLabel(labelString)
+                {
+                    actionBuilder.setLabelString(encryptedLabelString)
+                }
+                if
+                    let labelEmoji = label?.labelEmoji,
+                    let encryptedLabelEmoji = try? groupV2Params.encryptMemberLabelEmoji(labelEmoji)
+                {
+                    actionBuilder.setLabelEmoji(encryptedLabelEmoji)
+                }
+
+                actionsBuilder.addModifyMemberLabel(actionBuilder.buildInfallibly())
+                didChange = true
+            }
         }
 
         let currentAccess = currentGroupModel.access

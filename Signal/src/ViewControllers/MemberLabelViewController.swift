@@ -8,20 +8,31 @@ import SignalServiceKit
 import SignalUI
 import SwiftUI
 
+protocol MemberLabelUpdateDelegate: AnyObject {
+    func updateLabelForLocalUser(memberLabel: MemberLabel?)
+}
+
 class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
-    private var memberLabel: String?
-    private var emoji: String?
+    private let initialEmoji: String?
+    private let initialMemberLabel: String?
+    private var updatedMemberLabel: String?
+    private var updatedEmoji: String?
     private var addEmojiButton = UIButton(type: .system)
     private var previewContainer: UIStackView?
     private let stackView = UIStackView()
     private let textField = UITextField()
     private var characterCountLabel = UILabel()
 
+    weak var updateDelegate: MemberLabelUpdateDelegate?
+
     private static let maxCharCount = 24
     private static let showCharacterCountMax = 9
 
-    init(memberLabel: String? = nil) {
-        self.memberLabel = memberLabel
+    init(memberLabel: String? = nil, emoji: String? = nil) {
+        self.initialMemberLabel = memberLabel
+        self.initialEmoji = emoji
+        self.updatedMemberLabel = memberLabel
+        self.updatedEmoji = emoji
         textField.text = memberLabel
 
         super.init()
@@ -29,19 +40,19 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
         view.backgroundColor = UIColor.Signal.groupedBackground
         navigationItem.title = OWSLocalizedString("MEMBER_LABEL_VIEW_TITLE", comment: "Title for a view where users can edit and preview their member label.")
 
-        // TODO: fade if text field empty
         navigationItem.rightBarButtonItem = .init(barButtonSystemItem: .done, target: self, action: #selector(didTapDone))
         navigationItem.leftBarButtonItem = .init(barButtonSystemItem: .cancel, target: self, action: #selector(didTapCancel))
         navigationItem.rightBarButtonItem?.tintColor = UIColor.Signal.ultramarine
+        navigationItem.rightBarButtonItem?.isEnabled = false
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        createViews()
+        createInitialViews()
     }
 
-    private func createViews() {
+    private func createInitialViews() {
         stackView.axis = .vertical
         stackView.spacing = 20
 
@@ -67,8 +78,14 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
         textFieldStack.isLayoutMarginsRelativeArrangement = true
         textFieldStack.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
-        addEmojiButton.setImage(UIImage(named: "emoji-plus"), for: .normal)
-        addEmojiButton.tintColor = UIColor.Signal.secondaryLabel
+        if let initialEmoji {
+            addEmojiButton.setImage(nil, for: .normal)
+            addEmojiButton.setTitle(initialEmoji, for: .normal)
+            addEmojiButton.titleLabel?.font = .dynamicTypeTitle3Clamped
+        } else {
+            addEmojiButton.setImage(UIImage(named: "emoji-plus"), for: .normal)
+            addEmojiButton.tintColor = UIColor.Signal.secondaryLabel
+        }
         addEmojiButton.setContentHuggingPriority(.required, for: .horizontal)
         addEmojiButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         addEmojiButton.addTarget(self, action: #selector(didTapEmojiPicker), for: .touchUpInside)
@@ -82,11 +99,13 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
         textField.delegate = self
 
         characterCountLabel.isHidden = true
-        if let count = memberLabel?.count {
+        if let count = initialMemberLabel?.count {
             characterCountLabel.text = String(Self.maxCharCount - count)
             characterCountLabel.font = .dynamicTypeBody
             characterCountLabel.textColor = UIColor.Signal.tertiaryLabel.withAlphaComponent(0.3)
             characterCountLabel.isHidden = Self.maxCharCount - count > Self.showCharacterCountMax
+            characterCountLabel.setContentHuggingHorizontalHigh()
+            characterCountLabel.setCompressionResistanceHigh()
         }
 
         let clearButton = UIButton(type: .system)
@@ -125,7 +144,6 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 22),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -22),
         ])
-
     }
 
     private func buildMockConversationItem() -> CVRenderItem? {
@@ -154,9 +172,8 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
 
         var groupModelBuilder = TSGroupModelBuilder(secretParams: secretParams)
         var groupMembershipBuilder = groupModelBuilder.groupMembership.asBuilder
-        if memberLabel != nil || emoji != nil {
-            let memberLabelWithEmoji = "\(emoji ?? "") \(memberLabel ?? "")"
-            groupMembershipBuilder.setMemberLabel(label: memberLabelWithEmoji, aci: localAci)
+        if let updatedMemberLabel {
+            groupMembershipBuilder.setMemberLabel(label: MemberLabel(label: updatedMemberLabel, labelEmoji: updatedEmoji), aci: localAci)
         }
         groupModelBuilder.groupMembership = groupMembershipBuilder.build()
 
@@ -226,16 +243,23 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
     @objc
     private func clearButtonTapped() {
         textField.text = ""
-        memberLabel = nil
-        emoji = nil
+        updatedMemberLabel = nil
+        updatedEmoji = nil
         addEmojiButton.setImage(UIImage(named: "emoji-plus"), for: .normal)
         addEmojiButton.setTitle(nil, for: .normal)
+        addEmojiButton.tintColor = UIColor.Signal.secondaryLabel
 
         reloadMessagePreview()
+        reloadDoneButtonStatus()
     }
 
     @objc
     private func didTapDone() {
+        var memberLabel: MemberLabel?
+        if let updatedMemberLabel {
+            memberLabel = MemberLabel(label: updatedMemberLabel, labelEmoji: updatedEmoji)
+        }
+        updateDelegate?.updateLabelForLocalUser(memberLabel: memberLabel)
         dismiss(animated: true)
     }
 
@@ -250,10 +274,11 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
             guard let emojiString = emoji?.rawValue else {
                 return
             }
-            self?.emoji = emojiString
+            self?.updatedEmoji = emojiString
             self?.addEmojiButton.setImage(nil, for: .normal)
             self?.addEmojiButton.setTitle(emojiString, for: .normal)
             self?.addEmojiButton.titleLabel?.font = .dynamicTypeTitle3Clamped
+            self?.reloadDoneButtonStatus()
             self?.reloadMessagePreview()
         }
         present(picker, animated: true)
@@ -278,10 +303,33 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
         characterCountLabel.textColor = charsRemaining > 5 ? UIColor.Signal.tertiaryLabel.withAlphaComponent(0.3) : UIColor.Signal.red
     }
 
+    private func reloadDoneButtonStatus() {
+        // No change, don't allow sending.
+        if initialMemberLabel == updatedMemberLabel, initialEmoji == updatedEmoji {
+            navigationItem.rightBarButtonItem?.isEnabled = false
+            return
+        }
+
+        // Clears member label, this is allowed.
+        if updatedMemberLabel == nil, updatedEmoji == nil {
+            navigationItem.rightBarButtonItem?.isEnabled = true
+            return
+        }
+
+        // Don't allow emoji-only.
+        if updatedMemberLabel == nil {
+            navigationItem.rightBarButtonItem?.isEnabled = false
+            return
+        }
+
+        navigationItem.rightBarButtonItem?.isEnabled = true
+    }
+
     @objc
     func textDidChange(_ textField: UITextField) {
-        textField.text = textField.text?.filter { $0.unicodeScalars.first?.properties.isEmoji != true }
-        memberLabel = textField.text == "" ? nil : textField.text?.filterStringForDisplay()
+        textField.text = textField.text?.filter { !$0.unicodeScalars.containsOnlyEmoji() }
+        updatedMemberLabel = textField.text == "" ? nil : textField.text?.filterStringForDisplay()
+        reloadDoneButtonStatus()
         reloadMessagePreview()
     }
 

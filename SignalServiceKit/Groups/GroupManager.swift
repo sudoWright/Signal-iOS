@@ -31,7 +31,8 @@ public class GroupManager: NSObject {
     // Epoch 3: Announcement-Only Groups
     // Epoch 4: Banned Members
     // Epoch 5: Promote pending PNI members
-    public static let changeProtoEpoch: UInt32 = 5
+    // Epoch 6: Member Labels
+    public static let changeProtoEpoch: UInt32 = 6
 
     public static let maxEmbeddedChangeProtoLength: UInt = UInt(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes)
 
@@ -709,6 +710,16 @@ public class GroupManager: NSObject {
         }
     }
 
+    public static func changeMemberLabel(
+        groupModel: TSGroupModelV2,
+        aci: Aci,
+        label: MemberLabel?,
+    ) async throws {
+        try await updateGroupV2(groupModel: groupModel, description: "Change member label") { groupChangeSet in
+            groupChangeSet.changeLabelForMember(aci, label: label)
+        }
+    }
+
     // MARK: - Messages
 
     public static func sendGroupUpdateMessage(
@@ -1064,14 +1075,13 @@ public class GroupManager: NSObject {
             tx: transaction,
         )
 
-        let hasUserFacingUpdate: Bool = (
-            newGroupModel.hasUserFacingChangeCompared(to: oldGroupModel)
+        let showInfoMessageForChange: Bool = (
+            newGroupModel.showInfoMessageForChangeComparedTo(to: oldGroupModel)
                 || updateDMResult.newConfiguration.asVersionedToken != updateDMResult.oldConfiguration.asVersionedToken,
         )
 
         groupThread.update(
             with: newGroupModel,
-            shouldUpdateChatListUi: hasUserFacingUpdate,
             transaction: transaction,
         )
 
@@ -1083,7 +1093,7 @@ public class GroupManager: NSObject {
             shouldInsertInfoMessages = false
         }
 
-        if hasUserFacingUpdate, shouldInsertInfoMessages {
+        if showInfoMessageForChange, shouldInsertInfoMessages {
             insertGroupUpdateInfoMessage(
                 groupThread: groupThread,
                 oldGroupModel: oldGroupModel,

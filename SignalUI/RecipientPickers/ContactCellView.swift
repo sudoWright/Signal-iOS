@@ -53,7 +53,7 @@ public class ContactCellConfiguration: NSObject {
 
     public var avatarSizeClass: ConversationAvatarView.Configuration.SizeClass?
 
-    public var memberLabel: MemberLabel?
+    public var memberLabel: MemberLabelForRendering?
 
     public init(address: SignalServiceAddress, localUserDisplayMode: LocalUserDisplayMode) {
         self.dataSource = .address(address)

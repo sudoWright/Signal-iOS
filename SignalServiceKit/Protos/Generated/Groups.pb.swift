@@ -75,6 +75,11 @@ struct GroupsProtos_Member: Sendable {
   /// client and used by the server to populate the other fields.
   var presentation: Data = Data()
 
+  /// These two fields each decrypt to a UTF8 string
+  var labelEmoji: Data = Data()
+
+  var labelString: Data = Data()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   enum Role: SwiftProtobuf.Enum, Swift.CaseIterable {
@@ -645,6 +650,12 @@ struct GroupsProtos_GroupChange: Sendable {
       set {_uniqueStorage()._promotePniPendingMembers = newValue}
     }
 
+    /// change epoch = 6;
+    var modifyMemberLabel: [GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction] {
+      get {return _storage._modifyMemberLabel}
+      set {_uniqueStorage()._modifyMemberLabel = newValue}
+    }
+
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
     struct AddMemberAction: Sendable {
@@ -690,6 +701,23 @@ struct GroupsProtos_GroupChange: Sendable {
       var userID: Data = Data()
 
       var role: GroupsProtos_Member.Role = .unknown
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+    }
+
+    struct ModifyMemberLabelAction: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      var userID: Data = Data()
+
+      /// These two fields each decrypt to a UTF8 string
+      var labelEmoji: Data = Data()
+
+      var labelString: Data = Data()
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1165,7 +1193,7 @@ extension GroupsProtos_AvatarUploadAttributes: SwiftProtobuf.Message, SwiftProto
 
 extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Member"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}role\0\u{1}profileKey\0\u{1}presentation\0\u{1}joinedAtRevision\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}role\0\u{1}profileKey\0\u{1}presentation\0\u{1}joinedAtRevision\0\u{3}label_emoji\0\u{3}label_string\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1178,6 +1206,8 @@ extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
       case 3: try { try decoder.decodeSingularBytesField(value: &self.profileKey) }()
       case 4: try { try decoder.decodeSingularBytesField(value: &self.presentation) }()
       case 5: try { try decoder.decodeSingularUInt32Field(value: &self.joinedAtRevision) }()
+      case 6: try { try decoder.decodeSingularBytesField(value: &self.labelEmoji) }()
+      case 7: try { try decoder.decodeSingularBytesField(value: &self.labelString) }()
       default: break
       }
     }
@@ -1199,6 +1229,12 @@ extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if self.joinedAtRevision != 0 {
       try visitor.visitSingularUInt32Field(value: self.joinedAtRevision, fieldNumber: 5)
     }
+    if !self.labelEmoji.isEmpty {
+      try visitor.visitSingularBytesField(value: self.labelEmoji, fieldNumber: 6)
+    }
+    if !self.labelString.isEmpty {
+      try visitor.visitSingularBytesField(value: self.labelString, fieldNumber: 7)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1208,6 +1244,8 @@ extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if lhs.profileKey != rhs.profileKey {return false}
     if lhs.joinedAtRevision != rhs.joinedAtRevision {return false}
     if lhs.presentation != rhs.presentation {return false}
+    if lhs.labelEmoji != rhs.labelEmoji {return false}
+    if lhs.labelString != rhs.labelString {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -1748,7 +1786,7 @@ extension GroupsProtos_GroupChange: SwiftProtobuf.Message, SwiftProtobuf._Messag
 
 extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.protoMessageName + ".Actions"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sourceUserId\0\u{1}revision\0\u{1}addMembers\0\u{1}deleteMembers\0\u{1}modifyMemberRoles\0\u{1}modifyMemberProfileKeys\0\u{1}addPendingMembers\0\u{1}deletePendingMembers\0\u{1}promotePendingMembers\0\u{1}modifyTitle\0\u{1}modifyAvatar\0\u{1}modifyDisappearingMessagesTimer\0\u{1}modifyAttributesAccess\0\u{1}modifyMemberAccess\0\u{1}modifyAddFromInviteLinkAccess\0\u{1}addRequestingMembers\0\u{1}deleteRequestingMembers\0\u{1}promoteRequestingMembers\0\u{1}modifyInviteLinkPassword\0\u{1}modifyDescription\0\u{1}modifyAnnouncementsOnly\0\u{1}addBannedMembers\0\u{1}deleteBannedMembers\0\u{1}promotePniPendingMembers\0\u{3}group_id\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sourceUserId\0\u{1}revision\0\u{1}addMembers\0\u{1}deleteMembers\0\u{1}modifyMemberRoles\0\u{1}modifyMemberProfileKeys\0\u{1}addPendingMembers\0\u{1}deletePendingMembers\0\u{1}promotePendingMembers\0\u{1}modifyTitle\0\u{1}modifyAvatar\0\u{1}modifyDisappearingMessagesTimer\0\u{1}modifyAttributesAccess\0\u{1}modifyMemberAccess\0\u{1}modifyAddFromInviteLinkAccess\0\u{1}addRequestingMembers\0\u{1}deleteRequestingMembers\0\u{1}promoteRequestingMembers\0\u{1}modifyInviteLinkPassword\0\u{1}modifyDescription\0\u{1}modifyAnnouncementsOnly\0\u{1}addBannedMembers\0\u{1}deleteBannedMembers\0\u{1}promotePniPendingMembers\0\u{3}group_id\0\u{1}modifyMemberLabel\0")
 
   fileprivate class _StorageClass {
     var _sourceUserID: Data = Data()
@@ -1776,6 +1814,7 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
     var _addBannedMembers: [GroupsProtos_GroupChange.Actions.AddBannedMemberAction] = []
     var _deleteBannedMembers: [GroupsProtos_GroupChange.Actions.DeleteBannedMemberAction] = []
     var _promotePniPendingMembers: [GroupsProtos_GroupChange.Actions.PromoteMemberPendingPniAciProfileKeyAction] = []
+    var _modifyMemberLabel: [GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction] = []
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -1811,6 +1850,7 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
       _addBannedMembers = source._addBannedMembers
       _deleteBannedMembers = source._deleteBannedMembers
       _promotePniPendingMembers = source._promotePniPendingMembers
+      _modifyMemberLabel = source._modifyMemberLabel
     }
   }
 
@@ -1854,6 +1894,7 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
         case 23: try { try decoder.decodeRepeatedMessageField(value: &_storage._deleteBannedMembers) }()
         case 24: try { try decoder.decodeRepeatedMessageField(value: &_storage._promotePniPendingMembers) }()
         case 25: try { try decoder.decodeSingularBytesField(value: &_storage._groupID) }()
+        case 26: try { try decoder.decodeRepeatedMessageField(value: &_storage._modifyMemberLabel) }()
         default: break
         }
       }
@@ -1941,6 +1982,9 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
       if !_storage._groupID.isEmpty {
         try visitor.visitSingularBytesField(value: _storage._groupID, fieldNumber: 25)
       }
+      if !_storage._modifyMemberLabel.isEmpty {
+        try visitor.visitRepeatedMessageField(value: _storage._modifyMemberLabel, fieldNumber: 26)
+      }
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1975,6 +2019,7 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
         if _storage._addBannedMembers != rhs_storage._addBannedMembers {return false}
         if _storage._deleteBannedMembers != rhs_storage._deleteBannedMembers {return false}
         if _storage._promotePniPendingMembers != rhs_storage._promotePniPendingMembers {return false}
+        if _storage._modifyMemberLabel != rhs_storage._modifyMemberLabel {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -2083,6 +2128,46 @@ extension GroupsProtos_GroupChange.Actions.ModifyMemberRoleAction: SwiftProtobuf
   static func ==(lhs: GroupsProtos_GroupChange.Actions.ModifyMemberRoleAction, rhs: GroupsProtos_GroupChange.Actions.ModifyMemberRoleAction) -> Bool {
     if lhs.userID != rhs.userID {return false}
     if lhs.role != rhs.role {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyMemberLabelAction"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}user_id\0\u{3}label_emoji\0\u{3}label_string\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self.userID) }()
+      case 2: try { try decoder.decodeSingularBytesField(value: &self.labelEmoji) }()
+      case 3: try { try decoder.decodeSingularBytesField(value: &self.labelString) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.userID.isEmpty {
+      try visitor.visitSingularBytesField(value: self.userID, fieldNumber: 1)
+    }
+    if !self.labelEmoji.isEmpty {
+      try visitor.visitSingularBytesField(value: self.labelEmoji, fieldNumber: 2)
+    }
+    if !self.labelString.isEmpty {
+      try visitor.visitSingularBytesField(value: self.labelString, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction, rhs: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction) -> Bool {
+    if lhs.userID != rhs.userID {return false}
+    if lhs.labelEmoji != rhs.labelEmoji {return false}
+    if lhs.labelString != rhs.labelString {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

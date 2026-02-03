@@ -139,7 +139,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
 
     fileprivate typealias MemberStateMap = [SignalServiceAddress: GroupMemberState]
     fileprivate typealias InvalidInviteMap = [Data: InvalidInviteModel]
-    fileprivate typealias MemberLabelsMap = [Aci: String]
+    fileprivate typealias MemberLabelsMap = [Aci: MemberLabel]
 
     private typealias LegacyMemberStateMap = [SignalServiceAddress: LegacyMemberState]
 
@@ -210,14 +210,15 @@ public class GroupMembership: NSObject, NSSecureCoding {
             self.bannedMembers = [:]
         }
 
-        if
-            let memberLabels = coder.decodeDictionary(
-                withKeyClass: NSUUID.self,
-                objectClass: NSString.self,
-                forKey: Self.memberLabelsMapKey,
-            ) as [UUID: String]?
-        {
-            self.memberLabels = memberLabels.mapKeys(injectiveTransform: { Aci(fromUUID: $0) })
+        if let memberLabelsData = coder.decodeObject(of: NSData.self, forKey: Self.memberLabelsMapKey) as Data? {
+            let decoder = JSONDecoder()
+            do {
+                let memberLabelServiceIdBinaryMap = try decoder.decode(Dictionary<UUID, MemberLabel>.self, from: memberLabelsData)
+                self.memberLabels = memberLabelServiceIdBinaryMap.mapKeys(injectiveTransform: { Aci(fromUUID: $0) })
+            } catch {
+                owsFailDebug("Could not decode member labels: \(error)")
+                return nil
+            }
         } else {
             self.memberLabels = [:]
         }
@@ -229,7 +230,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
     private static var legacyMemberStatesKey: String { "memberStateMap" }
     private static var bannedMembersKey: String { "bannedMembers" }
     private static var invalidInviteMapKey: String { "invalidInviteMap" }
-    private static var memberLabelsMapKey: String { "memberLabelsMap" }
+    private static var memberLabelsMapKey: String { "memberLabelsMapV3" }
 
     public func encode(with aCoder: NSCoder) {
         let encoder = JSONEncoder()
@@ -242,7 +243,13 @@ public class GroupMembership: NSObject, NSSecureCoding {
 
         aCoder.encode(bannedMembers.mapKeys(injectiveTransform: { $0.rawUUID }), forKey: Self.bannedMembersKey)
         aCoder.encode(invalidInviteMap, forKey: Self.invalidInviteMapKey)
-        aCoder.encode(memberLabels.mapKeys(injectiveTransform: { $0.rawUUID }), forKey: Self.memberLabelsMapKey)
+
+        do {
+            let memberLabelsData = try encoder.encode(self.memberLabels.mapKeys(injectiveTransform: { $0.rawUUID }))
+            aCoder.encode(memberLabelsData, forKey: Self.memberLabelsMapKey)
+        } catch {
+            owsFailDebug("Error: \(error)")
+        }
     }
 
     fileprivate init(
@@ -269,6 +276,27 @@ public class GroupMembership: NSObject, NSSecureCoding {
         self.memberLabels = [:]
 
         super.init()
+    }
+
+    public func showInfoMessageForChangeComparedTo(
+        to other: GroupMembership,
+    ) -> Bool {
+        guard
+            Self.memberStates(
+                self.memberStates,
+                areEqualTo: other.memberStates,
+            )
+        else {
+            return true
+        }
+
+        guard self.bannedMembers == other.bannedMembers else {
+            return true
+        }
+
+        let invalidlyInvitedUserIdsSet = Set(invalidInviteUserIds)
+        let otherInvalidlyInvitedUserIdsSet = Set(other.invalidInviteUserIds)
+        return invalidlyInvitedUserIdsSet != otherInvalidlyInvitedUserIdsSet
     }
 
 #if TESTABLE_BUILD
@@ -630,7 +658,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
 
     // MARK:
 
-    public func memberLabel(for aci: Aci) -> String? {
+    public func memberLabel(for aci: Aci) -> MemberLabel? {
         return memberLabels[aci]
     }
 
@@ -811,7 +839,7 @@ public class GroupMembership: NSObject, NSSecureCoding {
 
         // MARK: Member labels
 
-        public mutating func setMemberLabel(label: String?, aci: Aci) {
+        public mutating func setMemberLabel(label: MemberLabel?, aci: Aci) {
             memberLabels[aci] = label
         }
 

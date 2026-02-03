@@ -170,7 +170,7 @@ public extension ProfileDetailLabel {
         )
     }
 
-    static func memberLabel(_ label: String?) -> UIView {
+    static func memberLabel(_ label: String?, tapAction: @escaping () -> Void) -> UIView {
         guard let label else {
             return ProfileDetailLabel(
                 title: OWSLocalizedString("MEMBER_LABEL_ADD", comment: "Label for an action to add a member label"),
@@ -178,7 +178,7 @@ public extension ProfileDetailLabel {
                 font: .dynamicTypeBody,
                 showDetailDisclosure: true,
                 tapAction: {
-                    print("Unimplemented!")
+                    tapAction()
                 },
             )
         }
@@ -188,7 +188,7 @@ public extension ProfileDetailLabel {
             font: .dynamicTypeBody,
             showDetailDisclosure: true,
             tapAction: {
-                print("Unimplemented!")
+                tapAction()
             },
         )
     }

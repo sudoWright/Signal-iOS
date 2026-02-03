@@ -24,7 +24,7 @@ public protocol ConversationSettingsViewDelegate: AnyObject {
 // MARK: -
 
 // TODO: We should describe which state updates & when it is committed.
-class ConversationSettingsViewController: OWSTableViewController2, BadgeCollectionDataSource {
+class ConversationSettingsViewController: OWSTableViewController2, BadgeCollectionDataSource, MemberLabelUpdateDelegate {
 
     weak var conversationSettingsViewDelegate: ConversationSettingsViewDelegate?
 
@@ -323,15 +323,15 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
             return
         }
 
-        var memberLabel: MemberLabel?
+        var memberLabel: MemberLabelForRendering?
         if
             let groupThread = thread as? TSGroupThread,
             let memberAci = memberAddress.aci,
-            let memberLabelString = groupThread.groupModel.groupMembership.memberLabel(for: memberAci),
+            let memberLabelString = groupThread.groupModel.groupMembership.memberLabel(for: memberAci)?.labelForRendering(),
             let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aci
         {
             let groupNameColors = GroupNameColors.forThread(groupThread, localAci: localAci)
-            memberLabel = MemberLabel(label: memberLabelString, groupNameColor: groupNameColors.color(for: memberAci))
+            memberLabel = MemberLabelForRendering(label: memberLabelString, groupNameColor: groupNameColors.color(for: memberAci))
         }
 
         ProfileSheetSheetCoordinator(
@@ -1058,6 +1058,21 @@ class ConversationSettingsViewController: OWSTableViewController2, BadgeCollecti
     // when selection behavior is non-mutating
     var availableBadges: [OWSUserProfileBadgeInfo] = []
     var selectedBadgeIndex = 0
+
+    // MARK: - MemberLabelUpdateDelegate
+
+    func updateLabelForLocalUser(memberLabel: MemberLabel?) {
+        Task {
+            let db = DependenciesBridge.shared.db
+            let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+            if
+                let groupModelV2 = currentGroupModel as? TSGroupModelV2,
+                let localAci = db.read(block: { tx in tsAccountManager.localIdentifiers(tx: tx)?.aci })
+            {
+                try await GroupManager.changeMemberLabel(groupModel: groupModelV2, aci: localAci, label: memberLabel)
+            }
+        }
+    }
 }
 
 // MARK: -

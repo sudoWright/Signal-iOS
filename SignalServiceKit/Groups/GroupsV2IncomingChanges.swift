@@ -243,6 +243,33 @@ public class GroupsV2IncomingChanges {
             groupMembershipBuilder.addFullMember(aci, role: role)
         }
 
+        for action in changeActionsProto.modifyMemberLabel {
+            if !canEditAttributes {
+                owsFailDebug("Cannot modify member label.")
+            }
+            guard let userId = action.userID else {
+                throw OWSAssertionError("Missing userID.")
+            }
+
+            let aci = try groupV2Params.aci(for: userId)
+
+            var decryptedLabelString: String?
+            if let encryptedLabelString = action.labelString {
+                decryptedLabelString = try? groupV2Params.decryptMemberLabel(encryptedLabelString)
+            }
+
+            var decryptedLabelEmoji: String?
+            if let encryptedLabelEmoji = action.labelEmoji {
+                decryptedLabelEmoji = try? groupV2Params.decryptMemberLabelEmoji(encryptedLabelEmoji)
+            }
+
+            var memberLabel: MemberLabel?
+            if let decryptedLabelString {
+                memberLabel = MemberLabel(label: decryptedLabelString, labelEmoji: decryptedLabelEmoji)
+            }
+            groupMembershipBuilder.setMemberLabel(label: memberLabel, aci: aci)
+        }
+
         for action in changeActionsProto.modifyMemberProfileKeys {
             let (aci, profileKey) = try {
                 let props = try action.getAciProperties(groupV2Params: groupV2Params)

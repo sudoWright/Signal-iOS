@@ -34,7 +34,7 @@ struct ConversationHeaderBuilder {
         for thread: TSThread,
         sizeClass: ConversationAvatarView.Configuration.SizeClass,
         options: Options,
-        memberLabel: MemberLabel?,
+        memberLabel: MemberLabelForRendering?,
         delegate: ConversationHeaderDelegate,
     ) -> UIView {
         if let groupThread = thread as? TSGroupThread {
@@ -131,7 +131,7 @@ struct ConversationHeaderBuilder {
         contactThread: TSContactThread,
         sizeClass: ConversationAvatarView.Configuration.SizeClass,
         options: Options,
-        memberLabel: MemberLabel?,
+        memberLabel: MemberLabelForRendering?,
         delegate: ConversationHeaderDelegate,
     ) -> UIView {
         // Make sure the view is loaded before we open a transaction,
@@ -153,7 +153,7 @@ struct ConversationHeaderBuilder {
         contactThread: TSContactThread,
         sizeClass: ConversationAvatarView.Configuration.SizeClass,
         options: Options,
-        memberLabel: MemberLabel?,
+        memberLabel: MemberLabelForRendering?,
         delegate: ConversationHeaderDelegate,
         transaction: DBReadTransaction,
     ) -> UIView {
@@ -164,7 +164,7 @@ struct ConversationHeaderBuilder {
             transaction: transaction,
         )
 
-        if BuildFlags.MemberLabel.receive, let memberLabel {
+        if BuildFlags.MemberLabel.display, let memberLabel {
             let memberLabelLabel = builder.addMemberLabel(label: memberLabel.label, backgroundColor: memberLabel.groupNameColor)
             memberLabelLabel.numberOfLines = 0
             memberLabelLabel.textAlignment = .center

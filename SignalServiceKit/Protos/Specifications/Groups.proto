@@ -44,6 +44,10 @@ message Member {
   // A `LibSignalClient.ProfileKeyCredentialPresentation` created by the
   // client and used by the server to populate the other fields.
   bytes presentation = 4;
+
+  // These two fields each decrypt to a UTF8 string
+  bytes label_emoji = 6;
+  bytes label_string = 7;
 }
 
 // An invited member of the group.
@@ -173,6 +177,13 @@ message GroupChange {
       Member.Role role = 2;
     }
 
+    message ModifyMemberLabelAction {
+      bytes user_id = 1;
+      // These two fields each decrypt to a UTF8 string
+      bytes label_emoji = 2;
+      bytes label_string = 3;
+    }
+
     message ModifyMemberProfileKeyAction {
       bytes presentation = 1;
       bytes user_id = 2;
@@ -299,6 +310,7 @@ message GroupChange {
     repeated AddBannedMemberAction addBannedMembers = 22;  // change epoch = 4
     repeated DeleteBannedMemberAction deleteBannedMembers = 23;  // change epoch = 4
     repeated PromoteMemberPendingPniAciProfileKeyAction promotePniPendingMembers = 24;  // change epoch = 5
+    repeated ModifyMemberLabelAction modifyMemberLabel = 26; // change epoch = 6;
   }
 
   bytes actions = 1; // The serialized actions

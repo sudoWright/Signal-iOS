@@ -8,7 +8,6 @@ public import LibSignalClient
 extension TSGroupThread {
     func update(
         with newGroupModel: TSGroupModel,
-        shouldUpdateChatListUi: Bool = true,
         transaction tx: DBWriteTransaction,
     ) {
         let didAvatarChange = newGroupModel.avatarHash == groupModel.avatarHash

@@ -790,12 +790,12 @@ extension ConversationSettingsViewController {
                         cell.selectionStyle = .default
                     }
 
-                    if BuildFlags.MemberLabel.receive, let memberAci = memberAddress.aci {
+                    if BuildFlags.MemberLabel.display, let memberAci = memberAddress.aci {
                         if
-                            let memberLabel = groupModel.groupMembership.memberLabel(for: memberAci),
+                            let memberLabel = groupModel.groupMembership.memberLabel(for: memberAci)?.labelForRendering(),
                             let groupNameColors
                         {
-                            configuration.memberLabel = MemberLabel(label: memberLabel, groupNameColor: groupNameColors.color(for: memberAddress.aci))
+                            configuration.memberLabel = MemberLabelForRendering(label: memberLabel, groupNameColor: groupNameColors.color(for: memberAddress.aci))
                         }
                     }
 
@@ -894,7 +894,13 @@ extension ConversationSettingsViewController {
             ),
         )
 
-        if BuildFlags.MemberLabel.send, groupViewHelper.canEditConversationAttributes {
+        let db = DependenciesBridge.shared.db
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        if
+            BuildFlags.MemberLabel.send,
+            groupViewHelper.canEditConversationAttributes,
+            let localAci = db.read(block: { tx in tsAccountManager.localIdentifiers(tx: tx)?.aci })
+        {
             section.add(
                 OWSTableItem.disclosureItem(
                     icon: .memberLabel,
@@ -903,7 +909,9 @@ extension ConversationSettingsViewController {
                         comment: "Label for 'member label' action in conversation settings view.",
                     ),
                     actionBlock: { [weak self] in
-                        let memberLabelViewController = MemberLabelViewController()
+                        let fullMemberLabel = groupModelV2.groupMembership.memberLabel(for: localAci)
+                        let memberLabelViewController = MemberLabelViewController(memberLabel: fullMemberLabel?.label, emoji: fullMemberLabel?.labelEmoji)
+                        memberLabelViewController.updateDelegate = self
                         self?.present(OWSNavigationController(rootViewController: memberLabelViewController), animated: true)
                     },
                 ),

@@ -11,13 +11,13 @@ struct ProfileSheetSheetCoordinator {
     private let address: SignalServiceAddress
     private let groupViewHelper: GroupViewHelper?
     private let spoilerState: SpoilerRenderState
-    private let memberLabel: MemberLabel?
+    private let memberLabel: MemberLabelForRendering?
 
     init(
         address: SignalServiceAddress,
         groupViewHelper: GroupViewHelper?,
         spoilerState: SpoilerRenderState,
-        memberLabel: MemberLabel? = nil,
+        memberLabel: MemberLabelForRendering? = nil,
     ) {
         self.address = address
         self.groupViewHelper = groupViewHelper
@@ -68,14 +68,14 @@ class MemberActionSheet: OWSTableSheetViewController {
     var threadViewModel: ThreadViewModel
     let address: SignalServiceAddress
     let spoilerState: SpoilerRenderState
-    let memberLabel: MemberLabel?
+    let memberLabel: MemberLabelForRendering?
 
     fileprivate init(
         threadViewModel: ThreadViewModel,
         address: SignalServiceAddress,
         groupViewHelper: GroupViewHelper?,
         spoilerState: SpoilerRenderState,
-        memberLabel: MemberLabel?,
+        memberLabel: MemberLabelForRendering?,
     ) {
         self.threadViewModel = threadViewModel
         self.groupViewHelper = groupViewHelper

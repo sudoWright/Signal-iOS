@@ -418,6 +418,29 @@ public class GroupsV2Protos {
             groupMembershipBuilder.addBannedMember(aci, bannedAtTimestamp: bannedAtTimestamp)
         }
 
+        for member in groupProto.members {
+            guard let labelString = member.labelString else {
+                continue
+            }
+            guard let userId = member.userID else {
+                throw OWSAssertionError("Member missing userID.")
+            }
+            let aci = try groupV2Params.aci(for: userId)
+
+            let decryptedLabelString = try? groupV2Params.decryptMemberLabel(labelString)
+            var decryptedLabelEmoji: String?
+            if let emoji = member.labelEmoji {
+                decryptedLabelEmoji = try? groupV2Params.decryptMemberLabelEmoji(emoji)
+            }
+
+            var memberLabel: MemberLabel?
+            if let decryptedLabelString {
+                memberLabel = MemberLabel(label: decryptedLabelString, labelEmoji: decryptedLabelEmoji)
+            }
+
+            groupMembershipBuilder.setMemberLabel(label: memberLabel, aci: aci)
+        }
+
         let groupMembership = groupMembershipBuilder.build()
 
         let inviteLinkPassword = groupProto.inviteLinkPassword

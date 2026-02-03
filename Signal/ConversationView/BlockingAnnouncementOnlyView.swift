@@ -166,13 +166,13 @@ class MessageUserSubsetSheet: OWSTableSheetViewController {
                     configuration.forceDarkAppearance = self?.forceDarkMode ?? false
 
                     if
-                        BuildFlags.MemberLabel.receive,
+                        BuildFlags.MemberLabel.display,
                         let groupThread = self?.groupThread,
                         let senderAci = address.aci,
-                        let memberLabelString = groupThread.groupModel.groupMembership.memberLabel(for: senderAci),
+                        let memberLabelString = groupThread.groupModel.groupMembership.memberLabel(for: senderAci)?.labelForRendering(),
                         let groupNameColors
                     {
-                        configuration.memberLabel = MemberLabel(label: memberLabelString, groupNameColor: groupNameColors.color(for: senderAci))
+                        configuration.memberLabel = MemberLabelForRendering(label: memberLabelString, groupNameColor: groupNameColors.color(for: senderAci))
                     }
 
                     SSKEnvironment.shared.databaseStorageRef.read {

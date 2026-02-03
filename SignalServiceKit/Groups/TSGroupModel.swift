@@ -226,32 +226,34 @@ public final class TSGroupModelV2: TSGroupModel {
         return Array(groupMembership.fullMembers)
     }
 
-    public func hasUserFacingChangeCompared(
+    public func showInfoMessageForChangeComparedTo(
         to otherGroupModel: TSGroupModelV2,
     ) -> Bool {
         if self === otherGroupModel {
             return false
         }
 
-        let avatarHasUserFacingChange: Bool
+        let avatarChangeRequiresInfoMessage: Bool
         if avatarHash == otherGroupModel.avatarHash {
-            avatarHasUserFacingChange = false
+            avatarChangeRequiresInfoMessage = false
         } else if
             otherGroupModel.lowTrustAvatarDownloadWasBlocked,
             !self.lowTrustAvatarDownloadWasBlocked
         {
             // Avatar unblurred. No info message needed
-            avatarHasUserFacingChange = false
+            avatarChangeRequiresInfoMessage = false
         } else {
-            avatarHasUserFacingChange = true
+            avatarChangeRequiresInfoMessage = true
         }
+
+        let membershipChangeRequiresInfoMessage = membership.showInfoMessageForChangeComparedTo(to: otherGroupModel.membership)
 
         guard
             groupName == otherGroupModel.groupName,
-            !avatarHasUserFacingChange,
+            !avatarChangeRequiresInfoMessage,
             addedByAddress == otherGroupModel.addedByAddress,
             descriptionText == otherGroupModel.descriptionText,
-            membership == otherGroupModel.membership,
+            !membershipChangeRequiresInfoMessage,
             access == otherGroupModel.access,
             isAnnouncementsOnly == otherGroupModel.isAnnouncementsOnly,
             inviteLinkPassword == otherGroupModel.inviteLinkPassword
