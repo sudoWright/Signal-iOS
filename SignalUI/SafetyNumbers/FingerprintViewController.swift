@@ -102,6 +102,7 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
             deps: FingerprintViewController.Deps(
                 db: db,
                 identityManager: identityManager,
+                keyTransparencyManager: keyTransparencyManager,
             ),
         )
         let navigationController = OWSNavigationController(rootViewController: fingerprintViewController)
@@ -121,6 +122,7 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
     fileprivate struct Deps {
         let db: DB
         let identityManager: OWSIdentityManager
+        let keyTransparencyManager: KeyTransparencyManager
     }
 
     private let recipientAci: Aci
@@ -722,15 +724,28 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
     fileprivate func didTapKeyTransparencyButton(state: KeyTransparencyView.State) {
         switch state {
         case .unableToVerify:
-            print("Unable to verify!")
+            present(KeyTransparencyNotAvailableHeroSheet(), animated: true)
         case .readyToVerify:
-            print("Starting!")
+            guard
+                let deps,
+                let keyTransparencyCheckParams
+            else { return }
+
+            keyTransparencyView.state = .verifying
+            Task { @MainActor [weak self] in
+                do {
+                    try await deps.keyTransparencyManager.performCheck(params: keyTransparencyCheckParams)
+                    self?.keyTransparencyView.state = .verifiedSuccess
+                } catch {
+                    self?.keyTransparencyView.state = .verifiedFailure
+                }
+            }
         case .verifying:
-            print("Already in progress!")
+            break
         case .verifiedSuccess:
-            print("Succeeded!")
+            present(KeyTransparencySuccessHeroSheet(), animated: true)
         case .verifiedFailure:
-            print("Failed!")
+            present(KeyTransparencyFailureHeroSheet(theirName: fingerprint.theirName), animated: true)
         }
     }
 }
@@ -755,6 +770,66 @@ extension FingerprintViewController: CompareSafetyNumbersActivityDelegate {
             isUserError: error == .userError,
             localizedErrorDescription: error.localizedError,
             tag: "[\(type(of: self))]",
+        )
+    }
+}
+
+// MARK: -
+
+private final class KeyTransparencyNotAvailableHeroSheet: HeroSheetViewController {
+    init() {
+        super.init(
+            hero: .image(UIImage(named: "info")!, tintColor: .Signal.label),
+            title: OWSLocalizedString(
+                "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE",
+                comment: "Title for a sheet explaining that encryption auto-verification is not available.",
+            ),
+            body: OWSLocalizedString(
+                "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY",
+                comment: "Body for a sheet explaining that encryption auto-verification is not available.",
+            ),
+            primaryButton: .dismissing(title: CommonStrings.okButton),
+        )
+    }
+}
+
+// MARK: -
+
+private final class KeyTransparencySuccessHeroSheet: HeroSheetViewController {
+    init() {
+        super.init(
+            hero: .image(UIImage(named: "check-circle")!, tintColor: .Signal.label),
+            title: OWSLocalizedString(
+                "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE",
+                comment: "Title for a sheet explaining that encryption auto-verification succeeded.",
+            ),
+            body: OWSLocalizedString(
+                "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY",
+                comment: "Body for a sheet explaining that encryption auto-verification succeeded.",
+            ),
+            primaryButton: .dismissing(title: CommonStrings.okButton),
+        )
+    }
+}
+
+// MARK: -
+
+private final class KeyTransparencyFailureHeroSheet: HeroSheetViewController {
+    init(theirName: String) {
+        super.init(
+            hero: .image(UIImage(named: "check-circle")!, tintColor: .Signal.label),
+            title: OWSLocalizedString(
+                "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE",
+                comment: "Title for a sheet explaining that encryption auto-verification did not succeed.",
+            ),
+            body: String(
+                format: OWSLocalizedString(
+                    "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT",
+                    comment: "Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}.",
+                ),
+                theirName,
+            ),
+            primaryButton: .dismissing(title: CommonStrings.okButton),
         )
     }
 }

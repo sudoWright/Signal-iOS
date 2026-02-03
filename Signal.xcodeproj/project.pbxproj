@@ -3009,6 +3009,7 @@
 		D99ABC782A3D132D0034CD3B /* blue-rectangle.png in Resources */ = {isa = PBXBuildFile; fileRef = D99ABC762A3D132D0034CD3B /* blue-rectangle.png */; };
 		D99ABC7A2A3D1D710034CD3B /* semitransparent.png in Resources */ = {isa = PBXBuildFile; fileRef = D99ABC792A3D1D710034CD3B /* semitransparent.png */; };
 		D99D960F292871C600D5028B /* DonateViewController+OneTimePaypalDonation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99D960E292871C600D5028B /* DonateViewController+OneTimePaypalDonation.swift */; };
+		D99E19BE2F2D72B400CA6A09 /* DebugUIKeyTransparency.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99E19BD2F2D72AF00CA6A09 /* DebugUIKeyTransparency.swift */; };
 		D9A36B932C7FEDA100CEC0E7 /* LineByLineStringDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A36B922C7FEDA100CEC0E7 /* LineByLineStringDiff.swift */; };
 		D9A3E22B2A0D633500E2A8B5 /* UsernameLookupRecordTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D925F56F298DF41B00158EE4 /* UsernameLookupRecordTest.swift */; };
 		D9A3E2302A0DABDF00E2A8B5 /* UsernameQuerier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A3E22F2A0DABDF00E2A8B5 /* UsernameQuerier.swift */; };
@@ -7181,6 +7182,7 @@
 		D99ABC762A3D132D0034CD3B /* blue-rectangle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blue-rectangle.png"; sourceTree = "<group>"; };
 		D99ABC792A3D1D710034CD3B /* semitransparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = semitransparent.png; sourceTree = "<group>"; };
 		D99D960E292871C600D5028B /* DonateViewController+OneTimePaypalDonation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DonateViewController+OneTimePaypalDonation.swift"; sourceTree = "<group>"; };
+		D99E19BD2F2D72AF00CA6A09 /* DebugUIKeyTransparency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUIKeyTransparency.swift; sourceTree = "<group>"; };
 		D9A36B922C7FEDA100CEC0E7 /* LineByLineStringDiff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineByLineStringDiff.swift; sourceTree = "<group>"; };
 		D9A3E22F2A0DABDF00E2A8B5 /* UsernameQuerier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernameQuerier.swift; sourceTree = "<group>"; };
 		D9A81C6A2BAA54FC00C07D2B /* CallRecordSyncMessageConversationIdAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallRecordSyncMessageConversationIdAdapter.swift; sourceTree = "<group>"; };
@@ -9237,6 +9239,7 @@
 			children = (
 				D9AAB2672EBC0ABB0012D306 /* DebugUIBackups.swift */,
 				76F958622A09A5AE00B43E63 /* DebugUIDiskUsage.swift */,
+				D99E19BD2F2D72AF00CA6A09 /* DebugUIKeyTransparency.swift */,
 				34429B3C273440420050D3EA /* DebugUIMisc.swift */,
 				76E02C1D2A0A1ADD008BC372 /* DebugUIPage.swift */,
 				D92A1CD92E314BD000C91E21 /* DebugUIPrompts.swift */,
@@ -17865,6 +17868,7 @@
 				34067EAB2710D61A000407C3 /* DebugLogs.swift in Sources */,
 				D9AAB2682EBC0ABF0012D306 /* DebugUIBackups.swift in Sources */,
 				76F958632A09A5AE00B43E63 /* DebugUIDiskUsage.swift in Sources */,
+				D99E19BE2F2D72B400CA6A09 /* DebugUIKeyTransparency.swift in Sources */,
 				34429B3D273440420050D3EA /* DebugUIMisc.swift in Sources */,
 				76E02C1E2A0A1ADD008BC372 /* DebugUIPage.swift in Sources */,
 				D92A1CDA2E314BD400C91E21 /* DebugUIPrompts.swift in Sources */,

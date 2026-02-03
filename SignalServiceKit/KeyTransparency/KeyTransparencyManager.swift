@@ -24,6 +24,8 @@ public final class KeyTransparencyManager {
     private let tsAccountManager: TSAccountManager
     private let udManager: OWSUDManager
 
+    private let taskQueue: KeyedConcurrentTaskQueue<Aci>
+
     init(
         chatConnectionManager: ChatConnectionManager,
         db: DB,
@@ -39,7 +41,11 @@ public final class KeyTransparencyManager {
         self.recipientDatabaseTable = recipientDatabaseTable
         self.tsAccountManager = tsAccountManager
         self.udManager = udManager
+
+        self.taskQueue = KeyedConcurrentTaskQueue(concurrentLimitPerKey: 1)
     }
+
+    // MARK: -
 
     /// Prepare to perform a Key Transparency check.
     /// - Returns
@@ -110,9 +116,53 @@ public final class KeyTransparencyManager {
         )
     }
 
-    public func performCheck(params: CheckParams) async throws {
-        let logger = logger.suffixed(with: "[\(params.aciInfo.aci)]")
+    // MARK: -
 
+    public func performCheck(params: CheckParams) async throws {
+        try await taskQueue.run(forKey: params.aciInfo.aci) {
+            let logger = logger.suffixed(with: "[\(params.aciInfo.aci)]")
+
+            do {
+                // We want to retry network errors indefinitely, as we don't
+                // want them to suggest that KT has failed.
+                try await Retry.performWithBackoff(
+                    maxAttempts: .max,
+                    preferredBackoffBlock: { error -> TimeInterval? in
+                        switch error {
+                        case SignalError.rateLimitedError(let retryAfter, message: _):
+                            return retryAfter
+                        default:
+                            return nil
+                        }
+                    },
+                    isRetryable: { error -> Bool in
+                        switch error {
+                        case SignalError.rateLimitedError,
+                             SignalError.connectionFailed,
+                             SignalError.ioError,
+                             SignalError.webSocketError:
+                            return true
+                        default:
+                            return false
+                        }
+                    },
+                    block: {
+                        try await _performCheck(params: params, logger: logger)
+                    },
+                )
+
+                logger.info("Success!")
+            } catch {
+                logger.warn("Failure! \(error)")
+                throw error
+            }
+        }
+    }
+
+    private func _performCheck(
+        params: CheckParams,
+        logger: PrefixedLogger,
+    ) async throws {
         let ktClient = try await chatConnectionManager.keyTransparencyClient()
         let libSignalStore = KeyTransparencyStoreForLibSignal(db: db)
 
@@ -162,6 +212,15 @@ public final class KeyTransparencyManager {
                 e164: params.e164Info,
                 store: libSignalStore,
             )
+        }
+    }
+
+    // MARK: -
+
+    public static func wipeAllKeyTransparencyData(tx: DBWriteTransaction) {
+        distinguishedTreeStore.removeAll(tx: tx)
+        failIfThrows {
+            try KeyTransparencyRecord.deleteAll(tx.database)
         }
     }
 

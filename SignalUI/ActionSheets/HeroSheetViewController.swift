@@ -10,7 +10,7 @@ import SignalServiceKit
 open class HeroSheetViewController: StackSheetViewController {
     public enum Hero {
         /// Scaled image to display at the top of the sheet
-        case image(UIImage)
+        case image(UIImage, tintColor: UIColor? = nil)
         /// Lottie name and height to display at the top of the sheet
         case animation(named: String, height: CGFloat)
         case circleIcon(
@@ -204,9 +204,12 @@ open class HeroSheetViewController: StackSheetViewController {
     private func viewForHero(_ hero: Hero) -> UIView {
         let heroView: UIView
         switch hero {
-        case let .image(image):
+        case let .image(image, tintColor):
             heroView = UIImageView(image: image)
             heroView.contentMode = .center
+            if let tintColor {
+                heroView.tintColor = tintColor
+            }
         case let .animation(lottieName, height):
             let lottieView = LottieAnimationView(name: lottieName)
             lottieView.autoSetDimension(.height, toSize: height)
