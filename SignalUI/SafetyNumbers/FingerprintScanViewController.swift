@@ -12,7 +12,6 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
     private let recipientAci: Aci
     private let recipientIdentity: OWSRecipientIdentity
     private let contactName: String
-    private let identityKey: Data
     private let fingerprint: OWSFingerprint
 
     private lazy var qrCodeScanViewController = QRCodeScanViewController(appearance: .framed)
@@ -24,7 +23,6 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
     ) {
         self.recipientAci = recipientAci
         self.recipientIdentity = recipientIdentity
-        self.identityKey = recipientIdentity.identityKey
 
         self.fingerprint = fingerprint
         self.contactName = SSKEnvironment.shared.databaseStorageRef.read { tx in
@@ -88,7 +86,7 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
         func showSuccess() {
             FingerprintScanViewController.showVerificationSucceeded(
                 from: self,
-                identityKey: identityKey,
+                identityKey: fingerprint.theirAciIdentityKey,
                 recipientAci: recipientAci,
                 contactName: contactName,
                 tag: "[\(type(of: self))]",
@@ -117,7 +115,7 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
 
     static func showVerificationSucceeded(
         from viewController: UIViewController,
-        identityKey: Data,
+        identityKey: IdentityKey,
         recipientAci: Aci,
         contactName: String,
         tag: String,
@@ -145,7 +143,7 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
                     identityManager.saveIdentityKey(identityKey, for: recipientAci, tx: tx)
                     _ = identityManager.setVerificationState(
                         .verified,
-                        of: identityKey,
+                        of: identityKey.publicKey.keyBytes,
                         for: SignalServiceAddress(recipientAci),
                         isUserInitiatedChange: true,
                         tx: tx,

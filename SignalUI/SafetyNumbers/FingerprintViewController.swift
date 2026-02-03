@@ -17,27 +17,60 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
         for theirAci: Aci?,
         from viewController: UIViewController,
     ) {
+        struct FingerprintResult {
+            let theirAci: Aci
+            let theirRecipientIdentity: OWSRecipientIdentity
+            let theirVerificationState: VerificationState
+            let fingerprint: OWSFingerprint
+        }
+
         let contactsManager = SSKEnvironment.shared.contactManagerRef
         let db = DependenciesBridge.shared.db
         let identityManager = DependenciesBridge.shared.identityManager
+        let keyTransparencyManager = DependenciesBridge.shared.keyTransparencyManager
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
 
-        let fingerprintResult = db.read { tx -> OWSFingerprintBuilder.FingerprintResult? in
+        let fingerprintResult: FingerprintResult?
+        let keyTransparencyCheckParams: KeyTransparencyManager.CheckParams?
+        (
+            fingerprintResult,
+            keyTransparencyCheckParams,
+        ) = db.read { tx in
             guard let theirAci else {
-                return nil
+                return (nil, nil)
             }
+
             let theirAddress = SignalServiceAddress(theirAci)
-            guard let theirRecipientIdentity = identityManager.recipientIdentity(for: theirAddress, tx: tx) else {
-                return nil
+            let theirName = contactsManager.displayName(for: theirAddress, tx: tx).resolvedValue()
+            let theirVerificationState = identityManager.verificationState(for: theirAddress, tx: tx)
+
+            guard
+                let theirRecipientIdentity = identityManager.recipientIdentity(for: theirAddress, tx: tx),
+                let theirAciIdentityKey = try? theirRecipientIdentity.identityKeyObject,
+                let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx),
+                let myAciIdentityKey = identityManager.identityKeyPair(for: .aci, tx: tx)?.keyPair.identityKey
+            else {
+                return (nil, nil)
             }
-            return OWSFingerprintBuilder(
-                contactsManager: contactsManager,
-                identityManager: identityManager,
-                tsAccountManager: tsAccountManager,
-            ).fingerprints(
-                theirAci: theirAci,
-                theirRecipientIdentity: theirRecipientIdentity,
-                tx: tx,
+
+            return (
+                FingerprintResult(
+                    theirAci: theirAci,
+                    theirRecipientIdentity: theirRecipientIdentity,
+                    theirVerificationState: theirVerificationState,
+                    fingerprint: OWSFingerprint(
+                        myAci: localIdentifiers.aci,
+                        theirAci: theirAci,
+                        myAciIdentityKey: myAciIdentityKey,
+                        theirAciIdentityKey: theirAciIdentityKey,
+                        theirName: theirName,
+                    ),
+                ),
+                keyTransparencyManager.prepareCheck(
+                    aci: theirAci,
+                    identityKey: theirAciIdentityKey,
+                    tx: tx,
+                ),
             )
         }
 
@@ -60,9 +93,12 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
         }
 
         let fingerprintViewController = FingerprintViewController(
-            fingerprint: fingerprintResult.fingerprint,
             recipientAci: fingerprintResult.theirAci,
             recipientIdentity: fingerprintResult.theirRecipientIdentity,
+            recipientVerificationState: fingerprintResult.theirVerificationState,
+            fingerprint: fingerprintResult.fingerprint,
+            keyTransparencyCheckParams: keyTransparencyCheckParams,
+            keyTransparencyViewInitialState: keyTransparencyCheckParams == nil ? .unableToVerify : .readyToVerify,
             deps: FingerprintViewController.Deps(
                 db: db,
                 identityManager: identityManager,
@@ -89,24 +125,33 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
 
     private let recipientAci: Aci
     private let recipientIdentity: OWSRecipientIdentity
-    private let identityKey: Data
+    private let recipientVerificationState: VerificationState
     private let fingerprint: OWSFingerprint
-    private var isVerified = false
+    private let keyTransparencyCheckParams: KeyTransparencyManager.CheckParams?
+    private let keyTransparencyViewInitialState: KeyTransparencyView.State
 
     private let deps: Deps?
+    private var identityStateChangeObserver: AnyObject?
 
     fileprivate init(
-        fingerprint: OWSFingerprint,
         recipientAci: Aci,
         recipientIdentity: OWSRecipientIdentity,
+        recipientVerificationState: VerificationState,
+        fingerprint: OWSFingerprint,
+        keyTransparencyCheckParams: KeyTransparencyManager.CheckParams?,
+        keyTransparencyViewInitialState: KeyTransparencyView.State,
         deps: Deps?,
     ) {
+        // We snapshot state when we present this view and dismiss the view when
+        // there's an identity change, to avoid edge cases related to state
+        // changing while this view is presented. (E.g., you verified them on
+        // another device; you learned their identity key changed; etc.)
         self.recipientAci = recipientAci
-        // By capturing the identity key when we enter these views, we prevent the edge case
-        // where the user verifies a key that we learned about while this view was open.
         self.recipientIdentity = recipientIdentity
-        self.identityKey = recipientIdentity.identityKey
+        self.recipientVerificationState = recipientVerificationState
         self.fingerprint = fingerprint
+        self.keyTransparencyCheckParams = keyTransparencyCheckParams
+        self.keyTransparencyViewInitialState = keyTransparencyViewInitialState
 
         self.deps = deps
 
@@ -120,7 +165,7 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
             object: nil,
             queue: .main,
         ) { [weak self] _ in
-            self?.identityStateDidChange()
+            self?.dismiss(animated: true)
         }
     }
 
@@ -138,7 +183,11 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
 
     // MARK: UI
 
-    private lazy var fingerprintCard = FingerprintCard(fingerprint: fingerprint, controller: self)
+    private lazy var fingerprintCard = FingerprintCard(
+        fingerprint: fingerprint,
+        theirVerificationState: recipientVerificationState,
+        controller: self,
+    )
 
     private lazy var instructionsTextView: UITextView = {
         let instructions = String(
@@ -168,7 +217,10 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
         return textView
     }()
 
-    private lazy var keyTransparencyView = KeyTransparencyView(controller: self)
+    private lazy var keyTransparencyView = KeyTransparencyView(
+        initialState: keyTransparencyViewInitialState,
+        controller: self,
+    )
 
     private func configureUI() {
         let scrollView = UIScrollView()
@@ -202,32 +254,22 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
         } else {
             instructionsTextView.autoPinEdge(.bottom, to: .bottom, of: scrollView, withOffset: -8)
         }
-
-        updateVerificationStateButton()
-    }
-
-    private func updateVerificationStateButton() {
-        if let deps {
-            isVerified = deps.db.read { tx in
-                return deps.identityManager.verificationState(
-                    for: SignalServiceAddress(recipientAci),
-                    tx: tx,
-                ) == .verified
-            }
-        }
-
-        fingerprintCard.setIsVerified(isVerified)
     }
 
     // MARK: - Fingerprint Card
 
     private final class FingerprintCard: UIView {
-
         private let fingerprint: OWSFingerprint
+        private let theirVerificationState: VerificationState
         private weak var controller: FingerprintViewController?
 
-        init(fingerprint: OWSFingerprint, controller: FingerprintViewController) {
+        init(
+            fingerprint: OWSFingerprint,
+            theirVerificationState: VerificationState,
+            controller: FingerprintViewController,
+        ) {
             self.fingerprint = fingerprint
+            self.theirVerificationState = theirVerificationState
             self.controller = controller
             super.init(frame: .zero)
 
@@ -339,6 +381,19 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
             configuration.contentInsets = NSDirectionalEdgeInsets(hMargin: 16, vMargin: 12)
             configuration.cornerStyle = .capsule
 
+            switch theirVerificationState {
+            case .verified:
+                configuration.title = OWSLocalizedString(
+                    "PRIVACY_UNVERIFY_BUTTON",
+                    comment: "Button that lets user mark another user's identity as unverified.",
+                )
+            case .noLongerVerified, .implicit:
+                configuration.title = OWSLocalizedString(
+                    "PRIVACY_VERIFY_BUTTON",
+                    comment: "Button that lets user mark another user's identity as verified.",
+                )
+            }
+
             return UIButton(
                 configuration: configuration,
                 primaryAction: UIAction { [weak self] _ in
@@ -346,20 +401,6 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
                 },
             )
         }()
-
-        func setIsVerified(_ isVerified: Bool) {
-            if isVerified {
-                verifyUnverifyButton.configuration!.title = OWSLocalizedString(
-                    "PRIVACY_UNVERIFY_BUTTON",
-                    comment: "Button that lets user mark another user's identity as unverified.",
-                )
-            } else {
-                verifyUnverifyButton.configuration!.title = OWSLocalizedString(
-                    "PRIVACY_VERIFY_BUTTON",
-                    comment: "Button that lets user mark another user's identity as verified.",
-                )
-            }
-        }
 
         @objc
         func didTapToScan() {
@@ -385,7 +426,8 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
 
     fileprivate final class KeyTransparencyView: UIView {
         enum State {
-            case initial
+            case unableToVerify
+            case readyToVerify
             case verifying
             case verifiedSuccess
             case verifiedFailure
@@ -397,8 +439,11 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
 
         private weak var controller: FingerprintViewController?
 
-        init(controller: FingerprintViewController) {
-            self.state = .verifiedFailure
+        init(
+            initialState: State,
+            controller: FingerprintViewController,
+        ) {
+            self.state = initialState
             self.controller = controller
             super.init(frame: .zero)
 
@@ -433,7 +478,7 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
             let foregroundColor: UIColor
             let showChevron: Bool
             switch state {
-            case .initial:
+            case .readyToVerify:
                 leadingView = verifyButtonLeadingViewKey
                 titleText = OWSLocalizedString(
                     "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY",
@@ -457,7 +502,7 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
                 )
                 foregroundColor = .Signal.label
                 showChevron = true
-            case .verifiedFailure:
+            case .verifiedFailure, .unableToVerify:
                 leadingView = verifyButtonLeadingViewFailure
                 titleText = OWSLocalizedString(
                     "SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY_FAILURE",
@@ -611,11 +656,20 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
         guard let deps else { return }
 
         deps.db.write { tx in
-            let newVerificationState: VerificationState = isVerified ? .implicit(isAcknowledged: false) : .verified
+            let identityKey = fingerprint.theirAciIdentityKey
+
+            let newVerificationState: VerificationState
+            switch recipientVerificationState {
+            case .verified:
+                newVerificationState = .implicit(isAcknowledged: false)
+            case .noLongerVerified, .implicit:
+                newVerificationState = .verified
+            }
+
             deps.identityManager.saveIdentityKey(identityKey, for: recipientAci, tx: tx)
             _ = deps.identityManager.setVerificationState(
                 newVerificationState,
-                of: identityKey,
+                of: identityKey.publicKey.keyBytes,
                 for: SignalServiceAddress(recipientAci),
                 isUserInitiatedChange: true,
                 tx: tx,
@@ -667,7 +721,9 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
 
     fileprivate func didTapKeyTransparencyButton(state: KeyTransparencyView.State) {
         switch state {
-        case .initial:
+        case .unableToVerify:
+            print("Unable to verify!")
+        case .readyToVerify:
             print("Starting!")
         case .verifying:
             print("Already in progress!")
@@ -676,15 +732,6 @@ public class FingerprintViewController: OWSViewController, OWSNavigationChildCon
         case .verifiedFailure:
             print("Failed!")
         }
-    }
-
-    // MARK: -
-
-    private var identityStateChangeObserver: Any?
-
-    private func identityStateDidChange() {
-        AssertIsOnMainThread()
-        updateVerificationStateButton()
     }
 }
 
@@ -695,7 +742,7 @@ extension FingerprintViewController: CompareSafetyNumbersActivityDelegate {
     func compareSafetyNumbersActivitySucceeded(activity: CompareSafetyNumbersActivity) {
         FingerprintScanViewController.showVerificationSucceeded(
             from: self,
-            identityKey: identityKey,
+            identityKey: fingerprint.theirAciIdentityKey,
             recipientAci: recipientAci,
             contactName: fingerprint.theirName,
             tag: "[\(type(of: self))]",
@@ -724,18 +771,14 @@ private extension IdentityKey {
 }
 
 private final class FingerprintPreviewViewController: UINavigationController {
-    init() {
+    init(
+        theirVerificationState: VerificationState = .verified,
+        keyTransparencyViewInitialState: FingerprintViewController.KeyTransparencyView.State = .readyToVerify,
+    ) {
         let recipientAci = Aci.randomForTesting()
         let recipientIdentityKey = IdentityKey.forPreview()
 
         let fingerprintViewController = FingerprintViewController(
-            fingerprint: OWSFingerprint(
-                myAci: .randomForTesting(),
-                theirAci: recipientAci,
-                myAciIdentityKey: .forPreview(),
-                theirAciIdentityKey: recipientIdentityKey,
-                theirName: "Boba Fett",
-            ),
             recipientAci: recipientAci,
             recipientIdentity: OWSRecipientIdentity(
                 uniqueId: UUID().uuidString,
@@ -744,6 +787,16 @@ private final class FingerprintPreviewViewController: UINavigationController {
                 createdAt: Date().addingTimeInterval(-.week),
                 verificationState: .default,
             ),
+            recipientVerificationState: theirVerificationState,
+            fingerprint: OWSFingerprint(
+                myAci: .randomForTesting(),
+                theirAci: recipientAci,
+                myAciIdentityKey: .forPreview(),
+                theirAciIdentityKey: recipientIdentityKey,
+                theirName: "Boba Fett",
+            ),
+            keyTransparencyCheckParams: nil,
+            keyTransparencyViewInitialState: keyTransparencyViewInitialState,
             deps: nil,
         )
 
@@ -754,8 +807,33 @@ private final class FingerprintPreviewViewController: UINavigationController {
 }
 
 @available(iOS 17, *)
-#Preview {
-    FingerprintPreviewViewController()
+#Preview("Not Verified") {
+    FingerprintPreviewViewController(theirVerificationState: .noLongerVerified)
+}
+
+@available(iOS 17, *)
+#Preview("Verified") {
+    FingerprintPreviewViewController(theirVerificationState: .verified)
+}
+
+@available(iOS 17, *)
+#Preview("KT Unavailable") {
+    FingerprintPreviewViewController(keyTransparencyViewInitialState: .unableToVerify)
+}
+
+@available(iOS 17, *)
+#Preview("KT Running") {
+    FingerprintPreviewViewController(keyTransparencyViewInitialState: .verifying)
+}
+
+@available(iOS 17, *)
+#Preview("KT Success") {
+    FingerprintPreviewViewController(keyTransparencyViewInitialState: .verifiedSuccess)
+}
+
+@available(iOS 17, *)
+#Preview("KT Failure") {
+    FingerprintPreviewViewController(keyTransparencyViewInitialState: .verifiedFailure)
 }
 
 #endif

@@ -1057,7 +1057,6 @@
 		6675F64F29261C39007A311E /* SyncPushTokensJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6675F64E29261C39007A311E /* SyncPushTokensJob.swift */; };
 		6675F65129261E0C007A311E /* APNSRotationStoreTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6675F65029261E0C007A311E /* APNSRotationStoreTest.swift */; };
 		667664362A43BBCD00716B84 /* OWSFingerprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667664352A43BBCD00716B84 /* OWSFingerprint.swift */; };
-		667664382A44B6C200716B84 /* OWSFingerprintBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667664372A44B6C200716B84 /* OWSFingerprintBuilder.swift */; };
 		6676A40A2BD1EB3D006B9CC9 /* OwnedAttachmentPointerProto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6676A4092BD1EB3D006B9CC9 /* OwnedAttachmentPointerProto.swift */; };
 		667AF9DA2B48A3F3008AEE5D /* TSInfoMessage+GroupUpdates+PersistableGroupUpdateItemUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667AF9D92B48A3F3008AEE5D /* TSInfoMessage+GroupUpdates+PersistableGroupUpdateItemUpdater.swift */; };
 		667AF9DE2B4C5824008AEE5D /* PersistableGroupUpdateItem+CVComponentSystemMessageAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667AF9DD2B4C5824008AEE5D /* PersistableGroupUpdateItem+CVComponentSystemMessageAction.swift */; };
@@ -5212,7 +5211,6 @@
 		6675F64E29261C39007A311E /* SyncPushTokensJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPushTokensJob.swift; sourceTree = "<group>"; };
 		6675F65029261E0C007A311E /* APNSRotationStoreTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNSRotationStoreTest.swift; sourceTree = "<group>"; };
 		667664352A43BBCD00716B84 /* OWSFingerprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OWSFingerprint.swift; sourceTree = "<group>"; };
-		667664372A44B6C200716B84 /* OWSFingerprintBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OWSFingerprintBuilder.swift; sourceTree = "<group>"; };
 		6676A4092BD1EB3D006B9CC9 /* OwnedAttachmentPointerProto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnedAttachmentPointerProto.swift; sourceTree = "<group>"; };
 		667AF9D92B48A3F3008AEE5D /* TSInfoMessage+GroupUpdates+PersistableGroupUpdateItemUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TSInfoMessage+GroupUpdates+PersistableGroupUpdateItemUpdater.swift"; sourceTree = "<group>"; };
 		667AF9DD2B4C5824008AEE5D /* PersistableGroupUpdateItem+CVComponentSystemMessageAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersistableGroupUpdateItem+CVComponentSystemMessageAction.swift"; sourceTree = "<group>"; };
@@ -15190,7 +15188,6 @@
 				727328062CA6CF530080E2C7 /* Certificates.swift */,
 				727328042CA6619A0080E2C7 /* HttpSecurityPolicy.swift */,
 				667664352A43BBCD00716B84 /* OWSFingerprint.swift */,
-				667664372A44B6C200716B84 /* OWSFingerprintBuilder.swift */,
 				F9C5CB9F289453B200548EEE /* OWSRecipientIdentity.swift */,
 				F9C5CB99289453B200548EEE /* OWSVerificationState.h */,
 			);
@@ -19094,7 +19091,6 @@
 				503BD28B2B44DA64009624FC /* OWSFakeProfileManager.swift in Sources */,
 				F9C5CDD7289453B400548EEE /* OWSFileSystem.swift in Sources */,
 				667664362A43BBCD00716B84 /* OWSFingerprint.swift in Sources */,
-				667664382A44B6C200716B84 /* OWSFingerprintBuilder.swift in Sources */,
 				F9C5CE1A289453B400548EEE /* OWSFormat.swift in Sources */,
 				F9C5CBF9289453B300548EEE /* OWSGiftBadge.swift in Sources */,
 				F9C5CC46289453B300548EEE /* OWSGroupCallMessage+SDS.swift in Sources */,
