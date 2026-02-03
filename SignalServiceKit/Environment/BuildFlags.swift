@@ -172,6 +172,12 @@ public enum DebugFlags {
         details: LocalizationNotNeeded("Group calls will connect to sfu.test.voip.signal.org."),
     )
 
+    public static let callingNeverRelay = TestableFlag(
+        false,
+        title: LocalizationNotNeeded("Calling: Never use relay"),
+        details: LocalizationNotNeeded("1:1 calls will not connect to a TURN server (remote party may still use TURN)."),
+    )
+
     public static let delayedMessageResend = TestableFlag(
         false,
         title: LocalizationNotNeeded("Delayed message resend"),
@@ -190,6 +196,7 @@ public enum DebugFlags {
     public static func allTestableFlags() -> [TestableFlag] {
         return [
             callingUseTestSFU,
+            callingNeverRelay,
             delayedMessageResend,
             fastPlaceholderExpiration,
             messageSendsFail,

@@ -421,7 +421,7 @@ final class IndividualCallService: CallServiceStateObserver {
         // Start the call, asynchronously.
         Task { @MainActor in
             do {
-                let iceServers = try await RTCIceServerFetcher(networkManager: networkManager)
+                var iceServers = try await RTCIceServerFetcher(networkManager: networkManager)
                     .getIceServers()
                 guard self.callServiceState.currentCall === call else {
                     Logger.debug("call has since ended")
@@ -440,6 +440,9 @@ final class IndividualCallService: CallServiceStateObserver {
                 let useLowData = self.callService.shouldUseLowDataWithSneakyTransaction(for: NetworkRoute(localAdapterType: .unknown))
                 Logger.info("Configuring call for \(useLowData ? "low" : "standard") data")
 
+                if DebugFlags.callingNeverRelay.get() {
+                    iceServers = iceServers.filter { !$0.urlStrings.contains { $0.starts(with: "turn:") || $0.starts(with: "turns:") } }
+                }
                 // Tell the Call Manager to proceed with its active call.
                 try self.callManager.proceed(callId: callId, iceServers: iceServers, hideIp: useTurnOnly, videoCaptureController: call.videoCaptureController, dataMode: useLowData ? .low : .normal, audioLevelsIntervalMillis: nil)
             } catch {
