@@ -1455,7 +1455,7 @@ public class AttachmentDownloadManagerImpl: AttachmentDownloadManager {
             self.signalService = signalService
         }
 
-        private let queue = ConcurrentTaskQueue(concurrentLimit: 4)
+        private let queue = ConcurrentTaskQueue(concurrentLimit: 12)
 
         /// Non-transient attachments have an in-memory disconnect from the downloadQueue and the actual job runner;
         /// they are enqueued to disk and then read off disk to be downloaded. In order to get an in-memory object

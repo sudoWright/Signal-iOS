@@ -102,7 +102,7 @@ public class BackupArchiveFullTextSearchIndexerImpl: BackupArchiveFullTextSearch
         await TimeGatedBatch.processAll(
             db: db,
             yieldTxAfter: 0.1,
-            delayTwixtTx: 0.1,
+            delayTwixtTx: 0.2,
             buildTxContext: { tx -> TxContext in
                 let minInteractionRowIdExclusive = minInteractionRowIdExclusive(tx: tx)
 
