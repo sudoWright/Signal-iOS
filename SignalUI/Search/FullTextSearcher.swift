@@ -661,6 +661,22 @@ public class FullTextSearcher: NSObject {
             throw CancellationError()
         }
 
+        if
+            DebugFlags.internalLogging,
+            searchText.count == 13,
+            let timestamp = UInt64(searchText),
+            let interactions = try? DependenciesBridge.shared.interactionStore.fetchInteractions(
+                timestamp: timestamp,
+                tx: transaction,
+            )
+        {
+            for interaction in interactions {
+                if let message = interaction as? TSMessage {
+                    appendMessage(message, snippet: nil)
+                }
+            }
+        }
+
         // Order the conversation and message results in reverse chronological order.
         // Order "Other Contacts" by name.
 
