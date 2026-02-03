@@ -308,13 +308,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         databaseMigratorRunner.registerBGProcessingTask(appReadiness: appReadiness)
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            attachmentValidationRunner.scheduleBGProcessingTaskIfNeeded()
-            backupRunner.scheduleBGProcessingTaskIfNeeded()
-        }
-
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             Task {
-                databaseMigratorRunner.scheduleBGProcessingTaskIfNeeded()
+                await attachmentValidationRunner.scheduleBGProcessingTaskIfNeeded()
+                await backupRunner.scheduleBGProcessingTaskIfNeeded()
+                await databaseMigratorRunner.scheduleBGProcessingTaskIfNeeded()
 
 #if targetEnvironment(simulator)
                 // The simulator won't run BGProcessingTasks, but we still want to run

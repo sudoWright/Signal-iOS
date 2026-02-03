@@ -72,8 +72,10 @@ extension BGProcessingTaskRunner where Self: Sendable {
                     do {
                         logger.info("Starting...")
                         try await self.run()
-                        bgTask.setTaskCompleted(success: true)
                         logger.info("Success!")
+                        await scheduleBGProcessingTaskIfNeeded()
+                        logger.info("Re-scheduled.")
+                        bgTask.setTaskCompleted(success: true)
                     } catch is CancellationError {
                         // Re-schedule so we try to run it again. We do this unconditionally
                         // because tasks we cancel haven't finished and have more work to do.
@@ -97,18 +99,13 @@ extension BGProcessingTaskRunner where Self: Sendable {
         )
     }
 
-    public func scheduleBGProcessingTaskIfNeeded() {
-        // Note: this file only exists in the main app (Signal/src) so this is guaranteed.
-        owsAssertDebug(CurrentAppContext().isMainApp)
-
+    public func scheduleBGProcessingTaskIfNeeded() async {
         let startCondition = self.startCondition()
         guard startCondition != .never else {
             return
         }
 
-        Task {
-            await self.scheduleBGProcessingTask(startCondition: startCondition)
-        }
+        await self.scheduleBGProcessingTask(startCondition: startCondition)
     }
 
     private func scheduleBGProcessingTask(startCondition: BGProcessingTaskStartCondition) async {
