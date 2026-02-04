@@ -65,7 +65,6 @@ public extension TSInfoMessage {
         return nil
     }
 
-    @objc
     func learnedProfileNameDescription(tx: DBReadTransaction) -> String {
         guard let displayNameBeforeLearningProfileName else {
             return ""

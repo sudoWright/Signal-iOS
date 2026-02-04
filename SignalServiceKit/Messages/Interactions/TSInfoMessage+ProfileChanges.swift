@@ -70,8 +70,7 @@ public extension TSInfoMessage {
 // MARK: -
 
 public extension TSInfoMessage {
-    @objc
-    func profileChangeDescription(transaction tx: DBReadTransaction) -> String {
+    func profileChangeDescription(tx: DBReadTransaction) -> String {
         guard
             let profileChanges,
             let updateDescription = profileChanges.descriptionForUpdate(tx: tx)

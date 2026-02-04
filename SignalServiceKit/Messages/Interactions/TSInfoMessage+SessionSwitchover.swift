@@ -29,7 +29,6 @@ public extension TSInfoMessage {
         return infoMessageValue(forKey: .sessionSwitchoverPhoneNumber)
     }
 
-    @objc
     func sessionSwitchoverDescription(tx: DBReadTransaction) -> String {
         if let phoneNumber = sessionSwitchoverPhoneNumber {
             let displayName = contactThreadDisplayName(tx: tx)

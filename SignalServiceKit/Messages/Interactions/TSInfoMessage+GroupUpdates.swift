@@ -99,8 +99,7 @@ public extension TSInfoMessage {
 
     // MARK: -
 
-    @objc
-    func groupUpdateDescription(transaction tx: DBReadTransaction) -> NSAttributedString {
+    func groupUpdateDescription(tx: DBReadTransaction) -> NSAttributedString {
         let fallback = DisplayableGroupUpdateItem.genericUpdateByUnknownUser.localizedText
 
         guard

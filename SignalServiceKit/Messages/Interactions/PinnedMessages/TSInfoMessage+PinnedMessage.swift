@@ -88,7 +88,6 @@ extension TSInfoMessage {
         return message.uniqueId
     }
 
-    @objc
     func pinnedMessageDescription(transaction: DBReadTransaction) -> String? {
         guard let pinnedMessageItem: PersistablePinnedMessageItem = infoMessageValue(forKey: .pinnedMessage) else {
             return nil

@@ -31,7 +31,6 @@ public extension TSInfoMessage {
         return infoMessageValue(forKey: .threadMergePhoneNumber)
     }
 
-    @objc
     func threadMergeDescription(tx: DBReadTransaction) -> String {
         let displayName = contactThreadDisplayName(tx: tx)
         if let phoneNumber = threadMergePhoneNumber {

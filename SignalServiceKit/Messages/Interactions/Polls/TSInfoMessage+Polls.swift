@@ -72,7 +72,6 @@ extension TSInfoMessage {
         }
     }
 
-    @objc
     func endPollDescription(transaction: DBReadTransaction) -> String? {
         guard let endPollItem: PersistableEndPollItem = infoMessageValue(forKey: .endPoll) else {
             return nil

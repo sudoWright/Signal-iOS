@@ -143,8 +143,7 @@ extension TSInfoMessage {
         }
     }
 
-    @objc
-    func paymentsActivationRequestDescription(transaction: DBReadTransaction) -> String? {
+    func paymentsActivationRequestDescription(tx transaction: DBReadTransaction) -> String? {
         let aci: Aci
         let formatString: String
         switch paymentsActivationRequestType(transaction: transaction) {
@@ -168,8 +167,7 @@ extension TSInfoMessage {
         return String(format: formatString, displayName.resolvedValue())
     }
 
-    @objc
-    func paymentsActivatedDescription(transaction: DBReadTransaction) -> String? {
+    func paymentsActivatedDescription(tx transaction: DBReadTransaction) -> String? {
         switch paymentsActivatedType(transaction: transaction) {
         case .none:
             return nil
