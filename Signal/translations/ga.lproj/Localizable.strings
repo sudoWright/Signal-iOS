@@ -2,7 +2,7 @@
 "AB_PERMISSION_MISSING_ACTION_NOT_NOW" = "Ná bac leis anois";
 
 /* Footer for the 'about' help section. For non-English languages, exclude the word '501c3'. */
-"ABOUT_SECTION_FOOTER" = "Copyright Signal Messenger\nLicensed under the AGPLv3\nSignal is a 501c3 nonprofit";
+"ABOUT_SECTION_FOOTER" = "Cóipcheart Signal Messenger\nCeadúnaithe faoin AGPLv3\nEagraíocht neamhbhrabúis is ea é Signal";
 
 /* Title for the 'about' help section */
 "ABOUT_SECTION_TITLE" = "Maidir le Signal";
@@ -1394,7 +1394,7 @@
 "CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER" = "Tá faisnéis íseal-leibhéil faoin aip san fhaisnéis a chomhroinntear linn agus ní áirítear léi ábhar do ghlaonna.";
 
 /* Header text explaining the purpose of sharing debug logs in the call quality survey. The text inside the <link> tags is tappable for viewing the diagnostic information. */
-"CALL_QUALITY_SURVEY_DEBUG_LOG_HEADER" = "Submitting will share your feedback along with <link>diagnostic information about your call</link>. You can optionally share a debug log to help us improve call quality.";
+"CALL_QUALITY_SURVEY_DEBUG_LOG_HEADER" = "Trína chur isteach, comhroinnfear d'aiseolas mar aon le <link>faisnéis dhiagnóiseach faoi do ghlao</link>. Is féidir leat loga dífhabhtaithe a chomhroinnt le cabhrú linn cáilíocht glaonna a fheabhsú.";
 
 /* Link text to open a preview of debug logs in the call quality survey. Appended to CALL_QUALITY_SURVEY_DEBUG_LOG_FOOTER */
 "CALL_QUALITY_SURVEY_DEBUG_LOG_PREVIEW_LINK" = "Féach ar an loga dífhabhtaithe";
@@ -1406,7 +1406,7 @@
 "CALL_QUALITY_SURVEY_DEBUG_LOG_TOGGLE" = "Comhroinn an loga dífhabhtaithe";
 
 /* Title for preview of the call diagnostic info that will be sent with the survey */
-"CALL_QUALITY_SURVEY_DIAGNOSTICS_TITLE" = "Diagnostic Information";
+"CALL_QUALITY_SURVEY_DIAGNOSTICS_TITLE" = "Faisnéis dhiagnóiseach";
 
 /* Button label for indicating the call did not have issues in the call quality survey */
 "CALL_QUALITY_SURVEY_GREAT_BUTTON" = "Iontach";
@@ -3071,16 +3071,16 @@
 "DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT" = "Thug %1$@ tabhartas do Signal ar do shon! Léirigh do thacaíocht do Signal ar do phróifíl.";
 
 /* Body text for a sheet discussing donating to Signal. */
-"DONATION_READ_MORE_SHEET_BODY" = "As an independent nonprofit, Signal is committed to private messaging and calls. No ads, no trackers, no surveillance. Donate today to support Signal.";
+"DONATION_READ_MORE_SHEET_BODY" = "Mar eagraíocht neamhbhrabúis neamhspleách, tá Signal tiomanta do theachtaireachtaí agus do ghlaonna príobháideacha. Gan aon fhógraí, gan aon rianairí, gan aon fhaireachas. Tabhair airgead inniu chun tacú le Signal.";
 
 /* Bullet point for a sheet discussing donating to Signal. */
-"DONATION_READ_MORE_SHEET_BULLET_1" = "Get an optional badge on your profile when you donate";
+"DONATION_READ_MORE_SHEET_BULLET_1" = "Faigh suaitheantas roghnach ar do phróifíl nuair a thugann tú airgead";
 
 /* Bullet point for a sheet discussing donating to Signal. */
-"DONATION_READ_MORE_SHEET_BULLET_2" = "Your privacy is our mission";
+"DONATION_READ_MORE_SHEET_BULLET_2" = "Ár misean; do phríobháideacht";
 
 /* Bullet point for a sheet discussing donating to Signal. For non-English languages, skip the word 501c3, and skip the language about US donations being tax deductible. */
-"DONATION_READ_MORE_SHEET_BULLET_3" = "Signal is a 501c3 nonprofit. US donations are tax deductible.";
+"DONATION_READ_MORE_SHEET_BULLET_3" = "Eagraíocht neamhbhrabúis is ea é Signal.";
 
 /* Section title for donation amount on receipts */
 "DONATION_RECEIPT_AMOUNT" = "Amount";
@@ -3131,13 +3131,13 @@
 "DONATION_SCREEN_DONATE_BUTTON" = "Tabhair airgead";
 
 /* On donation screens, a small amount of information text is shown. This is the subtitle for that text. */
-"DONATION_SCREENS_HEADER_DESCRIPTION" = "Donate to support private messaging. Keep Signal independent and ad-free.";
+"DONATION_SCREENS_HEADER_DESCRIPTION" = "Tabhair airgead chun tacú le cur teachtaireachtaí príobháideacha. Coinnigh Signal neamhspleách agus saor ó fhógraíocht.";
 
 /* On donation screens, a small amount of information text is shown. Users can click this link to learn more information. */
 "DONATION_SCREENS_HEADER_READ_MORE" = "Léigh tuilleadh";
 
 /* On donation screens, a small amount of information text is shown. This is the title for that text. */
-"DONATION_SCREENS_HEADER_TITLE" = "Proudly Nonprofit";
+"DONATION_SCREENS_HEADER_TITLE" = "Eagraíocht neamhbhrabúis agus bródúil as";
 
 /* Button title confirming the user wants to begin a new donation. */
 "DONATION_SETTINGS_CANCEL_DONATION_AWAITING_AUTHORIZATION_DONATE_ACTION" = "Tabhair airgead";
@@ -3548,19 +3548,19 @@
 "GENERIC_INCOMING_MESSAGE_NOTIFICATION" = "Teachtaireacht Nua!";
 
 /* Title for the 'Get Started' banner */
-"GET_STARTED_BANNER_TITLE" = "Get Started";
+"GET_STARTED_BANNER_TITLE" = "Tosaigh air";
 
 /* 'Get Started' button direction users to avatar builder */
 "GET_STARTED_CARD_AVATAR_BUILDER" = "Cuir leis";
 
 /* 'Get Started' button directing users to Chat Color settings */
-"GET_STARTED_CARD_CHAT_COLOR" = "Chat Color";
+"GET_STARTED_CARD_CHAT_COLOR" = "Dath an chomhrá";
 
 /* 'Get Started' button directing users to invite friends */
-"GET_STARTED_CARD_INVITE_FRIENDS" = "Invite Friends";
+"GET_STARTED_CARD_INVITE_FRIENDS" = "Tabhair cuireadh do chairde";
 
 /* 'Get Started' button directing users to create a group */
-"GET_STARTED_CARD_NEW_GROUP" = "New Group";
+"GET_STARTED_CARD_NEW_GROUP" = "Grúpa nua";
 
 /* Error displayed when there is a failure fetching a GIF from the remote service. */
 "GIF_PICKER_ERROR_FETCH_FAILURE" = "Níorbh fhéidir an GIF a fháil. Deimhnigh go bhfuil tú ar líne.";
@@ -4996,6 +4996,9 @@
 /* Label for an action to add a member label */
 "MEMBER_LABEL_ADD" = "Cuir Lipéad Baill Leis";
 
+/* Accessibility prefix for member labels. */
+"MEMBER_LABEL_AX_PREFIX" = "Member label: ";
+
 /* Heading shown above the preview of a message bubble with the edited member label. */
 "MEMBER_LABEL_PREVIEW_HEADING" = "Réamhamharc";
 
@@ -5867,7 +5870,7 @@
 "ONBOARDING_SPLASH_HAVE_OLD_DEVICE_TITLE" = "Tá mo sheanghuthán agam";
 
 /* Text indicating Signal is a nonprofit on the 'onboarding splash' view. For non-English languages, exclude the word '501c3'. */
-"ONBOARDING_SPLASH_NONPROFIT" = "Signal is a 501c3 nonprofit";
+"ONBOARDING_SPLASH_NONPROFIT" = "Eagraíocht neamhbhrabúis is ea é Signal";
 
 /* Button for restoring or transferring account in the 'onboarding splash' view. */
 "ONBOARDING_SPLASH_RESTORE_OR_TRANSFER_BUTTON_TITLE" = "Aischuir nó Aistrigh Cuntas";
@@ -7581,6 +7584,42 @@
 
 /* Snippet to share {{safety number}} with a friend. sent e.g. via SMS */
 "SAFETY_NUMBER_SHARE_FORMAT" = "Ár nUimhir Shábháilteachta Signal:\n%1$@";
+
+/* Title for a button offering automatic key verification. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY" = "Verify Automatically";
+
+/* Title for a button when automatic key verification fails. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY_FAILURE" = "Auto-Verification Unavailable";
+
+/* Title for a button when automatic key verification succeeds. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFY_SUCCESS" = "Encryption Verified";
+
+/* Title for a button while automatic key verification is ongoing. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_BUTTON_VERIFYING" = "Verifying Encryption…";
+
+/* Body for a sheet explaining that encryption auto-verification did not succeed. Embeds {{ 1: the contact's name }}. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_BODY_FORMAT" = "Signal can no longer automatically verify the encryption for this chat. This is likely because %1$@ changed their phone number. Verify end-to-end encryption manually by comparing the numbers on the previous screen or scanning the code on their device.";
+
+/* Title for a sheet explaining that encryption auto-verification did not succeed. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FAILURE_SHEET_TITLE" = "Auto-verification is no longer available for this chat";
+
+/* Footer explaining that automatic verification is not available for all chats */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_FOOTER" = "Auto-verification is not available for all chats.";
+
+/* Header for automatic key verification */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_HEADER" = "Automatic Key Verification";
+
+/* Body for a sheet explaining that encryption auto-verification is not available. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_BODY" = "Signal can only automatically verify the encryption in chats where you’re connected to someone via a phone number. If the chat was started with a username or a group in common, verify end-to-end encryption by comparing the numbers on the previous screen or scanning the code on their device.";
+
+/* Title for a sheet explaining that encryption auto-verification is not available. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_NOT_AVAILABLE_SHEET_TITLE" = "Auto-verification not available for this chat";
+
+/* Body for a sheet explaining that encryption auto-verification succeeded. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_BODY" = "For contacts you’re connected to by phone number, Signal can automatically confirm whether the connection is secure using a process called key transparency. For added security, verify end-to-end encryption manually by comparing the numbers on the previous screen or scanning the code on their device.";
+
+/* Title for a sheet explaining that encryption auto-verification succeeded. */
+"SAFETY_NUMBERS_AUTOMATIC_VERIFICATION_SUCCESS_SHEET_TITLE" = "Encryption was auto-verified for this chat";
 
 /* Title for Safety Tips button in thread details. */
 "SAFETY_TIPS_BUTTON_ACTION_TITLE" = "Leideanna Sábháilteachta";
@@ -9837,9 +9876,6 @@
 
 /* An error indicating to the user that we failed to clear the wallpaper. */
 "WALLPAPER_SETTINGS_FAILED_TO_CLEAR" = "The wallpaper could not be cleared, please try again later or contact support if the error persists.";
-
-/* An error indicating to the user that we failed to reset all wallpapers. */
-"WALLPAPER_SETTINGS_FAILED_TO_RESET" = "All wallpapers could not be reset, please try again later or contact support if the error persists.";
 
 /* Label for 'reset all chat colors' action in the global wallpaper settings. */
 "WALLPAPER_SETTINGS_RESET_ALL_CHAT_COLORS" = "Reset All Colors";
