@@ -59,7 +59,7 @@ public class CVCapsuleLabel: UILabel {
             let highlightColor = Theme.isDarkThemeEnabled ? textColor.withAlphaComponent(0.25) : textColor.withAlphaComponent(0.1)
             layoutManager.enumerateEnclosingRects(forGlyphRange: glyphRange, withinSelectedGlyphRange: NSRange(location: NSNotFound, length: 0), in: textContainer) { rect, _ in
                 let hOffset = needsLeadingPadding ? horizontalInset : 0
-                let roundedRect = rect.offsetBy(dx: hOffset, dy: 0).insetBy(dx: -Self.horizontalInset, dy: -Self.verticalInset)
+                let roundedRect = rect.offsetBy(dx: hOffset, dy: -1).insetBy(dx: -Self.horizontalInset, dy: -Self.verticalInset)
                 let path = UIBezierPath(roundedRect: roundedRect, cornerRadius: roundedRect.height / 2)
                 highlightColor.setFill()
                 path.fill()

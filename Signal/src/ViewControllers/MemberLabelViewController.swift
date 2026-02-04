@@ -50,6 +50,8 @@ class MemberLabelViewController: OWSViewController, UITextFieldDelegate {
         super.viewDidLoad()
 
         createInitialViews()
+
+        textField.becomeFirstResponder()
     }
 
     private func createInitialViews() {

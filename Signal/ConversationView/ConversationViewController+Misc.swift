@@ -280,10 +280,22 @@ extension ConversationViewController {
             groupViewHelper!.delegate = self
         }
 
+        var memberLabel: MemberLabelForRendering?
+        if
+            let groupThread = thread as? TSGroupThread,
+            let memberAci = address.aci,
+            let memberLabelString = groupThread.groupModel.groupMembership.memberLabel(for: memberAci)?.labelForRendering(),
+            let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aci
+        {
+            let groupNameColors = GroupNameColors.forThread(groupThread, localAci: localAci)
+            memberLabel = MemberLabelForRendering(label: memberLabelString, groupNameColor: groupNameColors.color(for: memberAci))
+        }
+
         ProfileSheetSheetCoordinator(
             address: address,
             groupViewHelper: groupViewHelper,
             spoilerState: spoilerState,
+            memberLabel: memberLabel,
         )
         .presentAppropriateSheet(from: self)
     }
